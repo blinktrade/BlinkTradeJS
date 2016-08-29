@@ -1,0 +1,3 @@
+# BlinkTradeJS SDK
+
+[LICENSE GPLv3](./LICENSE)
