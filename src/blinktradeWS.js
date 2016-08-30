@@ -33,18 +33,8 @@ import {
 } from './listener';
 
 import {
+  EVENTS,
   BALANCE,
-  TRADE_NEW,
-  ORDER_BOOK_NEW_ORDER,
-  ORDER_BOOK_UPDATE_ORDER,
-  ORDER_BOOK_DELETE_ORDER,
-  ORDER_BOOK_DELETE_ORDERS_THRU,
-
-  EXECUTION_REPORT_NEW,
-  EXECUTION_REPORT_PARTIAL,
-  EXECUTION_REPORT_EXECUTION,
-  EXECUTION_REPORT_CANCELED,
-  EXECUTION_REPORT_REJECTED,
 } from './constants/actionTypes';
 
 
@@ -107,7 +97,7 @@ class BlinkTradeWS extends WebSocketTransport {
     }
 
     return new Promise((resolve, reject) => {
-      return super.sendMessageAsPromise(msg).then(data => {
+      return super.sendMessageAsPromise(msg, callback).then(data => {
         if (data.UserStatus === 1) {
           this.session = data;
           return resolve(data);
@@ -243,17 +233,30 @@ class BlinkTradeWS extends WebSocketTransport {
       Instruments: symbols,
     };
 
+
     const promise = new Promise((resolve, reject) => {
       return super.sendMessageAsPromise(msg, callback).then(data => {
         if (data.MsgType === 'W') {
-          const buy = data.MDFullGrp.filter(order => order.MDEntryType === '0');
-          const sell = data.MDFullGrp.filter(order => order.MDEntryType === '1');
+          // Split orders in bids and asks
+          const { bids, asks } = data.MDFullGrp.reduce((prev, order) => {
+            const side = order.MDEntryType === '0' ? 'bids' : 'asks';
+            (prev[side] || (prev[side] = [])).push([
+              order.MDEntryPx / 1e8,
+              order.MDEntrySize / 1e8,
+              order.UserID,
+            ]);
+            return prev;
+          }, []);
+
           registerEventEmitter({ MDReqID: data.MDReqID }, subscribeEvent);
+
           return resolve({
             ...data,
             MDFullGrp: {
-              0: buy,
-              1: sell,
+              [data.Symbol]: {
+                bids,
+                asks,
+              },
             },
           });
         }
@@ -269,17 +272,27 @@ class BlinkTradeWS extends WebSocketTransport {
     const subscribeEvent = (data) => {
       if (data.MDBkTyp === '3') {
         data.MDIncGrp.map(order => {
-          callback && callback(null, data);
+          const dataOrder = {
+            index: order.MDEntryPositionNo,
+            price: order.MDEntryPx / 1e8,
+            size: order.MDEntrySize / 1e8,
+            side: order.MDEntryType === '0' ? 'buy' : 'sell',
+            userId: order.UserID,
+            orderId: order.OrderID,
+            symbol: order.Symbol,
+            time: new Date(`${order.MDEntryDate} ${order.MDEntryTime}`).toString(),
+          };
+
+          callback && callback(null, dataOrder);
+
           switch (order.MDEntryType) {
             case '0':
             case '1':
-              return order.MDUpdateAction === '0' ? this.eventEmitter.emit(ORDER_BOOK_NEW_ORDER, data)
-                   : order.MDUpdateAction === '1' ? this.eventEmitter.emit(ORDER_BOOK_UPDATE_ORDER, data)
-                   : order.MDUpdateAction === '2' ? this.eventEmitter.emit(ORDER_BOOK_DELETE_ORDER, data)
-                   : order.MDUpdateAction === '3' ? this.eventEmitter.emit(ORDER_BOOK_DELETE_ORDERS_THRU, data)
-                   : null;
+              const orderbookEvent = EVENTS.ORDERBOOK[order.MDUpdateAction];
+              return this.eventEmitter.emit(orderbookEvent, { ...dataOrder, type: orderbookEvent });
             case '2':
-              return this.eventEmitter.emit(TRADE_NEW, data);
+              const tradeEvent = EVENTS.TRADES[order.MDUpdateAction];
+              return this.eventEmitter.emit(tradeEvent, { ...dataOrder, type: tradeEvent });
             case '4':
               break;
             default:
@@ -378,15 +391,9 @@ class BlinkTradeWS extends WebSocketTransport {
   }
 
   executionReport(callback?: Function): Promise {
-
     registerListener('8', (data) => {
       callback && callback(data);
-      return data.ExecType === '0' ? this.eventEmitter.emit(EXECUTION_REPORT_NEW, data)
-           : data.ExecType === '1' ? this.eventEmitter.emit(EXECUTION_REPORT_PARTIAL, data)
-           : data.ExecType === '2' ? this.eventEmitter.emit(EXECUTION_REPORT_EXECUTION, data)
-           : data.ExecType === '4' ? this.eventEmitter.emit(EXECUTION_REPORT_CANCELED, data)
-           : data.ExecType === '8' ? this.eventEmitter.emit(EXECUTION_REPORT_REJECTED, data)
-           : null;
+      return this.eventEmitter.emit(EVENTS.EXECUTION_REPORT[data.ExecType], data);
     });
 
     return this.eventEmitter;

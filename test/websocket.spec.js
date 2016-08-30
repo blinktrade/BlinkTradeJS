@@ -20,6 +20,8 @@
  * @flow
  */
 
+/* eslint-disable new-cap */
+
 import { spy, stub } from 'sinon';
 import { expect } from 'chai';
 import { BlinkTradeWS } from '../src';
@@ -32,6 +34,26 @@ const MOCK_FULL_REFRESH = {
   MDReqID: 1062858,
   Symbol: 'BTCUSD',
   MDFullGrp: [{}],
+};
+
+const MOCK_INCREMENT = (action, type) => {
+  return {
+    MDReqID: 1062858,
+    MDBkTyp: '3',
+    MsgType: 'X',
+    MDIncGrp: [{
+      MDUpdateAction: action || 0,
+      MDEntryType: type || '0',
+      MDEntryPositionNo: 1,
+      MDEntryTime: '03:50:48',
+      MDEntryDate: '2016-08-24',
+      MDEntryPx: 58000000000,
+      MDEntrySize: 100000000,
+      UserID: 90800535,
+      OrderID: 1459028829944,
+      Symbol: 'BTCUSD',
+    }],
+  };
 };
 
 const MOCK_NEW_ORDER = {
@@ -320,8 +342,10 @@ describe('WebSocket', () => {
       expect(data).to.be.eql({
         ...mock,
         MDFullGrp: {
-          0: [mock.MDFullGrp[0], mock.MDFullGrp[1]],
-          1: [mock.MDFullGrp[2], mock.MDFullGrp[3]],
+          BTCUSD: {
+            bids: [[578, 28.63231429, 90800535], [577.79, 5.68, 90800535]],
+            asks: [[578.71, 0.1, 90800292], [578.72, 8.87239144, 90800535]],
+          }
         },
       });
       done();
@@ -329,17 +353,6 @@ describe('WebSocket', () => {
   });
 
   it('Should get incremental orderbook updates and emit OB_NEW_ORDER', (done) => {
-    const mock = {
-      MDReqID: 1062858,
-      MDBkTyp: '3',
-      MsgType: 'X',
-      MDIncGrp: [{
-        MDUpdateAction: '0',
-        Symbol: 'BTCUSD',
-        MDEntryType: '0',
-      }],
-    };
-
     BlinkTrade = new BlinkTradeWS();
 
     stub(BlinkTrade, 'sendMessage', (msg, promise) => {
@@ -348,15 +361,18 @@ describe('WebSocket', () => {
 
     // Mock eventEmitter callback
     const sinon = stub(listener, 'registerEventEmitter', (message, callback) => {
-      callback(mock);
+      callback(MOCK_INCREMENT('0'));
     });
 
     BlinkTrade.connect().then(() => {
       BlinkTrade.subscribeOrderbook(['BTCUSD'])
       .on('OB_NEW_ORDER', (data) => {
-        expect(data.MDReqID).to.be.equal(MOCK_FULL_REFRESH.MDReqID);
-        expect(data.MDIncGrp[0].MDUpdateAction).to.be.equal('0');
-        expect(data.MDIncGrp[0].Symbol).to.be.equal(MOCK_FULL_REFRESH.Symbol);
+        expect(data.index).to.be.equal(1);
+        expect(data.size).to.be.equal(1);
+        expect(data.price).to.be.equal(580);
+        expect(data.side).to.be.equal('buy');
+        expect(data.type).to.be.equal('OB_NEW_ORDER');
+        expect(data.time).to.be.equal('Wed Aug 24 2016 03:50:48 GMT-0300 (BRT)');
         sinon.restore();
         done();
       }).catch(err => done(err));
@@ -364,17 +380,6 @@ describe('WebSocket', () => {
   });
 
   it('Should get incremental orderbook updates and emit OB_UPDATE_ORDER', (done) => {
-    const mock = {
-      MDReqID: 1062858,
-      MDBkTyp: '3',
-      MsgType: 'X',
-      MDIncGrp: [{
-        MDUpdateAction: '1',
-        Symbol: 'BTCUSD',
-        MDEntryType: '0',
-      }],
-    };
-
     BlinkTrade = new BlinkTradeWS();
 
     stub(BlinkTrade, 'sendMessage', (msg, promise) => {
@@ -383,15 +388,13 @@ describe('WebSocket', () => {
 
     // Mock eventEmitter callback
     const sinon = stub(listener, 'registerEventEmitter', (message, callback) => {
-      callback(mock);
+      callback(MOCK_INCREMENT('1'));
     });
 
     BlinkTrade.connect().then(() => {
       BlinkTrade.subscribeOrderbook(['BTCUSD'])
       .on('OB_UPDATE_ORDER', (data) => {
-        expect(data.MDReqID).to.be.equal(MOCK_FULL_REFRESH.MDReqID);
-        expect(data.MDIncGrp[0].MDUpdateAction).to.be.equal('1');
-        expect(data.MDIncGrp[0].Symbol).to.be.equal(MOCK_FULL_REFRESH.Symbol);
+        expect(data.type).to.be.equal('OB_UPDATE_ORDER');
         sinon.restore();
         done();
       });
@@ -399,17 +402,6 @@ describe('WebSocket', () => {
   });
 
   it('Should get incremental orderbook updates and emit OB_DELETE_ORDER', (done) => {
-    const mock = {
-      MDReqID: 1062858,
-      MDBkTyp: '3',
-      MsgType: 'X',
-      MDIncGrp: [{
-        MDUpdateAction: '2',
-        Symbol: 'BTCUSD',
-        MDEntryType: '0',
-      }],
-    };
-
     BlinkTrade = new BlinkTradeWS();
 
     stub(BlinkTrade, 'sendMessage', (msg, promise) => {
@@ -418,15 +410,13 @@ describe('WebSocket', () => {
 
     // Mock eventEmitter callback
     const sinon = stub(listener, 'registerEventEmitter', (message, callback) => {
-      callback(mock);
+      callback(MOCK_INCREMENT('2'));
     });
 
     BlinkTrade.connect().then(() => {
       BlinkTrade.subscribeOrderbook(['BTCUSD'])
       .on('OB_DELETE_ORDER', (data) => {
-        expect(data.MDReqID).to.be.equal(MOCK_FULL_REFRESH.MDReqID);
-        expect(data.MDIncGrp[0].MDUpdateAction).to.be.equal('2');
-        expect(data.MDIncGrp[0].Symbol).to.be.equal(MOCK_FULL_REFRESH.Symbol);
+        expect(data.type).to.be.equal('OB_DELETE_ORDER');
         sinon.restore();
         done();
       });
@@ -434,17 +424,6 @@ describe('WebSocket', () => {
   });
 
   it('Should get incremental orderbook updates and emit OB_DELETE_ORDERS_THRU', (done) => {
-    const mock = {
-      MDReqID: 1062858,
-      MDBkTyp: '3',
-      MsgType: 'X',
-      MDIncGrp: [{
-        MDUpdateAction: '3',
-        Symbol: 'BTCUSD',
-        MDEntryType: '0',
-      }],
-    };
-
     BlinkTrade = new BlinkTradeWS();
 
     stub(BlinkTrade, 'sendMessage', (msg, promise) => {
@@ -453,15 +432,13 @@ describe('WebSocket', () => {
 
     // Mock eventEmitter callback
     const sinon = stub(listener, 'registerEventEmitter', (message, callback) => {
-      callback(mock);
+      callback(MOCK_INCREMENT('3'));
     });
 
     BlinkTrade.connect().then(() => {
       BlinkTrade.subscribeOrderbook(['BTCUSD'])
       .on('OB_DELETE_ORDERS_THRU', (data) => {
-        expect(data.MDReqID).to.be.equal(MOCK_FULL_REFRESH.MDReqID);
-        expect(data.MDIncGrp[0].MDUpdateAction).to.be.equal('3');
-        expect(data.MDIncGrp[0].Symbol).to.be.equal(MOCK_FULL_REFRESH.Symbol);
+        expect(data.type).to.be.equal('OB_DELETE_ORDERS_THRU');
         sinon.restore();
         done();
       });
@@ -469,16 +446,6 @@ describe('WebSocket', () => {
   });
 
   it('Should get incremental orderbook updates and emit OB_TRADE_NEW', (done) => {
-    const mock = {
-      MDReqID: 1062858,
-      MDBkTyp: '3',
-      MsgType: 'X',
-      MDIncGrp: [{
-        Symbol: 'BTCUSD',
-        MDEntryType: '2',
-      }],
-    };
-
     BlinkTrade = new BlinkTradeWS();
 
     stub(BlinkTrade, 'sendMessage', (msg, promise) => {
@@ -487,13 +454,13 @@ describe('WebSocket', () => {
 
     // Mock eventEmitter callback
     const sinon = stub(listener, 'registerEventEmitter', (message, callback) => {
-      callback(mock);
+      callback(MOCK_INCREMENT('0', '2'));
     });
 
     BlinkTrade.connect().then(() => {
       return BlinkTrade.subscribeOrderbook(['BTCUSD'])
       .on('OB_TRADE_NEW', (data) => {
-        expect(data.MDIncGrp[0].MDEntryType).to.be.equal('2');
+        expect(data.type).to.be.equal('OB_TRADE_NEW');
         sinon.restore();
         done();
       });
@@ -569,7 +536,7 @@ describe('WebSocket', () => {
 
     const callback = spy();
 
-    const sinon = stub(listener, 'registerListener', (message, callback) => {
+    const sinon = stub(listener, 'registerListener', () => {
       callback(mock);
     });
 
