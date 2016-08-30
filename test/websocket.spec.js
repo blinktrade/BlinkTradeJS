@@ -22,7 +22,7 @@
 
 import { stub } from 'sinon';
 import { expect } from 'chai';
-import { BlinkTradeWS } from '../';
+import { BlinkTradeWS } from '../src';
 import * as listener from '../src/listener';
 
 let BlinkTrade;
@@ -100,7 +100,7 @@ describe('WebSocket', () => {
     });
 
     BlinkTrade.connect().then(() => {
-      return BlinkTrade.login(login);
+      return BlinkTrade.login(login.username, login.password);
     }).then(data => {
       expect(data.UserStatus).to.be.equal(1);
       expect(data.Username).to.be.equal(login.username);
@@ -127,7 +127,7 @@ describe('WebSocket', () => {
     });
 
     BlinkTrade.connect().then(() => {
-      return BlinkTrade.login(login);
+      return BlinkTrade.login(login.username, login.password);
     }).catch(data => {
       expect(data.UserStatus).to.be.equal(3);
       done();
@@ -160,7 +160,7 @@ describe('WebSocket', () => {
     });
 
     BlinkTrade.connect().then(() => {
-      return BlinkTrade.login(login);
+      return BlinkTrade.login(login.username, login.password);
     }).then(data => {
       expect(data.UserStatus).to.be.equal(1);
       return BlinkTrade.logout();
