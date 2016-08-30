@@ -1,0 +1,23 @@
+{
+  "name": "blinktrade-js-example",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BlinkTradeJS example",
+  "main": "bundle-node.js",
+  "scripts": {
+    "build:ws": "webpack ./ws.js ./bundle/bundle-ws.js",
+    "build:rest": "webpack ./rest.js ./bundle/bundle-rest.js",
+    "build:scripts": "npm run build:ws && npm run build:rest",
+    "build": "rm -rf node_modules/blinktrade && npm install && npm run build:scripts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "blinktrade": "../../"
+  },
+  "author": "Cesar Augusto",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "babel-loader": "^6.2.5",
+    "webpack": "^1.13.2"
+  }
+}

@@ -2,24 +2,6 @@ var BlinkTradeWS = require('blinktrade').BlinkTradeWS;
 
 var blinktrade = new BlinkTradeWS();
 
-// blinktrade.connect().then(function() {
-  // blinktrade.subscribeOrderbook(['BTCUSD'])
-  // .on('OB_NEW_ORDER', (data) => {
-    // console.log('OB_NEW_ORDER', data);
-  // }).on('OB_UPDATE_ORDER', (data) => {
-    // console.log('OB_UPDATE_ORDER', data);
-  // }).on('OB_DELETE_ORDER', (data) => {
-    // console.log('OB_DELETE_ORDER', data);
-  // }).on('OB_DELETE_ORDERS_THRU', (data) => {
-    // console.log('OB_DELETE_ORDERS_THRU', data);
-  // }).on('OB_TRADE_NEW', (data) => {
-    // console.log('OB_TRADE_NEW', data);
-  // }).then(function(full) {
-    // console.log('FULL', full);
-  // });
-// });
-
-
 blinktrade.connect().then(function() {
   console.log('WebSocket Connceted');
   return blinktrade.heartbeat();
@@ -96,3 +78,4 @@ blinktrade.connect().then(function() {
 }).catch(function(err) {
   console.log('Error', err);
 });
+
