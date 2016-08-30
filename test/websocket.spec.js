@@ -47,14 +47,27 @@ describe('WebSocket', () => {
     BlinkTrade.disconnect();
   });
 
-  it('Should connect on websocket', (done) => {
+  it('Should connect on websocket and resolve a promise', (done) => {
     BlinkTrade = new BlinkTradeWS({ prod: false });
     BlinkTrade.connect().then(() => done()).catch(err => done({ ...err }));
   });
 
-  it('Should connect on a wrong websocket url and throw an exception', (done) => {
+  it('Should connect on websocket and callback', (done) => {
+    BlinkTrade = new BlinkTradeWS({ prod: false });
+    BlinkTrade.connect(() => done());
+  });
+
+  it('Should connect on a wrong websocket url and reject promise', (done) => {
     BlinkTrade = new BlinkTradeWS({ url: 'wss://api.wrong.url' });
     BlinkTrade.connect().catch(() => done());
+  });
+
+  it('Should connect on a wrong websocket url and callback with error', (done) => {
+    BlinkTrade = new BlinkTradeWS({ url: 'wss://api.wrong.url' });
+    BlinkTrade.connect((err, data) => {
+      expect(data).to.be.undefined;
+      done();
+    });
   });
 
   it('Should send heartBeat message and mock ws response', (done) => {

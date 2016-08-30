@@ -22,6 +22,7 @@
 
 import Base from '../base';
 import Fingerprint2 from 'fingerprintjs2';
+import nodeify from 'nodeify';
 
 import {
   getRequest,
@@ -35,6 +36,7 @@ type ConstructorType = {
   testnet?: boolean;
   broker: 1 | 2 | 3 | 4 | 5;
 };
+
 
 class WebSocketTransport extends Base {
 
@@ -59,8 +61,8 @@ class WebSocketTransport extends Base {
     this.getFingerPrint();
   }
 
-  connect(): Promise {
-    return new Promise((resolve, reject) => {
+  connect(callback): Promise {
+    return nodeify.extend(new Promise((resolve, reject) => {
       this.promise = { resolve, reject };
 
       const WebSocket = this.isNode ? require('ws') : window.WebSocket;
@@ -69,7 +71,7 @@ class WebSocketTransport extends Base {
       this.socket.onclose = ::this.onClose;
       this.socket.onerror = ::this.onError;
       this.socket.onmessage = ::this.onMessage;
-    });
+    })).nodeify(callback);
   }
 
   disconnect(): void {
@@ -96,8 +98,8 @@ class WebSocketTransport extends Base {
     }
   }
 
-  sendMessageAsPromise(msg: Object): Promise {
-    return new Promise((resolve, reject) => {
+  sendMessageAsPromise(msg: Object, callback: Function): Promise {
+    return nodeify.extend(new Promise((resolve, reject) => {
       const promise = { resolve, reject };
 
       if (!msg) {
@@ -106,7 +108,7 @@ class WebSocketTransport extends Base {
 
       registerRequest(msg, promise);
       this.sendMessage(msg, promise);
-    });
+    })).nodeify(callback);
   }
 
   onMessage(msg: string): void {

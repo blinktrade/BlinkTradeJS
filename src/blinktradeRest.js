@@ -27,8 +27,8 @@ class BlinkTradeRest extends RestTransport {
     super(params);
   }
 
-  trades(limit: number = 1000, since: string) {
-    return super.fetch({}, `${this.currency}/trades?limit=${limit}&since=${since}`);
+  trades(limit: number = 1000, since: string, callback: Function) {
+    return super.fetch({}, `${this.currency}/trades?limit=${limit}&since=${since}`, callback);
   }
 }
 

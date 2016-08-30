@@ -22,6 +22,7 @@
 
 import Base from '../base';
 import sjcl from 'sjcl';
+import nodeify from 'nodeify';
 
 class RestTransport extends Base {
 
@@ -40,7 +41,7 @@ class RestTransport extends Base {
    */
   currency: 'BRL' | 'VEF' | 'CLP' | 'VND' | 'PKR';
 
-  constructor(params) {
+  constructor(params = {}) {
     super(params, 'rest');
 
     this.key = params.key;
@@ -66,9 +67,9 @@ class RestTransport extends Base {
     };
   }
 
-  fetch(msg: Object, api: string): Promise {
-    return this.fetch(this.endpoint + api)
-    .then(response => response.json());
+  fetch(msg: Object, api: string, callback: Function): Promise {
+    return nodeify(this.fetch(this.endpoint + api)
+    .then(response => response.json()), callback)
   }
 }
 
