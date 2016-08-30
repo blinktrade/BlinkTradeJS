@@ -48,7 +48,7 @@ class RestTransport extends Base {
     this.secret = params.secret;
     this.currency = params.currency;
 
-    this.fetch = this.isNode ? require('node-fetch') : require('fetch-jsonp');
+    this.fetch = this.isNode ? require('isomorphic-fetch') : require('fetch-jsonp');
   }
 
   headers(method) {
