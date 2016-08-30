@@ -20,7 +20,7 @@
  * @flow
  */
 
-import { stub } from 'sinon';
+import { spy, stub } from 'sinon';
 import { expect } from 'chai';
 import { BlinkTradeWS } from '../src';
 import * as listener from '../src/listener';
@@ -555,6 +555,34 @@ describe('WebSocket', () => {
     }).catch(err => done(err));
   });
 
+  it('Should send order and callback execution report ', (done) => {
+    const mock = {
+      MsgType: '8',
+      ExecType: '0',
+    };
+
+    BlinkTrade = new BlinkTradeWS();
+
+    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
+      return promise.resolve(mock);
+    });
+
+    const callback = spy();
+
+    const sinon = stub(listener, 'registerListener', (message, callback) => {
+      callback(mock);
+    });
+
+    BlinkTrade.connect().then(() => {
+      BlinkTrade.executionReport(callback);
+      return BlinkTrade.sendOrder(MOCK_NEW_ORDER);
+    }).then(() => {
+      expect(callback.called).to.be.true;
+      sinon.restore();
+      done();
+    }).catch(err => done(err));
+  });
+
   it('Should send order and emit BALANCE updates', (done) => {
     const mock = {
       5: { USD_locked: 8250000000 },
@@ -568,7 +596,7 @@ describe('WebSocket', () => {
       return promise.resolve(mock);
     });
 
-    stub(listener, 'registerListener', (message, callback) => {
+    const sinon = stub(listener, 'registerListener', (message, callback) => {
       setTimeout(() => {
         // Simulate server latency
         callback(mock);
@@ -577,11 +605,41 @@ describe('WebSocket', () => {
 
     BlinkTrade.connect().then(() => {
       return BlinkTrade.sendOrder(MOCK_NEW_ORDER);
-    }).then((data) => {
+    }).then(() => {
       BlinkTrade.balance().on('BALANCE', (data) => {
         expect(data).to.be.equal(mock);
+        sinon.restore();
         done();
       });
+    }).catch(err => done(err));
+  });
+
+  it('Should send order and callback balance updates', (done) => {
+    const mock = {
+      5: { USD_locked: 8250000000 },
+      MsgType: 'U3',
+      ClientID: 90800003,
+    };
+
+    BlinkTrade = new BlinkTradeWS();
+
+    const callback = spy();
+
+    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
+      return promise.resolve(mock);
+    });
+
+    const sinon = stub(listener, 'registerListener', () => {
+      callback(mock);
+    });
+
+    BlinkTrade.connect().then(() => {
+      BlinkTrade.balance(callback);
+      return BlinkTrade.sendOrder(MOCK_NEW_ORDER);
+    }).then(() => {
+      expect(callback.called).to.be.true;
+      sinon.restore();
+      done();
     }).catch(err => done(err));
   });
 });
