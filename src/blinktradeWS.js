@@ -238,7 +238,9 @@ class BlinkTradeWS extends WebSocketTransport {
       return super.sendMessageAsPromise(msg, callback).then(data => {
         if (data.MsgType === 'W') {
           // Split orders in bids and asks
-          const { bids, asks } = data.MDFullGrp.reduce((prev, order) => {
+          const { bids, asks } = data.MDFullGrp
+          .filter(order => order.MDEntryType === '0' || order.MDEntryType === '1')
+          .reduce((prev, order) => {
             const side = order.MDEntryType === '0' ? 'bids' : 'asks';
             (prev[side] || (prev[side] = [])).push([
               order.MDEntryPx / 1e8,
