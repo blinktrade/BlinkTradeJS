@@ -203,14 +203,14 @@ BlinkTrade.subscribeTicker(['BLINK:BTCUSD']).then(function(orderbook) {
 ```json
 
 {
-  MDReqID: 9894272,
-  Symbol: 'BTCUSD',
-  MsgType: 'W',
-  MarketDepth: 0,
-  MDFullGrp: {
-    BTCUSD: {
-      bids: [[ 578, 1.59231429, 90800535 ], [ 577.79, 5.68, 90800535 ]],
-      asks: [[ 578.72, 8.32039144, 90800535 ], [ 579.67, 2, 90800535 ]]
+  "MDReqID": 9894272,
+  "Symbol": "BTCUSD",
+  "MsgType": "W",
+  "MarketDepth": 0,
+  "MDFullGrp": {
+    "BTCUSD": {
+      "bids": [[ 578, 1.59231429, 90800535 ], [ 577.79, 5.68, 90800535 ]],
+      "asks": [[ 578.72, 8.32039144, 90800535 ], [ 579.67, 2, 90800535 ]]
     }
   }
 }
