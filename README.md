@@ -16,10 +16,13 @@ BlinkTrade provides a simple and robust WebSocket API to integrate our platform,
 # Modules
 
 * BlinkTradeWS
-* BlinkTradeRest 
+* BlinkTradeRest
+
+# Examples
+
+More examples can found in the examples [directory.](./examples)
 
 # Usage
-
 
 
 ```js
@@ -30,14 +33,34 @@ var BlinkTradeRest = require('blinktrade').BlinkTradeRest;
 // WebSocket
 var BlinkTrade = new BlinkTradeWS({ prod: true });
 
-// Rest
-var BlinkTrade = new BlinkTradeRest({ prod: true, key: "", secret: "" });
+// Using promises
+BlinkTrade.connect().then(function(){
+});
 
+// Using callbacks
+BlinkTrade.connect(function(){
+});
 
 ```
 
-
 ## WebSocket
+
+* [connect](#connect)
+* [heartbeat](#heartbeat)
+* [login](#login)
+* [logout](#logout)
+* [profile](#profile)
+* [changePassword](#login)
+* [balance](#balance)
+* [subscribeTicker](#ticker)
+* [unSubscribeTicker](#ticker)
+* [subscribeOrderbook](#orderbook)
+* [unSubscribeOrderbook](#orderbook)
+* [sendOrder](#send-order)
+* [cancelOrder](#cancel-order)
+* [myOrders](#my-orders)
+* [executionReport](#execution-report)
+* [tradeHistory](#trade-history)
 
 ```js
 
@@ -51,17 +74,15 @@ var BlinkTrade = new BlinkTradeWS({
 
 ```
 
-
 ### Connect
 
 ```js
 
 BlinkTrade.connect().then(function(){
-	// Conncted
+    // Conncted
 });
 
 ```
-
 
 ### Login
 
@@ -72,7 +93,6 @@ BlinkTrade.login('user', 'abc12345').then(function(user) {
 });
 
 ```
-
 
 ### Profile
 
@@ -96,7 +116,17 @@ BlinkTrade.balance().then(function(balance) {
 
 ```
 
-In order to keep balance update when sending orders, you can return a event emitter.
+In order to keep balance update when sending orders, you can pass a callback to it.
+
+```js
+
+BlinkTrade.balance(function(err, balance) {
+  console.log(balance);
+});
+
+```
+
+Or an event emitter listing the `BALANCE` event.
 
 ```js
 
@@ -168,6 +198,25 @@ BlinkTrade.subscribeTicker(['BLINK:BTCUSD']).then(function(orderbook) {
 
 ```
 
+#### EXAMPLE RESPONSE
+
+```json
+
+{
+  MDReqID: 9894272,
+  Symbol: 'BTCUSD',
+  MsgType: 'W',
+  MarketDepth: 0,
+  MDFullGrp: {
+    BTCUSD: {
+      bids: [[ 578, 1.59231429, 90800535 ], [ 577.79, 5.68, 90800535 ]],
+      asks: [[ 578.72, 8.32039144, 90800535 ], [ 579.67, 2, 90800535 ]]
+    }
+  }
+}
+
+```
+
 In order to get realtime updates on order book, you should listen to the event emitter on following events.
 
 
@@ -228,6 +277,15 @@ You can still return a promise from the event emitters anyways.
   
 ```
 
+### My orders
+
+```js
+
+  blinktrade.myOrders().then(function(orders) {
+  });
+
+```
+
 ### Execution Report
 
 An event emitter to get execution reports.
@@ -254,9 +312,19 @@ An event emitter to get execution reports.
 
 ```
 
+### Trade History
+
+```js
+
+blinktrade.tradeHistory().then(function(trades) {
+});
+
+```
+
 
 ## Rest
 
+* [Trades](#trades)
 
 ### Trades
 
