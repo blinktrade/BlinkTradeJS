@@ -30,14 +30,6 @@ import {
   registerRequest,
 } from '../listener';
 
-type ConstructorType = {
-  url?: string;
-  prod?: boolean;
-  testnet?: boolean;
-  broker: 1 | 2 | 3 | 4 | 5;
-};
-
-
 class WebSocketTransport extends Base {
 
   /*
@@ -53,24 +45,25 @@ class WebSocketTransport extends Base {
   /*
    * Transport Promise
    */
-  promise: Promise;
+  request: Request;
 
-  constructor(params: ConstructorType = {}) {
+  constructor(params: BlinkTradeBase) {
     super(params, 'ws');
 
     this.getFingerPrint();
   }
 
-  connect(callback): Promise {
+  connect(callback: Function): Promise<Object> {
     return nodeify.extend(new Promise((resolve, reject) => {
-      this.promise = { resolve, reject };
+      this.request = { resolve, reject };
 
       const WebSocket = this.isNode ? require('ws') : window.WebSocket;
+
       this.socket = new WebSocket(this.endpoint);
-      this.socket.onopen = ::this.onOpen;
-      this.socket.onclose = ::this.onClose;
-      this.socket.onerror = ::this.onError;
-      this.socket.onmessage = ::this.onMessage;
+      this.socket.onopen = this.onOpen.bind(this);
+      this.socket.onclose = this.onClose.bind(this);
+      this.socket.onerror = this.onError.bind(this);
+      this.socket.onmessage = this.onMessage.bind(this);
     })).nodeify(callback);
   }
 
@@ -79,14 +72,14 @@ class WebSocketTransport extends Base {
   }
 
   onOpen(): void {
-    this.promise.resolve({ connected: true });
+    this.request.resolve({ connected: true });
   }
 
   onClose(): void {
   }
 
   onError(): void {
-    this.promise.reject();
+    this.request.reject();
   }
 
   sendMessage(msg: Object): void {
@@ -98,7 +91,7 @@ class WebSocketTransport extends Base {
     }
   }
 
-  sendMessageAsPromise(msg: Object, callback: Function): Promise {
+  sendMessageAsPromise(msg: Object, callback?: Function): Promise<Object> {
     return nodeify.extend(new Promise((resolve, reject) => {
       const promise = { resolve, reject };
 
@@ -107,14 +100,16 @@ class WebSocketTransport extends Base {
       }
 
       registerRequest(msg, promise);
+
+      // Send promise to sendMessage to we can mock it.
       this.sendMessage(msg, promise);
     })).nodeify(callback);
   }
 
-  onMessage(msg: string): void {
+  onMessage(msg: Object): void {
     const data = JSON.parse(msg.data);
     if (data.MsgType === 'ERROR') {
-      this.promise.reject('ERROR');
+      this.request.reject('ERROR');
     }
 
     const request = getRequest(data);
@@ -123,13 +118,13 @@ class WebSocketTransport extends Base {
     this.dispatchListeners(listener, data);
   }
 
-  dispatchPromise(promise, data) {
-    return promise && promise.resolve  ? promise.resolve(data)
-         : promise && promise.callback ? promise.callback(data)
-         : this.promise.reject('ERROR');
+  dispatchPromise(request: ?Request, data: Object): void {
+    return request && request.resolve  ? request.resolve(data)
+         : request && request.callback ? request.callback(data)
+         : this.request.reject('ERROR');
   }
 
-  dispatchListeners(listener, data) {
+  dispatchListeners(listener: Function, data: Object): void {
     return listener && listener(data);
   }
 

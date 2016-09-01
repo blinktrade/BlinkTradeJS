@@ -22,12 +22,6 @@
 
 import common from './constants/common';
 
-type ConstructorType = {
-  url?: string;
-  prod?: boolean;
-  broker: 1 | 2 | 3 | 4 | 5;
-};
-
 class Base {
 
   /*
@@ -45,7 +39,7 @@ class Base {
    */
   isNode: boolean;
 
-  constructor(params: ConstructorType, env: 'rest' | 'ws') {
+  constructor(params: BlinkTradeBase = {}, env: 'rest' | 'ws') {
     const endpoint =
         params.url  ? params.url
       : params.prod ? common.prod[env]

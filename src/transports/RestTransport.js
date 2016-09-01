@@ -36,22 +36,27 @@ class RestTransport extends Base {
    */
   secret: string;
 
-  /*
+  /**
    * Exchanges currencies available.
    */
-  currency: 'BRL' | 'VEF' | 'CLP' | 'VND' | 'PKR';
+  currency: 'USD' | 'BRL' | 'VEF' | 'CLP' | 'VND' | 'PKR';
 
-  constructor(params = {}) {
+  /**
+   * Fetch rest API
+   */
+  fetchRequest: Function
+
+  constructor(params: BlinkTradeRest) {
     super(params, 'rest');
 
     this.key = params.key;
     this.secret = params.secret;
-    this.currency = params.currency;
+    this.currency = params.currency || 'USD';
 
-    this.fetch = this.isNode ? require('isomorphic-fetch') : require('fetch-jsonp');
+    this.fetchRequest = this.isNode ? require('isomorphic-fetch') : require('fetch-jsonp');
   }
 
-  headers(method) {
+  headers(method: string): Object {
     const timeStamp = Date.now().toString();
     const hexKey = sjcl.codec.utf8String.toBits(this.secret);
     const hmac = new sjcl.misc.hmac(hexKey, sjcl.hash.sha256);
@@ -67,9 +72,9 @@ class RestTransport extends Base {
     };
   }
 
-  fetch(msg: Object, api: string, callback: Function): Promise {
-    return nodeify(this.fetch(this.endpoint + api)
-    .then(response => response.json()), callback)
+  fetch(msg: Object, api: string, callback: Function): Promise<Object> {
+    return nodeify(this.fetchRequest(this.endpoint + api)
+    .then(response => response.json()), callback);
   }
 }
 

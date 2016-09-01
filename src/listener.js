@@ -23,11 +23,11 @@
 import lodash from 'lodash';
 import * as RequestTypes from './constants/requestTypes';
 
-let promises: Object = {};
+let requests: Object = {};
 const listeners: Object = {};
 
 export function getListeners() {
-  return promises;
+  return requests;
 }
 
 export function generateRequestId(): number {
@@ -38,35 +38,35 @@ export function getListener(msgType: string): Function {
   return listeners[msgType];
 }
 
-export function getRequest(message: Object): ?Object {
+export function getRequest(message: Object): ?Request {
   let result;
   lodash.mapKeys(RequestTypes, (key) => {
     if (lodash.has(message, key)) {
-      result = lodash.find(promises[key], { ReqId: message[key].toString() });
+      result = lodash.find(requests[key], { ReqId: message[key].toString() });
     }
   });
 
   return result;
 }
 
-export function registerRequest(message: Object, promise): Object {
+export function registerRequest(message: Object, promise: Request): Object {
   lodash.mapKeys(RequestTypes, (key) => {
     if (lodash.has(message, key)) {
-      promises[key] = promises[key] || [];
-      promises[key].push({ ReqId: message[key].toString(), ...promise });
+      requests[key] = requests[key] || [];
+      requests[key].push({ ReqId: message[key].toString(), ...promise });
     }
   });
 
-  return promises;
+  return requests;
 }
 
 export function registerEventEmitter(message: Object, callback: Function): Object {
   lodash.mapKeys(RequestTypes, (key) => {
     if (lodash.has(message, key)) {
-      if (promises[key] !== []) {
-        const index = lodash.findIndex(promises[key], { ReqId: message[key].toString() });
-        promises[key][index] = {
-          ...promises[key][index],
+      if (requests[key] !== []) {
+        const index = lodash.findIndex(requests[key], { ReqId: message[key].toString() });
+        requests[key][index] = {
+          ...requests[key][index],
           resolve: null,
           reject: null,
           callback,
@@ -75,7 +75,7 @@ export function registerEventEmitter(message: Object, callback: Function): Objec
     }
   });
 
-  return promises;
+  return requests;
 }
 
 export function registerListener(msgType: string, callback: Function): void {
@@ -84,6 +84,6 @@ export function registerListener(msgType: string, callback: Function): void {
 }
 
 export function deleteRequest(key: string): Object {
-  promises = lodash.omit(promises, [key]);
-  return promises;
+  requests = lodash.omit(requests, [key]);
+  return requests;
 }

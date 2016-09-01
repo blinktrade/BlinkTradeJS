@@ -1,0 +1,20 @@
+declare type Request = {
+  resolve: Function;
+  reject: Function;
+};
+
+declare type Listener = {
+  [key: string]: Function;
+};
+
+declare interface BlinkTradeBase {
+  url?: string;
+  prod?: boolean;
+  brokerId?: number;
+};
+
+declare interface BlinkTradeRest extends BlinkTradeBase {
+  key: string;
+  secret: string;
+  currency?: 'USD' | 'BRL' | 'VEF' | 'CLP' | 'VND' | 'PKR';
+};
