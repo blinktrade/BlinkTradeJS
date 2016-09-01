@@ -4,7 +4,7 @@ BlinkTradeJS websocket and rest client for node.js and browser
 
 # Getting Started
 
-BlinkTrade provides a simple and robust WebSocket API to integrate our platform, we strongly recommend you to use it over the Rest API, all API supports either a promises and a callback, if a callback is provided as the last argument, it will be called as callback(error, result), otherwise it will just return the original promise, you can also call event emitters in order to keep you updated.
+BlinkTrade provides a simple and robust WebSocket API to integrate our platform, we strongly recommend you to use it over the Rest API, all API supports either a promises and a callback, if a callback is provided as the last argument, it will be called as `callback(error, result)`, otherwise it will just return the original promise, you can also call event emitters in order to keep you updated.
 
 ## Install
 
