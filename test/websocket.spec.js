@@ -76,12 +76,15 @@ describe('WebSocket', () => {
 
   it('Should connect on websocket and callback', (done) => {
     BlinkTrade = new BlinkTradeWS({ prod: false });
-    BlinkTrade.connect(() => done());
+    BlinkTrade.connect((err, data) => {
+      expect(err).to.be.null;
+      done();
+    });
   });
 
   it('Should connect on a wrong websocket url and reject promise', (done) => {
     BlinkTrade = new BlinkTradeWS({ url: 'wss://api.wrong.url' });
-    BlinkTrade.connect().catch(() => done());
+    BlinkTrade.connect().catch(done);
   });
 
   it('Should connect on a wrong websocket url and callback with error', (done) => {
@@ -89,7 +92,7 @@ describe('WebSocket', () => {
     BlinkTrade.connect((err, data) => {
       expect(data).to.be.undefined;
       done();
-    });
+    }).catch(done);
   });
 
   it('Should send heartBeat message and mock ws response', (done) => {
@@ -207,6 +210,7 @@ describe('WebSocket', () => {
 
   it('Should request balance and match available balance', (done) => {
     const mock = {
+      // $FlowFixMe
       5: {
         BTC_locked: 0,
         USD: 178116788294761,
@@ -552,6 +556,7 @@ describe('WebSocket', () => {
 
   it('Should send order and emit BALANCE updates', (done) => {
     const mock = {
+      // $FlowFixMe
       5: { USD_locked: 8250000000 },
       MsgType: 'U3',
       ClientID: 90800003,
@@ -583,6 +588,7 @@ describe('WebSocket', () => {
 
   it('Should send order and callback balance updates', (done) => {
     const mock = {
+      // $FlowFixMe
       5: { USD_locked: 8250000000 },
       MsgType: 'U3',
       ClientID: 90800003,
