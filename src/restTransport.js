@@ -20,8 +20,8 @@
  * @flow
  */
 
-import Base from '../base';
-import BaseTransport from '../BaseTransport'
+import Base from './base';
+import BaseTransport from './baseTransport'
 import sjcl from 'sjcl';
 import nodeify from 'nodeify';
 import url from 'url';

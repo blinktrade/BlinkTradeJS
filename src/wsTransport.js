@@ -20,8 +20,8 @@
  * @flow
  */
 
-import Base from '../base';
-import BaseTransport from '../BaseTransport'
+import Base from './base';
+import BaseTransport from './baseTransport'
 import Fingerprint2 from 'fingerprintjs2';
 import nodeify from 'nodeify';
 import { EventEmitter } from 'events';
@@ -30,7 +30,7 @@ import {
   getRequest,
   getListener,
   registerRequest,
-} from '../listener';
+} from './listener';
 
 class WebSocketTransport extends BaseTransport {
 

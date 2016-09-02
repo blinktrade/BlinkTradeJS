@@ -23,7 +23,7 @@
 import MsgTypes from './constants/requests';
 import * as RequestTypes from './constants/requestTypes';
 
-import WebSocketTransport from './transports/WebSocketTransport';
+import WebSocketTransport from './wsTransport';
 import { EventEmitter } from 'events';
 import {
   deleteRequest,

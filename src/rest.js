@@ -21,7 +21,7 @@
  */
 
 import MsgTypes from './constants/requests';
-import RestTransport from './transports/RestTransport';
+import RestTransport from './RestTransport';
 import { generateRequestId } from './listener';
 
 class BlinkTradeRest extends RestTransport {

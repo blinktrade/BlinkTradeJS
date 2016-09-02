@@ -1,6 +1,6 @@
 import Brokers from './constants/brokers';
-import BlinkTradeWS from './blinktradeWS';
-import BlinkTradeRest from './blinktradeRest';
+import BlinkTradeWS from './ws';
+import BlinkTradeRest from './rest';
 
 export {
   Brokers,
