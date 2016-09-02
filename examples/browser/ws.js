@@ -7,10 +7,9 @@ blinktrade.connect().then(function() {
   return blinktrade.heartbeat();
 }).then(function(heartbeat) {
 
-  console.log('TestRequest: Latency', heartbeat.Latency);
-  return blinktrade.login('rodrigo', 'abc12345');
+  return blinktrade.login({ username: 'rodrigo', password: 'abc12345' });
 }).then(function(login) {
-  console.log('Rodrigo Logged', login);
+  console.log('Logged', login);
   return blinktrade.profile();
 }).then(function(profile) {
   console.log('My Profile', profile);
@@ -36,7 +35,8 @@ blinktrade.connect().then(function() {
   });
 
 }).then(function(marketData) {
-  console.log('OrderBook FULL REFRESH', marketData);
+  console.log('OrderBook FULL REFRESH');
+  console.log(marketData.MDFullGrp.BTCUSD);
   return blinktrade.balance()
   .on('BALANCE', (data) => {
     console.log('Balance Updated', data);
@@ -55,7 +55,6 @@ blinktrade.connect().then(function() {
     console.log('EXECUTION_REPORT_REJECTED', data);
   });
 
-  console.log('Sending Order');
   return blinktrade.sendOrder({
     side: '1',
     price: parseInt(550 * 1e8, 10),
@@ -64,7 +63,7 @@ blinktrade.connect().then(function() {
   });
 }).then(function(order) {
   console.log('Cancelling order');
-  return blinktrade.cancelOrder(order.OrderID, order.ClOrdID);
+  return blinktrade.cancelOrder({ orderId: order.OrderID, clientId: order.ClOrdID });
 }).then(function(order) {
   return blinktrade.myOrders();
 }).then(function(myOrders) {

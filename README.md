@@ -50,7 +50,6 @@ BlinkTrade.connect(function(){
 * [login](#login)
 * [logout](#logout)
 * [profile](#profile)
-* [changePassword](#login)
 * [balance](#balance)
 * [subscribeTicker](#ticker)
 * [unSubscribeTicker](#ticker)

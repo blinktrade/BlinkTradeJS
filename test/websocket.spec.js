@@ -138,10 +138,10 @@ describe('WebSocket', () => {
     });
 
     BlinkTrade.connect().then(() => {
-      return BlinkTrade.login(login.username, login.password);
+      return BlinkTrade.login(login);
     }).then(data => {
-      expect(data.UserStatus).to.be.equal(1);
       expect(data.Username).to.be.equal(login.username);
+      expect(data.UserStatus).to.be.equal(1);
       done();
     }).catch(err => done(err));
   });
@@ -165,7 +165,7 @@ describe('WebSocket', () => {
     });
 
     BlinkTrade.connect().then(() => {
-      return BlinkTrade.login(login.username, login.password);
+      return BlinkTrade.login(login);
     }).catch(data => {
       expect(data.UserStatus).to.be.equal(3);
       done();
@@ -198,8 +198,9 @@ describe('WebSocket', () => {
     });
 
     BlinkTrade.connect().then(() => {
-      return BlinkTrade.login(login.username, login.password);
+      return BlinkTrade.login(login);
     }).then(data => {
+      expect(data.Username).to.be.equal(login.username);
       expect(data.UserStatus).to.be.equal(1);
       return BlinkTrade.logout();
     }).then(data => {
