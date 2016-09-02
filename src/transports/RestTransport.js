@@ -21,12 +21,13 @@
  */
 
 import Base from '../base';
+import BaseTransport from '../BaseTransport'
 import sjcl from 'sjcl';
 import nodeify from 'nodeify';
 import url from 'url';
 import path from 'path';
 
-class RestTransport extends Base {
+class RestTransport extends BaseTransport {
 
   /**
    * APIKey
@@ -88,6 +89,7 @@ class RestTransport extends Base {
     const headers = this.headers('POST', msg);
     return nodeify(this.fetch(msg, 'tapi/v1/message', headers, callback)
       .then(response => response.Status === 500 ? Promise.reject(response) : response.Responses)
+      .then(response => response.length === 1 ? response[0] : response)
     , callback);
   }
 }

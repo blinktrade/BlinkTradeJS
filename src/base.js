@@ -39,7 +39,7 @@ class Base {
    */
   isNode: boolean;
 
-  constructor(params: BlinkTradeBase = {}, env: 'rest' | 'ws') {
+  constructor(params: BlinkTradeBase = {}, env: BlinkTradeEnv) {
     const endpoint =
         params.url  ? params.url
       : params.prod ? common.prod[env]

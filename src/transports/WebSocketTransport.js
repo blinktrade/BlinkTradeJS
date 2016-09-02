@@ -21,6 +21,7 @@
  */
 
 import Base from '../base';
+import BaseTransport from '../BaseTransport'
 import Fingerprint2 from 'fingerprintjs2';
 import nodeify from 'nodeify';
 import { EventEmitter } from 'events';
@@ -31,7 +32,7 @@ import {
   registerRequest,
 } from '../listener';
 
-class WebSocketTransport extends Base {
+class WebSocketTransport extends BaseTransport {
 
   /*
    * WebSocket Instance
@@ -117,7 +118,8 @@ class WebSocketTransport extends Base {
   onMessage(msg: Object): void {
     const data = JSON.parse(msg.data);
     if (data.MsgType === 'ERROR') {
-      this.request.reject('ERROR');
+      console.error('ERROR', data.Detail);
+      return;
     }
 
     const request = getRequest(data);

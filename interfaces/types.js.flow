@@ -1,3 +1,11 @@
+declare interface BlinkTradeBase {
+  url?: string;
+  prod?: boolean;
+  brokerId?: number;
+};
+
+declare type BlinkTradeEnv = 'rest' | 'ws';
+
 declare type Request = {
   resolve: Function;
   reject: Function;
@@ -5,12 +13,6 @@ declare type Request = {
 
 declare type Listener = {
   [key: string]: Function;
-};
-
-declare interface BlinkTradeBase {
-  url?: string;
-  prod?: boolean;
-  brokerId?: number;
 };
 
 declare interface BlinkTradeRest extends BlinkTradeBase {
