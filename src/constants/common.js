@@ -1,10 +1,10 @@
 export default {
   prod: {
     ws: 'wss://api.blinktrade.com/trade/',
-    rest: 'https://api.blinktrade.com/api/v1/',
+    rest: 'https://api.blinktrade.com/',
   },
   testnet: {
     ws: 'wss://api.testnet.blinktrade.com/trade/',
-    rest: 'https://api.testnet.blinktrade.com/tapi/v1/',
+    rest: 'https://api.testnet.blinktrade.com/',
   },
 };

@@ -23,6 +23,8 @@
 import Base from '../base';
 import sjcl from 'sjcl';
 import nodeify from 'nodeify';
+import url from 'url';
+import path from 'path';
 
 class RestTransport extends Base {
 
@@ -56,7 +58,7 @@ class RestTransport extends Base {
     this.fetchRequest = this.isNode ? require('isomorphic-fetch') : require('fetch-jsonp');
   }
 
-  headers(method: string): Object {
+  headers(method: string, body: Object): Object {
     const timeStamp = Date.now().toString();
     const hexKey = sjcl.codec.utf8String.toBits(this.secret);
     const hmac = new sjcl.misc.hmac(hexKey, sjcl.hash.sha256);
@@ -67,14 +69,26 @@ class RestTransport extends Base {
         'Content-Type': 'application/json',
         Nonce: timeStamp,
         APIKey: this.key,
-        Signature,
+        Signature
       },
+      body: JSON.stringify(body),
     };
   }
 
-  fetch(msg: Object, api: string, callback: Function): Promise<Object> {
-    return nodeify(this.fetchRequest(this.endpoint + api)
-    .then(response => response.json()), callback);
+  fetch(msg: Object, api: string, headers?: Object = {}): Promise<Object> {
+    return this.fetchRequest(url.resolve(this.endpoint, api), headers)
+      .then(response => response.json())
+  }
+
+  fetchPublic(api: string, callback?: Function): Promise<Object> {
+    return nodeify(this.fetch({}, path.join('api/v1', this.currency, api)), callback);
+  }
+
+  fetchTrade(msg: Object, callback?: Function): Promise<Object> {
+    const headers = this.headers('POST', msg);
+    return nodeify(this.fetch(msg, 'tapi/v1/message', headers, callback)
+      .then(response => response.Status === 500 ? Promise.reject(response) : response.Responses)
+    , callback);
   }
 }
 

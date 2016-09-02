@@ -20,11 +20,21 @@
  * @flow
  */
 
+import MsgTypes from './constants/requests';
 import RestTransport from './transports/RestTransport';
+import { generateRequestId } from './listener';
 
 class BlinkTradeRest extends RestTransport {
-  trades(limit: number = 1000, since: string, callback: Function) {
-    return super.fetch({}, `${this.currency}/trades?limit=${limit}&since=${since}`, callback);
+  ticker(callback?: Function): Promise<Object> {
+    return super.fetchPublic('ticker', callback);
+  }
+
+  trades(limit: number = 1000, since: string, callback?: Function): Promise<Object> {
+    return super.fetchPublic(`trades?limit=${limit}&since=${since}`, callback);
+  }
+
+  orderbook(callback?: Function): Promise<Object> {
+    return super.fetchPublic('orderbook', callback);
   }
 }
 
