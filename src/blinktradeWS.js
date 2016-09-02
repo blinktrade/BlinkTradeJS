@@ -60,7 +60,7 @@ class BlinkTradeWS extends WebSocketTransport {
 
   heartbeat(callback?: Function): Promise<Object> {
     const d = new Date();
-    const msg: any = {
+    const msg: Object = {
       MsgType: MsgTypes.HEARTBEAT,
       TestReqID: d.getTime(),
       SendTime: d.getTime(),
@@ -87,7 +87,7 @@ class BlinkTradeWS extends WebSocketTransport {
       };
     }
 
-    const msg: any = {
+    const msg: Object = {
       MsgType: MsgTypes.LOGIN,
       UserReqID: generateRequestId(),
       BrokerID: this.brokerId,
@@ -163,6 +163,7 @@ class BlinkTradeWS extends WebSocketTransport {
           if (!currency.includes('locked')) {
             Available[currency] = balances[currency] - balances[`${currency}_locked`];
           }
+          return Available;
         });
 
         return resolve({ ...data, Available });
@@ -262,6 +263,7 @@ class BlinkTradeWS extends WebSocketTransport {
       return super.sendMessageAsPromise(msg, callback).then(data => {
         if (data.MsgType === 'W') {
           // Split orders in bids and asks
+          /* eslint-disable no-param-reassign */
           const { bids, asks } = data.MDFullGrp
           .filter(order => order.MDEntryType === '0' || order.MDEntryType === '1')
           .reduce((prev, order) => {
@@ -273,6 +275,7 @@ class BlinkTradeWS extends WebSocketTransport {
             ]);
             return prev;
           }, []);
+          /* eslint-enable no-param-reassign */
 
           registerEventEmitter({ MDReqID: data.MDReqID }, subscribeEvent);
 
@@ -422,6 +425,97 @@ class BlinkTradeWS extends WebSocketTransport {
         });
       }).catch(reject);
     });
+  }
+
+  /**
+   * statusList: 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled
+   */
+  listWithdraws({
+    page: Page = 0,
+    pageSize: PageSize = 20,
+    statusList: StatusList = ['1', '2', '4', '8'],
+  }: {
+    page?: number;
+    pageSize?: number;
+    statusList?: Array<string>;
+  } = {}, callback?: Function): Promise<Object> {
+    const msg = {
+      MsgType: MsgTypes.REQUEST_WITHDRAW_LIST,
+      WithdrawListReqID: generateRequestId(),
+      Page,
+      PageSize,
+      StatusList,
+    };
+
+    return new Promise((resolve, reject) => {
+      return super.sendMessageAsPromise(msg, callback).then(data => {
+        const { Columns, ...withdrawData } = data;
+        const WithdrawList = [];
+        data.WithdrawListGrp.map(withdraw => {
+          return WithdrawList.push({
+            WithdrawID: withdraw[0],
+            Method: withdraw[1],
+            Currency: withdraw[2],
+            Amount: withdraw[3],
+            Data: withdraw[4],
+            Created: withdraw[5],
+            Status: withdraw[6],
+            ReasonID: withdraw[7],
+            Reason: withdraw[8],
+            PercentFee: withdraw[9],
+            FixedFee: withdraw[10],
+            PaidAmount: withdraw[11],
+            UserID: withdraw[12],
+            Username: withdraw[13],
+            BrokerID: withdraw[14],
+            ClOrdID: withdraw[15],
+          });
+        });
+
+        return resolve({
+          ...withdrawData,
+          WithdrawListGrp: WithdrawList,
+        });
+      }).catch(reject);
+    });
+  }
+
+  requestWithdraw({ amount, data, currency = 'BTC', method = 'bitcoin' }: {
+    data: Object,
+    amount: number;
+    method?: string;
+    currency?: string;
+  }, callback: Function): Promise<Object> {
+    const msg = {
+      MsgType: MsgTypes.REQUEST_WITHDRAW,
+      WithdrawReqID: generateRequestId(),
+      Method: method,
+      Amount: amount,
+      Currency: currency,
+      Data: data,
+    };
+
+    return super.sendMessageAsPromise(msg, callback);
+  }
+
+  requestDeposit({ currency, value, depositMethodId }: {
+    value?: number;
+    currency: string;
+    depositMethodId?: number;
+  }, callback?: Function): Promise<Object> {
+    const msg: Object = {
+      MsgType: MsgTypes.REQUEST_DEPOSIT,
+      DepositReqID: generateRequestId(),
+      Currency: currency,
+      BrokerID: this.brokerId,
+    };
+
+    if (currency !== 'BTC') {
+      msg.DepositMethodID = depositMethodId;
+      msg.Value = value;
+    }
+
+    return super.sendMessageAsPromise(msg, callback);
   }
 }
 

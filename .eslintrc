@@ -11,6 +11,11 @@
     "no-nested-ternary": 0,
     "no-multi-spaces": 0,
     "no-unused-expressions": 0,
+    "no-case-declarations": 0,
     "newline-per-chained-call": 0,
+    "no-unused-vars": [2, {"varsIgnorePattern": "Columns|VerificationData" }],
+  },
+  "globals": {
+    "BlinkTradeBase": true
   }
 }
