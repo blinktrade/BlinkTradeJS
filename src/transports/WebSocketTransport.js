@@ -23,6 +23,7 @@
 import Base from '../base';
 import Fingerprint2 from 'fingerprintjs2';
 import nodeify from 'nodeify';
+import { EventEmitter } from 'events';
 
 import {
   getRequest,
@@ -47,10 +48,17 @@ class WebSocketTransport extends Base {
    */
   request: Request;
 
+  /*
+   * Event emitter to dispatch websocket updates
+   */
+  eventEmitter: EventEmitter;
+
   constructor(params: BlinkTradeBase) {
     super(params, 'ws');
 
     this.getFingerPrint();
+
+    this.eventEmitter = new EventEmitter();
   }
 
   connect(callback: Function): Promise<Object> {
@@ -126,6 +134,14 @@ class WebSocketTransport extends Base {
 
   dispatchListeners(listener: Function, data: Object): void {
     return listener && listener(data);
+  }
+
+  emitterPromise<T>(promise: Promise<T>): Promise<T> {
+    promise.on = (event, listener) => {
+      this.eventEmitter.on(event, listener);
+      return promise;
+    };
+    return promise;
   }
 
   getFingerPrint(): string {

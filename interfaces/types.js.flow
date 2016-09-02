@@ -18,3 +18,12 @@ declare interface BlinkTradeRest extends BlinkTradeBase {
   secret: string;
   currency?: 'USD' | 'BRL' | 'VEF' | 'CLP' | 'VND' | 'PKR';
 };
+
+declare class Promise<T> extends Promise<T> mixins EventPromise {
+  static resolve<T>(object: Promise<T> | T): Promise<T>;
+  static reject<T>(error?: any): Promise<T>;
+};
+
+declare class EventPromise<T> {
+  on: (event: string, listener: Function) => Promise<T>;
+};

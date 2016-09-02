@@ -52,17 +52,10 @@ class BlinkTradeWS extends WebSocketTransport {
    */
   session: Object;
 
-  /*
-   * Event emitter to dispatch websocket updates
-   */
-  eventEmitter: EventEmitter;
-
   constructor(params: BlinkTradeBase) {
     super(params);
 
     this.session = {};
-
-    this.eventEmitter = new EventEmitter();
   }
 
   heartbeat(callback?: Function): Promise<Object> {
@@ -162,7 +155,7 @@ class BlinkTradeWS extends WebSocketTransport {
       return this.eventEmitter.emit(BALANCE, balance);
     });
 
-    const promise = new Promise((resolve, reject) => {
+    return super.emitterPromise(new Promise((resolve, reject) => {
       return super.sendMessageAsPromise(msg, callback).then(data => {
         const Available = {};
         const balances = data[this.brokerId];
@@ -174,14 +167,7 @@ class BlinkTradeWS extends WebSocketTransport {
 
         return resolve({ ...data, Available });
       }).catch(reject);
-    });
-
-    promise.on = (...args) => {
-      this.eventEmitter.on(...args);
-      return promise;
-    };
-
-    return promise;
+    }));
   }
 
   subscribeTicker(symbols: Array<string>, callback?: Function): Promise<Object> {
@@ -205,7 +191,7 @@ class BlinkTradeWS extends WebSocketTransport {
       };
     };
 
-    const promise = new Promise((resolve, reject) => {
+    return super.emitterPromise(new Promise((resolve, reject) => {
       return super.sendMessageAsPromise(msg, callback).then(data => {
         resolve(formatTicker(data));
         registerEventEmitter({ SecurityStatusReqID: data.SecurityStatusReqID }, (ticker) => {
@@ -213,14 +199,7 @@ class BlinkTradeWS extends WebSocketTransport {
           return this.eventEmitter.emit(`BLINK:${data.Symbol}`, formatTicker(ticker));
         });
       }).catch(reject);
-    });
-
-    promise.on = (...args) => {
-      this.eventEmitter.on(...args);
-      return promise;
-    };
-
-    return promise;
+    }));
   }
 
   unSubscribeTicker(SecurityStatusReqID: number): number {
@@ -243,44 +222,6 @@ class BlinkTradeWS extends WebSocketTransport {
       MDUpdateType: '1', // Incremental refresh
       MDEntryTypes: ['0', '1', '2'],
       Instruments: symbols,
-    };
-
-
-    const promise = new Promise((resolve, reject) => {
-      return super.sendMessageAsPromise(msg, callback).then(data => {
-        if (data.MsgType === 'W') {
-          // Split orders in bids and asks
-          const { bids, asks } = data.MDFullGrp
-          .filter(order => order.MDEntryType === '0' || order.MDEntryType === '1')
-          .reduce((prev, order) => {
-            const side = order.MDEntryType === '0' ? 'bids' : 'asks';
-            (prev[side] || (prev[side] = [])).push([
-              order.MDEntryPx / 1e8,
-              order.MDEntrySize / 1e8,
-              order.UserID,
-            ]);
-            return prev;
-          }, []);
-
-          registerEventEmitter({ MDReqID: data.MDReqID }, subscribeEvent);
-
-          return resolve({
-            ...data,
-            MDFullGrp: {
-              [data.Symbol]: {
-                bids,
-                asks,
-              },
-            },
-          });
-        }
-      }).catch(err => reject(err));
-    });
-
-    promise.on = (...args) => {
-      // return promise on EventEmitter
-      this.eventEmitter.on(...args);
-      return promise;
     };
 
     const subscribeEvent = (data) => {
@@ -317,7 +258,36 @@ class BlinkTradeWS extends WebSocketTransport {
       }
     };
 
-    return promise;
+    return super.emitterPromise(new Promise((resolve, reject) => {
+      return super.sendMessageAsPromise(msg, callback).then(data => {
+        if (data.MsgType === 'W') {
+          // Split orders in bids and asks
+          const { bids, asks } = data.MDFullGrp
+          .filter(order => order.MDEntryType === '0' || order.MDEntryType === '1')
+          .reduce((prev, order) => {
+            const side = order.MDEntryType === '0' ? 'bids' : 'asks';
+            (prev[side] || (prev[side] = [])).push([
+              order.MDEntryPx / 1e8,
+              order.MDEntrySize / 1e8,
+              order.UserID,
+            ]);
+            return prev;
+          }, []);
+
+          registerEventEmitter({ MDReqID: data.MDReqID }, subscribeEvent);
+
+          return resolve({
+            ...data,
+            MDFullGrp: {
+              [data.Symbol]: {
+                bids,
+                asks,
+              },
+            },
+          });
+        }
+      }).catch(err => reject(err));
+    }));
   }
 
   unSubscribeOrderbook(MDReqID: number): number {
