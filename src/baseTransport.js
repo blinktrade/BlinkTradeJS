@@ -228,9 +228,11 @@ class BaseTransport extends Base {
     currency?: string;
     depositMethodId?: number;
   } = {}, callback?: Function): Promise<Object> {
+    const reqId = generateRequestId()
     const msg: Object = {
       MsgType: MsgTypes.REQUEST_DEPOSIT,
-      DepositReqID: generateRequestId(),
+      DepositReqID: reqId,
+      ClOrdID: reqId,
       Currency: currency,
       BrokerID: this.brokerId,
     };
@@ -239,6 +241,15 @@ class BaseTransport extends Base {
       msg.DepositMethodID = depositMethodId;
       msg.Value = value;
     }
+
+    return this.send(msg, callback);
+  }
+
+  requestDepositMethods(callback?: Function): Promise<Object> {
+    var msg = {
+      MsgType: MsgTypes.REQUEST_DEPOSIT_METHODS,
+      DepositMethodReqID: generateRequestId(),
+    };
 
     return this.send(msg, callback);
   }
