@@ -21,6 +21,11 @@ declare interface BlinkTradeRest extends BlinkTradeBase {
   currency?: 'USD' | 'BRL' | 'VEF' | 'CLP' | 'VND' | 'PKR';
 };
 
+declare type Stun = {
+  local: ?Array<string>;
+  public: ?Array<string>;
+};
+
 declare class Promise<T> extends Promise<T> mixins EventPromise {
   static resolve<T>(object: Promise<T> | T): Promise<T>;
   static reject<T>(error?: any): Promise<T>;
