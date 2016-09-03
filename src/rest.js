@@ -29,7 +29,10 @@ class BlinkTradeRest extends RestTransport {
     return super.fetchPublic('ticker', callback);
   }
 
-  trades(limit: number = 1000, since: string, callback?: Function): Promise<Object> {
+  trades({ limit = 1000, since = '0' }: {
+    limit: number;
+    since: string;
+  } = {}, callback?: Function): Promise<Object> {
     return super.fetchPublic(`trades?limit=${limit}&since=${since}`, callback);
   }
 
