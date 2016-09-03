@@ -21,12 +21,10 @@
  */
 
 import MsgTypes from './constants/requests';
-import * as RequestTypes from './constants/requestTypes';
 
 import WebSocketTransport from './wsTransport';
 import { EventEmitter } from 'events';
 import {
-  deleteRequest,
   registerListener,
   generateRequestId,
   registerEventEmitter,
@@ -127,29 +125,13 @@ class BlinkTradeWS extends WebSocketTransport {
   }
 
   balance(callback?: Function): Promise<Object> {
-    const msg = {
-      MsgType: MsgTypes.BALANCE,
-      BalanceReqID: generateRequestId(),
-    };
-
     registerListener('U3', (balance) => {
       callback && callback(null, balance);
       return this.eventEmitter.emit(BALANCE, balance);
     });
 
     return super.emitterPromise(new Promise((resolve, reject) => {
-      return super.sendMessageAsPromise(msg, callback).then(data => {
-        const Available = {};
-        const balances = data[this.brokerId];
-        Object.keys(balances).map(currency => {
-          if (!currency.includes('locked')) {
-            Available[currency] = balances[currency] - balances[`${currency}_locked`];
-          }
-          return Available;
-        });
-
-        return resolve({ ...data, Available });
-      }).catch(reject);
+      return super.balance(callback).then(resolve).catch(reject);
     }));
   }
 
@@ -285,90 +267,6 @@ class BlinkTradeWS extends WebSocketTransport {
 
     super.sendMessage(msg);
     return MDReqID;
-  }
-
-  sendOrder({ side, amount, price, symbol }: {
-    side: '1' | '2';
-    price: number;
-    amount: number;
-    symbol: string;
-  }, callback?: Function): Promise<Object> {
-    const msg = {
-      MsgType: MsgTypes.ORDER_SEND,
-      ClOrdID: generateRequestId(),
-      Symbol: symbol,
-      Side: side,
-      OrdType: '2',
-      Price: price,
-      OrderQty: amount,
-      BrokerID: this.brokerId,
-    };
-
-    return new Promise((resolve, reject) => {
-      return super.sendMessageAsPromise(msg, callback).then(data => {
-        deleteRequest(RequestTypes.CLIENT_ORDER_ID);
-        resolve(data);
-      }).catch(reject);
-    });
-  }
-
-  cancelOrder(param: number | {
-    orderId: number;
-    clientId?: number;
-  }, callback?: Function): Promise<Object> {
-    const orderId = param.orderId ? param.orderId : param;
-    const msg: Object = {
-      MsgType: MsgTypes.ORDER_CANCEL,
-      OrderID: orderId,
-    };
-
-    if (param.clientId) {
-      msg.ClOrdID = param.clientId;
-    }
-
-    return super.sendMessageAsPromise(msg, callback);
-  }
-
-  myOrders({ page: Page = 0, pageSize: PageSize = 40 }: {
-    page?: number;
-    pageSize?: number;
-  } = {}, callback?: Function): Promise<Object> {
-    const msg = {
-      MsgType: MsgTypes.ORDER_LIST,
-      OrdersReqID: generateRequestId(),
-      Page,
-      PageSize,
-    };
-
-    return new Promise((resolve, reject) => {
-      return super.sendMessageAsPromise(msg, callback).then(data => {
-        const { Columns, ...orders } = data;
-        const OrdListGrp = [];
-        data.OrdListGrp.map(order => {
-          return OrdListGrp.push({
-            ClOrdID: order[0],
-            OrderID: order[1],
-            CumQty: order[2],
-            OrdStatus: order[3],
-            LeavesQty: order[4],
-            CxlQty: order[5],
-            AvgPx: order[6],
-            Symbol: order[7],
-            Side: order[8],
-            OrdType: order[9],
-            OrderQty: order[10],
-            Price: order[11],
-            OrderDate: order[12],
-            Volume: order[13],
-            TimeInForce: order[14],
-          });
-        });
-        return resolve({
-          ...orders,
-          OrdListGrp,
-        });
-      }).catch(reject);
-    });
   }
 
   executionReport(callback?: Function): EventEmitter {
