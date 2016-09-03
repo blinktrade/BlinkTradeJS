@@ -14263,7 +14263,7 @@
 	      }
 	
 	      return new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this3).call(_this3, msg).then(function (data) {
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this3).call(_this3, msg, callback).then(function (data) {
 	          if (data.UserStatus === 1) {
 	            _this3.session = data;
 	            return resolve(data);
@@ -14422,17 +14422,23 @@
 	      var promise = new Promise(function (resolve, reject) {
 	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this6).call(_this6, msg, callback).then(function (data) {
 	          if (data.MsgType === 'W') {
-	            var _data$MDFullGrp$reduc = data.MDFullGrp.reduce(function (prev, order) {
-	              var side = order.MDEntryType === '1' ? 'bids' : 'asks';
+	            // Split orders in bids and asks
+	            console.log('DATA', data.MDFullGrp);
+	
+	            var _data$MDFullGrp$filte = data.MDFullGrp.filter(function (order) {
+	              return order.MDEntryType === '1' || order.MDEntryType === '2';
+	            }).reduce(function (prev, order) {
+	              var side = order.MDEntryType === '0' ? 'bids' : 'asks';
 	              (prev[side] || (prev[side] = [])).push([order.MDEntryPx / 1e8, order.MDEntrySize / 1e8, order.UserID]);
 	              return prev;
-	            });
+	            }, []);
 	
-	            var bids = _data$MDFullGrp$reduc.bids;
-	            var asks = _data$MDFullGrp$reduc.asks;
+	            var bids = _data$MDFullGrp$filte.bids;
+	            var asks = _data$MDFullGrp$filte.asks;
 	
 	
 	            (0, _listener.registerEventEmitter)({ MDReqID: data.MDReqID }, subscribeEvent);
+	
 	            return resolve(_extends({}, data, {
 	              MDFullGrp: _defineProperty({}, data.Symbol, {
 	                bids: bids,
@@ -14457,22 +14463,26 @@
 	        if (data.MDBkTyp === '3') {
 	          data.MDIncGrp.map(function (order) {
 	            var dataOrder = {
-	              type: _actionTypes.EVENTS.ORDERBOOK[order.MDUpdateAction],
 	              index: order.MDEntryPositionNo,
 	              price: order.MDEntryPx / 1e8,
 	              size: order.MDEntrySize / 1e8,
 	              side: order.MDEntryType === '0' ? 'buy' : 'sell',
+	              userId: order.UserID,
 	              orderId: order.OrderID,
 	              symbol: order.Symbol,
 	              time: new Date(order.MDEntryDate + ' ' + order.MDEntryTime).toString()
 	            };
+	
 	            callback && callback(null, dataOrder);
+	
 	            switch (order.MDEntryType) {
 	              case '0':
 	              case '1':
-	                return _this6.eventEmitter.emit(_actionTypes.EVENTS.ORDERBOOK[order.MDUpdateAction], dataOrder);
+	                var orderbookEvent = _actionTypes.EVENTS.ORDERBOOK[order.MDUpdateAction];
+	                return _this6.eventEmitter.emit(orderbookEvent, _extends({}, dataOrder, { type: orderbookEvent }));
 	              case '2':
-	                return _this6.eventEmitter.emit(_actionTypes.TRADE_NEW, dataOrder);
+	                var tradeEvent = _actionTypes.EVENTS.TRADES[order.MDUpdateAction];
+	                return _this6.eventEmitter.emit(tradeEvent, _extends({}, dataOrder, { type: tradeEvent }));
 	              case '4':
 	                break;
 	              default:
@@ -53991,12 +54001,16 @@
 	var EXECUTION_REPORT_CANCELED = exports.EXECUTION_REPORT_CANCELED = 'EXECUTION_REPORT_CANCELED';
 	var EXECUTION_REPORT_REJECTED = exports.EXECUTION_REPORT_REJECTED = 'EXECUTION_REPORT_REJECTED';
 	
+	/* eslint-disable quote-props */
 	var EVENTS = exports.EVENTS = {
 	  ORDERBOOK: {
 	    '0': ORDER_BOOK_NEW_ORDER,
 	    '1': ORDER_BOOK_UPDATE_ORDER,
 	    '2': ORDER_BOOK_DELETE_ORDER,
 	    '3': ORDER_BOOK_DELETE_ORDERS_THRU
+	  },
+	  TRADES: {
+	    '0': TRADE_NEW
 	  },
 	  EXECUTION_REPORT: {
 	    '0': EXECUTION_REPORT_NEW,
