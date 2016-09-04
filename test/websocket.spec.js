@@ -357,7 +357,7 @@ describe('WebSocket', () => {
     }).catch(err => done(err));
   });
 
-  it('Should get incremental orderbook updates and emit OB_NEW_ORDER', (done) => {
+  it('Should get incremental orderbook updates and emit OB:NEW_ORDER', (done) => {
     BlinkTrade = new BlinkTradeWS();
 
     stub(BlinkTrade, 'sendMessage', (msg, promise) => {
@@ -371,12 +371,12 @@ describe('WebSocket', () => {
 
     BlinkTrade.connect().then(() => {
       BlinkTrade.subscribeOrderbook(['BTCUSD'])
-      .on('OB_NEW_ORDER', (data) => {
+      .on('OB:NEW_ORDER', (data) => {
         expect(data.index).to.be.equal(1);
         expect(data.size).to.be.equal(1);
         expect(data.price).to.be.equal(580);
         expect(data.side).to.be.equal('buy');
-        expect(data.type).to.be.equal('OB_NEW_ORDER');
+        expect(data.type).to.be.equal('OB:NEW_ORDER');
         expect(data.time).to.be.equal('Wed Aug 24 2016 03:50:48 GMT-0300 (BRT)');
         sinon.restore();
         done();
@@ -384,7 +384,7 @@ describe('WebSocket', () => {
     }).catch(err => done(err));
   });
 
-  it('Should get incremental orderbook updates and emit OB_UPDATE_ORDER', (done) => {
+  it('Should get incremental orderbook updates and emit OB:UPDATE_ORDER', (done) => {
     BlinkTrade = new BlinkTradeWS();
 
     stub(BlinkTrade, 'sendMessage', (msg, promise) => {
@@ -398,15 +398,15 @@ describe('WebSocket', () => {
 
     BlinkTrade.connect().then(() => {
       BlinkTrade.subscribeOrderbook(['BTCUSD'])
-      .on('OB_UPDATE_ORDER', (data) => {
-        expect(data.type).to.be.equal('OB_UPDATE_ORDER');
+      .on('OB:UPDATE_ORDER', (data) => {
+        expect(data.type).to.be.equal('OB:UPDATE_ORDER');
         sinon.restore();
         done();
       });
     }).catch(err => done(err));
   });
 
-  it('Should get incremental orderbook updates and emit OB_DELETE_ORDER', (done) => {
+  it('Should get incremental orderbook updates and emit OB:DELETE_ORDER', (done) => {
     BlinkTrade = new BlinkTradeWS();
 
     stub(BlinkTrade, 'sendMessage', (msg, promise) => {
@@ -420,15 +420,15 @@ describe('WebSocket', () => {
 
     BlinkTrade.connect().then(() => {
       BlinkTrade.subscribeOrderbook(['BTCUSD'])
-      .on('OB_DELETE_ORDER', (data) => {
-        expect(data.type).to.be.equal('OB_DELETE_ORDER');
+      .on('OB:DELETE_ORDER', (data) => {
+        expect(data.type).to.be.equal('OB:DELETE_ORDER');
         sinon.restore();
         done();
       });
     }).catch(err => done(err));
   });
 
-  it('Should get incremental orderbook updates and emit OB_DELETE_ORDERS_THRU', (done) => {
+  it('Should get incremental orderbook updates and emit OB:DELETE_ORDERS_THRU', (done) => {
     BlinkTrade = new BlinkTradeWS();
 
     stub(BlinkTrade, 'sendMessage', (msg, promise) => {
@@ -442,15 +442,15 @@ describe('WebSocket', () => {
 
     BlinkTrade.connect().then(() => {
       BlinkTrade.subscribeOrderbook(['BTCUSD'])
-      .on('OB_DELETE_ORDERS_THRU', (data) => {
-        expect(data.type).to.be.equal('OB_DELETE_ORDERS_THRU');
+      .on('OB:DELETE_ORDERS_THRU', (data) => {
+        expect(data.type).to.be.equal('OB:DELETE_ORDERS_THRU');
         sinon.restore();
         done();
       });
     }).catch(err => done(err));
   });
 
-  it('Should get incremental orderbook updates and emit OB_TRADE_NEW', (done) => {
+  it('Should get incremental orderbook updates and emit OB:TRADE_NEW', (done) => {
     BlinkTrade = new BlinkTradeWS();
 
     stub(BlinkTrade, 'sendMessage', (msg, promise) => {
@@ -464,8 +464,8 @@ describe('WebSocket', () => {
 
     BlinkTrade.connect().then(() => {
       return BlinkTrade.subscribeOrderbook(['BTCUSD'])
-      .on('OB_TRADE_NEW', (data) => {
-        expect(data.type).to.be.equal('OB_TRADE_NEW');
+      .on('OB:TRADE_NEW', (data) => {
+        expect(data.type).to.be.equal('OB:TRADE_NEW');
         sinon.restore();
         done();
       });
@@ -497,7 +497,7 @@ describe('WebSocket', () => {
     }).catch(err => done(err));
   });
 
-  it('Should send order and emit EXECUTION_REPORT_NEW', (done) => {
+  it('Should send order and emit EXECUTION_REPORT:NEW', (done) => {
     const mock = {
       MsgType: '8',
       ExecType: '0',
@@ -519,7 +519,7 @@ describe('WebSocket', () => {
     BlinkTrade.connect().then(() => {
       return BlinkTrade.sendOrder(MOCK_NEW_ORDER);
     }).then(() => {
-      BlinkTrade.executionReport().on('EXECUTION_REPORT_NEW', (data) => {
+      BlinkTrade.executionReport().on('EXECUTION_REPORT:NEW', (data) => {
         expect(data.ExecType).to.be.equal('0');
         sinon.restore();
         done();
