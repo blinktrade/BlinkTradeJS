@@ -211,9 +211,11 @@ class BaseTransport extends Base {
     method?: string;
     currency?: string;
   }, callback: Function): Promise<Object> {
+    const reqId = generateRequestId()
     const msg = {
       MsgType: MsgTypes.REQUEST_WITHDRAW,
-      WithdrawReqID: generateRequestId(),
+      WithdrawReqID: reqId,
+      ClOrdID: reqId,
       Method: method,
       Amount: amount,
       Currency: currency,
