@@ -15,6 +15,14 @@ var since = moment()
   .toString()
   .slice(0, 10);
 
+BlinkTrade.ticker().then(function(data) {
+  console.log('Ticker', data);
+});
+
+BlinkTrade.orderbook().then(function(data) {
+  console.log('OrderBook', data.pair, 'Bids:', data.bids.length, 'Asks:', data.asks.length);
+});
+
 BlinkTrade.trades(1000, since).then(function(data) {
-  console.log('Trades', data);
+  console.log('Trades', data.length);
 });
