@@ -36,8 +36,8 @@ The most simple way to get the ticker, orderbook and trades, is through our publ
 
 ```js
 
-var BlinkTradeRest = require('blinktrade').BlinkTradeRest;
-var BlinkTrade = new BlinkTradeRest({ currency: 'BRL' });
+var BlinkTradeRest = require("blinktrade").BlinkTradeRest;
+var BlinkTrade = new BlinkTradeRest({ currency: "BRL" });
 
 BlinkTrade.ticker().then(function(ticker) {
   console.log(ticker);
@@ -55,7 +55,7 @@ BlinkTrade.ticker().then(function(ticker) {
     "buy": 1891.89,
     "last": 1891.89,
     "low": 1891.89,
-    "pair": 'BTCBRL',
+    "pair": "BTCBRL",
     "sell": 1910,
     "vol_brl": 9250.19572651
   }
@@ -67,8 +67,8 @@ BlinkTrade.ticker().then(function(ticker) {
 
 ```js
 
-var BlinkTradeRest = require('blinktrade').BlinkTradeRest;
-var BlinkTrade = new BlinkTradeRest({ currency: 'BRL' });
+var BlinkTradeRest = require("blinktrade").BlinkTradeRest;
+var BlinkTrade = new BlinkTradeRest({ currency: "BRL" });
 
 BlinkTrade.orderbook().then(function(orderbook) {
   console.log(orderbook);
@@ -81,7 +81,7 @@ BlinkTrade.orderbook().then(function(orderbook) {
 ```json
 
 {
-  pair: 'BTCBRL',
+  pair: "BTCBRL",
   bids: [
     [ 1891.89, 0.16314699, 90800027 ],
     [ 1880, 0.20712, 90800027 ]
@@ -98,8 +98,8 @@ BlinkTrade.orderbook().then(function(orderbook) {
 
 ```js
 
-var BlinkTradeRest = require('blinktrade').BlinkTradeRest;
-var BlinkTrade = new BlinkTradeRest({ currency: 'BRL' });
+var BlinkTradeRest = require("blinktrade").BlinkTradeRest;
+var BlinkTrade = new BlinkTradeRest({ currency: "BRL" });
 
 BlinkTrade.trades().then(function(trades) {
   console.log(trades);
@@ -116,19 +116,19 @@ BlinkTrade.trades().then(function(trades) {
     "date": 1472278473,
     "price": 1891.89,
     "amount": 0.1,
-    "side": 'sell'
+    "side": "sell"
   }, {
     "tid": 16094,
     "date": 1472278477,
     "price": 1891.89,
     "amount": 0.1,
-    "side": 'sell'
+    "side": "sell"
   }, {
     "tid": 16095,
     "date": 1472278668,
     "price": 1891.89,
     "amount": 0.1,
-    "side": 'sell'
+    "side": "sell"
  }]
 
 ```
@@ -141,19 +141,19 @@ you need to generate a API Key through our platform and set their respective per
 > note that when generate the API Key and the API Secret, it will be only shown once, you should save it securely, the API Password is only used in the WebSocket api.
 
 ```js
-var BlinkTradeRest = require('blinktrade').BlinkTradeRest;
+var BlinkTradeRest = require("blinktrade").BlinkTradeRest;
 var BlinkTrade = new BlinkTradeRest({
   prod: false,
-  key: 'YOUR_API_KEY_GENERATED_IN_API_MODULE',
-  secret: 'YOUR_SECRET_KEY_GENERATED_IN_API_MODULE',
-  currency: 'BRL',
+  key: "YOUR_API_KEY_GENERATED_IN_API_MODULE",
+  secret: "YOUR_SECRET_KEY_GENERATED_IN_API_MODULE",
+  currency: "BRL",
 });
 
 BlinkTrade.sendOrder({
-  side: '1',
+  side: "1",
   price: parseInt(1800 * 1e8),
   amount: parseInt(0.5 * 1e8),
-  symbol: 'BTCBRL',
+  symbol: "BTCBRL",
 }).then(function(order) {
 	console.log(order);
 });
@@ -167,21 +167,21 @@ BlinkTrade.sendOrder({
 {
     "OrderID": 1459028830811,
     "ExecID": 740972,
-    "ExecType": '0',
-    "OrdStatus": '0',
+    "ExecType": "0",
+    "OrdStatus": "0",
     "CumQty": 0,
-    "Symbol": 'BTCUSD',
+    "Symbol": "BTCUSD",
     "OrderQty": 5000000,
     "LastShares": 0,
     "LastPx": 0,
     "Price": 180000000000,
-    "TimeInForce": '1',
+    "TimeInForce": "1",
     "LeavesQty": 50000000,
-    "MsgType": '8',
-    "ExecSide": '1',
-    "OrdType": '2',
+    "MsgType": "8",
+    "ExecSide": "1",
+    "OrdType": "2",
     "CxlQty": 0,
-    "Side": '1',
+    "Side": "1",
     "ClOrdID": 3251968,
     "AvgPx": 0
 }
@@ -198,12 +198,12 @@ Make sure that you're connected in order to send messages through websocket, mos
 
 ```js
 
-var BlinkTradeWS = require('blinktrade').BlinkTradeWS;
+var BlinkTradeWS = require("blinktrade").BlinkTradeWS;
 var BlinkTrade = new BlinkTradeWS({ prod: true });
 
 BlinkTrade.connect().then(function(){
   // Connected
-  return BlinkTrade.login({ username: '', password: '' });
+  return BlinkTrade.login({ username: "", password: "" });
 }).then(function() {
 });
 
@@ -233,7 +233,7 @@ BlinkTrade.balance(function(err, balance) {
 
 ```js
 
-BlinkTrade.subscribeOrderbook(['BTCUSD']).then(function(orderbook) {
+BlinkTrade.subscribeOrderbook(["BTCUSD"]).then(function(orderbook) {
   console.log(orderbook);
 });
 
@@ -264,7 +264,7 @@ You can subscribe on one or more market symbols
 
 ```js
 
-BlinkTrade.subscribeTicker(['BLINK:BTCUSD']).then(function(ticker) {
+BlinkTrade.subscribeTicker(["BLINK:BTCUSD"]).then(function(ticker) {
   console.log(ticker);
 });
 
@@ -274,7 +274,7 @@ In order to unsubscribe on ticker, you should pass the `SecurityStatusReqID` on 
 
 ```js
 
-BlinkTrade.subscribeTicker(['BLINK:BTCUSD']).then(function(ticker) {
+BlinkTrade.subscribeTicker(["BLINK:BTCUSD"]).then(function(ticker) {
   return BlinkTrade.unSubscribeTicker(ticker.SecurityStatusReqID);
 }).then(function(){
   // Unsubscribed
@@ -306,10 +306,10 @@ parseInt((0.57 * 1e8).toFixed(0)) => 57000000
 ```js
 
   BlinkTrade.sendOrder({
-    side: '1', // Buy
+    side: "1", // Buy
     price: parseInt((550 * 1e8).toFixed(0)),
     amount: parseInt((0.05 * 1e8).toFixed(0)),
-    symbol: 'BTCUSD',
+    symbol: "BTCUSD",
   }).then(function(order) {
 		// Sent
   });
@@ -325,21 +325,21 @@ The response is the same as the [Execution Report](#execution-report), if you're
 {
     "OrderID": 1459028830811,
     "ExecID": 740972,
-    "ExecType": '0',
-    "OrdStatus": '0',
+    "ExecType": "0",
+    "OrdStatus": "0",
     "CumQty": 0,
-    "Symbol": 'BTCUSD',
+    "Symbol": "BTCUSD",
     "OrderQty": 5000000,
     "LastShares": 0,
     "LastPx": 0,
     "Price": 55000000000,
-    "TimeInForce": '1',
+    "TimeInForce": "1",
     "LeavesQty": 5000000,
-    "MsgType": '8',
-    "ExecSide": '1',
-    "OrdType": '2',
+    "MsgType": "8",
+    "ExecSide": "1",
+    "OrdType": "2",
     "CxlQty": 0,
-    "Side": '1',
+    "Side": "1",
     "ClOrdID": 3251968,
     "AvgPx": 0
 }
@@ -351,12 +351,12 @@ To cancel orders, you need to pass the OrderID, you'll also need to pass the ClO
 ```js
 
   BlinkTrade.cancelOrder({ orderID: order.OrderID, clientId: order.ClOrdID }).then(function(order) {
-    console.log('Order Cancelled');
+    console.log("Order Cancelled");
   });
   
 ```
 
-> The response will be the same as the sendOrder with `ExecType: '4'`
+> The response will be the same as the sendOrder with `ExecType: "4"`
 
 
 
@@ -367,7 +367,7 @@ A list of the last trades executed on an exchange since a chosen date.
 ```js
 
 BlinkTrade.trades({ limit: 1000, since: "1472347212" }).then(function(data) {
-  console.log('Trades', data);
+  console.log("Trades", data);
 });
 
 ```
@@ -381,7 +381,7 @@ You can generate both bitcoin and FIAT deposits, if any arguments was provied, i
 ```js
 
 blinktrade.connect().then(function() {
-  return blinktrade.login({ username: 'user', password: 'abc12345' });
+  return blinktrade.login({ username: "user", password: "abc12345" });
 }).then(function() {
   return blinktrade.requestDeposit();
 }).then(function(deposit) {
@@ -397,11 +397,11 @@ To generate a FIAT deposit, you need to pass the `depositMethodId` which corresp
 ```js
 
 blinktrade.connect().then(function() {
-  return blinktrade.login({ username: 'user', password: 'abc12345' });
+  return blinktrade.login({ username: "user", password: "abc12345" });
 }).then(function() {
   return blinktrade.requestDeposit({
   	 value: parseInt(200 * 1e8),
-  	 currency: 'BRL',
+  	 currency: "BRL",
   	 depositMethodId: 502,
   });
 }).then(function(deposit) {
@@ -417,32 +417,32 @@ Both response for bitcoin and fiat deposits are very similar.
 ```json
 
 {
-    "DepositMethodName": 'deposit_btc',
+    "DepositMethodName": "deposit_btc",
     "UserID": 90800003,
     "ControlNumber": null,
-    "State": 'UNCONFIRMED',
-    "Type": 'CRY',
+    "State": "UNCONFIRMED",
+    "Type": "CRY",
     "PercentFee": 0,
-    "Username": 'user',
+    "Username": "user",
     "CreditProvided": 0,
     "DepositReqID": 7302188,
-    "DepositID": '2a6b5e322fd24574a4d9f988681a542f',
+    "DepositID": "2a6b5e322fd24574a4d9f988681a542f",
     "Reason": null,
     "AccountID": 90800003,
     "Data": {
-        "InputAddress": 'mjjVMr8WcYQwVGzYc8HpaRyAZc89ngTdKV',
-        "Destination": 'n19ZAH1WGoUkQhubQw71fH11BenifxpBxf'
+        "InputAddress": "mjjVMr8WcYQwVGzYc8HpaRyAZc89ngTdKV",
+        "Destination": "n19ZAH1WGoUkQhubQw71fH11BenifxpBxf"
     },
-    "ClOrdID": '7302188',
-    "Status": '0',
-    "Created": '2016-09-03 23:08:26',
+    "ClOrdID": "7302188",
+    "Status": "0",
+    "Created": "2016-09-03 23:08:26",
     "DepositMethodID": null,
     "Value": 0,
     "BrokerID": 5,
     "PaidValue": 0,
-    "Currency": 'BTC',
+    "Currency": "BTC",
     "ReasonID": null,
-    "MsgType": 'U23',
+    "MsgType": "U23",
     "FixedFee": 0
 }
 
@@ -459,12 +459,12 @@ can check the [withdraws methods required]() fields on API section...
 
   BlinkTrade.requestWithdraw({
     amount: parseInt(400 * 1e8),
-    currency: 'BRL',
-    method: 'bradesco',
+    currency: "BRL",
+    method: "bradesco",
     data: {
       "AccountBranch": "111",
       "AccountNumber": "4444-5",
-      "AccountType": "corrente", 
+      "AccountType": "corrente",
       "CPF_CNPJ": "00000000000"
     }
   })
@@ -476,29 +476,29 @@ can check the [withdraws methods required]() fields on API section...
 ```json
 
 {
-    "Username": 'user',
-    "Status": '1',
-    "SecondFactorType": '',
-    "Created": '2016-09-03 23:42:06',
+    "Username": "user",
+    "Status": "1",
+    "SecondFactorType": "",
+    "Created": "2016-09-03 23:42:06",
     "PaidAmount": 50000000,
     "UserID": 90800003,
     "Reason": null,
-    "Currency": 'BRL',
+    "Currency": "BRL",
     "Amount": 50000000,
     "ReasonID": null,
     "BrokerID": 5,
-    "ClOrdID": '3332623',
+    "ClOrdID": "3332623",
     "WithdrawID": 523,
     "WithdrawReqID": 3332623,
-    "MsgType": 'U7',
+    "MsgType": "U7",
     "Data": {
-        "Instant": 'NO',
+        "Instant": "NO",
         "AccountBranch": "111",
         "AccountNumber": "4444-5",
         "AccountType": "corrente", 
         "CPF_CNPJ": "00000000000"
     },
-    "Method": 'bradesco',
+    "Method": "bradesco",
     "FixedFee": 0,
     "PercentFee": 0
 }
@@ -517,10 +517,10 @@ In order to keep ticker update on new events, you can return a event emitter and
 
 ```js
 
-BlinkTrade.subscribeTicker(['UOL:USDBRT', 'BLINK:BTCUSD', 'BLINK:BTCBRL'])
-  .on('UOL:USDBRT',   function(usdbrt) {
-}).on('BLINK:BTCUSD', function(btcusd) {
-}).on('BLINK:BTCBRL', function(btcbrl) {
+BlinkTrade.subscribeTicker(["UOL:USDBRT", "BLINK:BTCUSD", "BLINK:BTCBRL"])
+  .on("UOL:USDBRT",   function(usdbrt) {
+}).on("BLINK:BTCUSD", function(btcusd) {
+}).on("BLINK:BTCBRL", function(btcbrl) {
 });
 
 ```
@@ -533,12 +533,12 @@ To get realtime updates on order book, you should listen to the following events
 
 ```js
 
-  BlinkTrade.subscribeOrderbook(['BTCUSD'])
-    .on('OB_NEW_ORDER', function(order) {
-  }).on('OB_UPDATE_ORDER', function(order) {
-  }).on('OB_DELETE_ORDER', function(order) {
-  }).on('OB_DELETE_ORDERS_THRU', function(order) {
-  }).on('OB_TRADE_NEW', function(order) {
+  BlinkTrade.subscribeOrderbook(["BTCUSD"])
+    .on("OB_NEW_ORDER", function(order) {
+  }).on("OB_UPDATE_ORDER", function(order) {
+  }).on("OB_DELETE_ORDER", function(order) {
+  }).on("OB_DELETE_ORDERS_THRU", function(order) {
+  }).on("OB_TRADE_NEW", function(order) {
   });
 
 ```
@@ -547,11 +547,11 @@ You can still return a promise when listen events...
 
 ```js
 
-  BlinkTrade.subscribeOrderbook(['BTCUSD'])
-  .on('OB_NEW_ORDER', function(order) {
-  		console.log('New order received');
+  BlinkTrade.subscribeOrderbook(["BTCUSD"])
+  .on("OB_NEW_ORDER", function(order) {
+  		console.log("New order received");
   }).then(function(orderbook) {
-    console.log('Full orderbook', orderbook);
+    console.log("Full orderbook", orderbook);
   });
 
 ```
@@ -562,7 +562,7 @@ You listen the `BALANCE` event to receive balance updates
 
 ```js
 
-BlinkTrade.balance().on('BALANCE', function(balance) {
+BlinkTrade.balance().on("BALANCE", function(balance) {
   console.log(balance);
 });
 
@@ -575,11 +575,11 @@ In order the get when a order is executed, you can listen the execution report.
 ```js
 
   blinktrade.executionReport()
-    .on('EXECUTION_REPORT_NEW', function(data) {
-  }).on('EXECUTION_REPORT_PARTIAL', function(data) {
-  }).on('EXECUTION_REPORT_EXECUTION', function(data) {
-  }).on('EXECUTION_REPORT_CANCELED', function(data) {
-  }).on('EXECUTION_REPORT_REJECTED', function(data) {
+    .on("EXECUTION_REPORT_NEW", function(data) {
+  }).on("EXECUTION_REPORT_PARTIAL", function(data) {
+  }).on("EXECUTION_REPORT_EXECUTION", function(data) {
+  }).on("EXECUTION_REPORT_CANCELED", function(data) {
+  }).on("EXECUTION_REPORT_REJECTED", function(data) {
   });
 
 
@@ -589,34 +589,34 @@ In order the get when a order is executed, you can listen the execution report.
 
 ## Public Rest API
 
-* [Ticker](#public-ticker)
-* [Trades](#trades)
-* [Orderbook](#public-orderbook)
+* [Ticker](#ticker-rest)
+* [Trades](#trades-rest)
+* [Orderbook](#orderbook-rest)
 
 ## WebSocket
 
-* [connect](#connect)
-* [heartbeat](#heartbeat)
-* [login](#login)
-* [logout](#logout)
-* [profile](#profile)
-* [subscribeTicker](#ticker)
-* [unSubscribeTicker](#ticker)
-* [subscribeOrderbook](#orderbook)
-* [unSubscribeOrderbook](#orderbook)
-* [executionReport](#execution-report)
-* [tradeHistory](#trade-history)
+* [connect](#connect-websocket)
+* [heartbeat](#heartbeat-websocket)
+* [login](#login-websocket)
+* [logout](#logout-websocket)
+* [profile](#profile-websocket)
+* [subscribeTicker](#ticker-websocket)
+* [unSubscribeTicker](#ticker-websocket)
+* [subscribeOrderbook](#orderbook-websocket)
+* [unSubscribeOrderbook](#orderbook-websocket)
+* [executionReport](#executionreport-websocket)
+* [tradeHistory](#tradehistory-websocket)
 
 ## Trade Rest / Websocket
 
-* [balance](#balance)
-* [sendOrder](#send-order)
-* [cancelOrder](#cancel-order)
-* [myOrders](#my-orders)
-* [listWithdraws](#list-withdraws)
-* [requestWithdraw](#request-withdraw)
-* [requestDeposit](#request-deposit)
-* [requestDepositMethods](#request-deposit)
+* [balance](#balance-websocket-rest)
+* [sendOrder](#sendorder-websocket-rest)
+* [cancelOrder](#cancelorder-websocket-rest)
+* [myOrders](#myorders-websocket-rest)
+* [listWithdraws](#listwithdraws-websocket-rest)
+* [requestWithdraw](#requestwithdraw-websocket-rest)
+* [requestDeposit](#requestdeposit-websocket-rest)
+* [requestDepositMethods](#requestdeposit-websocket-rest)
 
 ## Public Rest
 
@@ -768,7 +768,7 @@ These methods bellow are both availabe under Rest and WebSocket API.
 
 #### Events
 
-`balance().on('BALANCE', Function callback)` => Promise
+`balance().on("BALANCE", Function callback)` => Promise
 
 ### sendOrder [websocket, rest]
 
@@ -778,7 +778,7 @@ These methods bellow are both availabe under Rest and WebSocket API.
 
 | Name     | Type   | Description                                    |
 |----------|--------|------------------------------------------------|
-| side     | String | '1' = Buy, '2' = Sell                          |
+| side     | String | "1" = Buy, "2" = Sell                          |
 | price    | Number | Price in "satoshis". e.g.: 1800 * 1e8          |
 | amount   | Number | Amount to be sent in satoshis. e.g.: 0.5 * 1e8 |
 | symbol   | String | Currency pair symbol, [check symbols table]()  |
