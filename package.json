@@ -25,6 +25,7 @@
   "author": "Cesar Augusto, Rodrigo Souza",
   "license": "GPLv3",
   "dependencies": {
+    "eventemitter2": "^2.1.0",
     "fetch-jsonp": "^1.0.1",
     "fingerprintjs2": "^1.4.1",
     "ip": "^1.1.3",

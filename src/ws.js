@@ -33,6 +33,8 @@ import {
 import {
   EVENTS,
   BALANCE,
+  ORDER_BOOK,
+  EXECUTION_REPORT,
 } from './constants/actionTypes';
 
 class BlinkTradeWS extends WebSocketTransport {
@@ -208,11 +210,17 @@ class BlinkTradeWS extends WebSocketTransport {
           switch (order.MDEntryType) {
             case '0':
             case '1':
-              const orderbookEvent = EVENTS.ORDERBOOK[order.MDUpdateAction];
-              return this.eventEmitter.emit(orderbookEvent, { ...dataOrder, type: orderbookEvent });
+              const orderbookEvent = ORDER_BOOK + ':' + EVENTS.ORDERBOOK[order.MDUpdateAction];
+              return this.eventEmitter.emit(orderbookEvent, {
+                ...dataOrder,
+                type: orderbookEvent,
+              });
             case '2':
-              const tradeEvent = EVENTS.TRADES[order.MDUpdateAction];
-              return this.eventEmitter.emit(tradeEvent, { ...dataOrder, type: tradeEvent });
+              const tradeEvent = ORDER_BOOK + ':' + EVENTS.TRADES[order.MDUpdateAction];
+              return this.eventEmitter.emit(tradeEvent, {
+                ...dataOrder,
+                type: tradeEvent,
+              });
             case '4':
               break;
             default:
@@ -272,7 +280,8 @@ class BlinkTradeWS extends WebSocketTransport {
   executionReport(callback?: Function): EventEmitter {
     registerListener('8', (data) => {
       callback && callback(data);
-      return this.eventEmitter.emit(EVENTS.EXECUTION_REPORT[data.ExecType], data);
+      const event = EVENTS.EXECUTION_REPORT[data.ExecType];
+      return this.eventEmitter.emit(`${EXECUTION_REPORT}:${event}`, data);
     });
 
     return this.eventEmitter;

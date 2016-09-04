@@ -23,7 +23,7 @@
 import BaseTransport from './baseTransport';
 import Fingerprint2 from 'fingerprintjs2';
 import nodeify from 'nodeify';
-import { EventEmitter } from 'events';
+import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 
 import {
   getRequest,
@@ -68,7 +68,7 @@ class WebSocketTransport extends BaseTransport {
     this.getStun();
     this.getFingerPrint();
 
-    this.eventEmitter = new EventEmitter();
+    this.eventEmitter = new EventEmitter({ wildcard: true, delimiter: ':' });
   }
 
   connect(callback: Function): Promise<Object> {
@@ -156,6 +156,31 @@ class WebSocketTransport extends BaseTransport {
       this.eventEmitter.on(event, listener);
       return promise;
     };
+    promise.onAny = (listener) => {
+      this.eventEmitter.onAny(listener);
+      return promise;
+    };
+    promise.offAny = (listener) => {
+      this.eventEmitter.offAny(listener);
+      return promise;
+    };
+    promise.once = (event, listener) => {
+      this.eventEmitter.once(event, listener);
+      return promise;
+    };
+    promise.many = (event, times, listener) => {
+      this.eventEmitter.many(event, times, listener);
+      return promise;
+    };
+    promise.removeListener = (event, listener) => {
+      this.eventEmitter.removeListener(event, listener);
+      return promise;
+    };
+    promise.removeAllListeners = (events) => {
+      this.eventEmitter.removeAllListeners(events);
+      return promise;
+    };
+
     return promise;
   }
   /* eslint-enable no-param-reassign */
