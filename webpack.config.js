@@ -6,6 +6,7 @@ var config = {
   devtool: 'source-map',
   plugins: [],
   node: {
+    dgram: 'empty',
     child_process: 'empty',
   },
   externals: [nodeExternals()],
