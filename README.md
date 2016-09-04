@@ -229,7 +229,7 @@ BlinkTrade.balance(function(err, balance) {
 
 ```
 
-### Subscribe to market data
+### Subscribe to OrderBook
 
 ```js
 
@@ -258,6 +258,19 @@ BlinkTrade.subscribeOrderbook(["BTCUSD"]).then(function(orderbook) {
 
 ```
 
+In order to unsubscribe on orderbook, you should pass the `MDReqID` on `unSubscribeOrderbook()`.
+
+```js
+
+BlinkTrade.subscribeOrderbook(["BTCUSD"]).then(function(orderbook) {
+  BlinkTrade.unSubscribeOrderbook(orderbook.MDReqID);
+});
+
+```
+
+> Note that there's not return when unsubscribe from orderbook.
+
+
 ### Subscribe to ticker
 
 You can subscribe on one or more market symbols
@@ -270,16 +283,13 @@ BlinkTrade.subscribeTicker(["BLINK:BTCUSD"]).then(function(ticker) {
 
 ```
 
-In order to unsubscribe on ticker, you should pass the `SecurityStatusReqID` on `unSubscribeTicker()`
+To unsubscribe ticker, you do the same as `unSubscribeOrderbook`, but passing `SecurityStatusReqID` to `unSubscribeTicker()`.
 
 ```js
 
 BlinkTrade.subscribeTicker(["BLINK:BTCUSD"]).then(function(ticker) {
-  return BlinkTrade.unSubscribeTicker(ticker.SecurityStatusReqID);
-}).then(function(){
-  // Unsubscribed
+  BlinkTrade.unSubscribeTicker(ticker.SecurityStatusReqID);
 });
-
 
 ```
 
@@ -380,11 +390,7 @@ You can generate both bitcoin and FIAT deposits, if any arguments was provied, i
 
 ```js
 
-blinktrade.connect().then(function() {
-  return blinktrade.login({ username: "user", password: "abc12345" });
-}).then(function() {
-  return blinktrade.requestDeposit();
-}).then(function(deposit) {
+blinktrade.requestDeposit().then(function(deposit) {
   console.log(deposit);
 });
 
@@ -396,14 +402,10 @@ To generate a FIAT deposit, you need to pass the `depositMethodId` which corresp
 
 ```js
 
-blinktrade.connect().then(function() {
-  return blinktrade.login({ username: "user", password: "abc12345" });
-}).then(function() {
-  return blinktrade.requestDeposit({
-  	 value: parseInt(200 * 1e8),
-  	 currency: "BRL",
-  	 depositMethodId: 502,
-  });
+blinktrade.requestDeposit({
+  value: parseInt(200 * 1e8),
+  currency: "BRL",
+  depositMethodId: 502,
 }).then(function(deposit) {
   console.log(deposit);
 });
