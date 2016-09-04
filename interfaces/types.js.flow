@@ -33,4 +33,10 @@ declare class Promise<T> extends Promise<T> mixins EventPromise {
 
 declare class EventPromise<T> {
   on: (event: string, listener: Function) => Promise<T>;
+  onAny: (listener: Function) => Promise<T>;
+  offAny: (listener: Function) => Promise<T>;
+  once: (event: string, listener: Function) => Promise<T>;
+  many: (event: string, times: number, listener: Function) => Promise<T>;
+  removeListener: (event: string, listener: Function) => Promise<T>;
+  removeAllListeners: (events: Array<string>) => Promise<T>;
 };

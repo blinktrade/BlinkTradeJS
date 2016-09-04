@@ -23,7 +23,7 @@
 import MsgTypes from './constants/requests';
 
 import WebSocketTransport from './wsTransport';
-import { EventEmitter } from 'events';
+import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import {
   registerListener,
   generateRequestId,
@@ -44,7 +44,7 @@ class BlinkTradeWS extends WebSocketTransport {
    */
   session: Object;
 
-  constructor(params: BlinkTradeBase) {
+  constructor(params?: BlinkTradeBase) {
     super(params);
 
     this.session = {};

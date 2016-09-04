@@ -60,7 +60,7 @@ class WebSocketTransport extends BaseTransport {
    */
   eventEmitter: EventEmitter;
 
-  constructor(params: BlinkTradeBase) {
+  constructor(params?: BlinkTradeBase) {
     super(params, 'ws');
 
     this.stun = { local: null, public: [] };
@@ -71,7 +71,7 @@ class WebSocketTransport extends BaseTransport {
     this.eventEmitter = new EventEmitter({ wildcard: true, delimiter: ':' });
   }
 
-  connect(callback: Function): Promise<Object> {
+  connect(callback?: Function): Promise<Object> {
     return nodeify.extend(new Promise((resolve, reject) => {
       this.request = { resolve, reject };
 
@@ -152,31 +152,31 @@ class WebSocketTransport extends BaseTransport {
 
   /* eslint-disable no-param-reassign */
   emitterPromise<T>(promise: Promise<T>): Promise<T> {
-    promise.on = (event, listener) => {
+    promise.on = (event: string, listener: Function) => {
       this.eventEmitter.on(event, listener);
       return promise;
     };
-    promise.onAny = (listener) => {
+    promise.onAny = (listener: Function) => {
       this.eventEmitter.onAny(listener);
       return promise;
     };
-    promise.offAny = (listener) => {
+    promise.offAny = (listener: Function) => {
       this.eventEmitter.offAny(listener);
       return promise;
     };
-    promise.once = (event, listener) => {
+    promise.once = (event: string, listener: Function) => {
       this.eventEmitter.once(event, listener);
       return promise;
     };
-    promise.many = (event, times, listener) => {
+    promise.many = (event: string, times: number, listener: Function) => {
       this.eventEmitter.many(event, times, listener);
       return promise;
     };
-    promise.removeListener = (event, listener) => {
+    promise.removeListener = (event: string, listener: Function) => {
       this.eventEmitter.removeListener(event, listener);
       return promise;
     };
-    promise.removeAllListeners = (events) => {
+    promise.removeAllListeners = (events: Array<string>) => {
       this.eventEmitter.removeAllListeners(events);
       return promise;
     };

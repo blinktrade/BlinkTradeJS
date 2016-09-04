@@ -40,7 +40,7 @@ class BaseTransport extends Base {
 
   sendMessageAsPromise: Function;
 
-  constructor(params: BlinkTradeBase, env: BlinkTradeEnv) {
+  constructor(params?: BlinkTradeBase, env: BlinkTradeEnv) {
     super(params, env);
 
     this.send = env === 'ws' ? this.sendMessageAsPromise : this.fetchTrade;
