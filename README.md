@@ -81,12 +81,12 @@ BlinkTrade.orderbook().then(function(orderbook) {
 ```json
 
 {
-  pair: "BTCBRL",
-  bids: [
+  "pair": "BTCBRL",
+  "bids": [
     [ 1891.89, 0.16314699, 90800027 ],
     [ 1880, 0.20712, 90800027 ]
   ],
-  asks: [
+  "asks": [
     [ 1910, 3.28046533, 90800027 ],
     [ 1919.99, 1.95046354, 90800027 ]
   ]
@@ -256,7 +256,7 @@ BlinkTrade.subscribeOrderbook(["BTCUSD"]).then(function(orderbook) {
   }
 }
 
-
+```
 
 ### Subscribe to ticker
 
@@ -306,14 +306,14 @@ parseInt((0.57 * 1e8).toFixed(0)) => 57000000
 ```js
 
   BlinkTrade.sendOrder({
-    side: "1", // Buy
-    price: parseInt((550 * 1e8).toFixed(0)),
-    amount: parseInt((0.05 * 1e8).toFixed(0)),
-    symbol: "BTCUSD",
+    "side": "1", // Buy
+    "price": parseInt((550 * 1e8).toFixed(0)),
+    "amount": parseInt((0.05 * 1e8).toFixed(0)),
+    "symbol": "BTCUSD",
   }).then(function(order) {
-		// Sent
+    // Sent
   });
-  
+
 ```
 
 > Response
@@ -455,13 +455,13 @@ To request withdraws, you need to pass a "data" information, whichs represents t
 it's related to bank accounts, numbers, or a bitcoin address, these informations are dynamically and is diferrent from brokers by brokers,
 can check the [withdraws methods required]() fields on API section...
 
-```json
+```js
 
   BlinkTrade.requestWithdraw({
-    amount: parseInt(400 * 1e8),
-    currency: "BRL",
-    method: "bradesco",
-    data: {
+    "amount": parseInt(400 * 1e8),
+    "currency": "BRL",
+    "method": "bradesco",
+    "data": {
       "AccountBranch": "111",
       "AccountNumber": "4444-5",
       "AccountType": "corrente",
