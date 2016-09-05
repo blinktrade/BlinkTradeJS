@@ -1,6 +1,6 @@
-var BlinkTradeWS = require('blinktrade').BlinkTradeWS;
+import { BlinkTradeRest, BlinkTradeWS } from 'blinktrade';
 
-var blinktrade = new BlinkTradeWS();
+let blinktrade = new BlinkTradeWS();
 
 blinktrade.connect().then(function() {
   console.log('WebSocket Connected');
@@ -56,8 +56,8 @@ blinktrade.connect().then(function() {
 
   return blinktrade.sendOrder({
     side: '1',
-    price: parseInt(550 * 1e8, 10),
-    amount: parseInt(0.05 * 1e8, 10),
+    price: parseInt((550 * 1e8).toFixed(0), 10),
+    amount: parseInt((0.05 * 1e8).toFixed(0), 10),
     symbol: 'BTCUSD',
   });
 }).then(function(order) {

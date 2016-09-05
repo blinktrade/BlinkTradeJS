@@ -5,11 +5,12 @@
   "description": "BlinkTradeJS example",
   "main": "bundle-node.js",
   "scripts": {
+    "webpack": "webpack",
     "build": "rm -rf node_modules/blinktrade && npm install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "blinktrade": "../../"
+    "blinktrade": "../"
   },
   "author": "Cesar Augusto",
   "license": "GPL-3.0",
