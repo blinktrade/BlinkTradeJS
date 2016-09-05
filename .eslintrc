@@ -17,6 +17,7 @@
   },
   "globals": {
     "BlinkTradeBase": true,
+    "BlinkTradeEnv": true,
     "Stun": true,
   }
 }

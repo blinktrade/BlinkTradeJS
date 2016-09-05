@@ -211,7 +211,7 @@ class BaseTransport extends Base {
     method?: string;
     currency?: string;
   }, callback: Function): Promise<Object> {
-    const reqId = generateRequestId()
+    const reqId = generateRequestId();
     const msg = {
       MsgType: MsgTypes.REQUEST_WITHDRAW,
       WithdrawReqID: reqId,
@@ -230,7 +230,7 @@ class BaseTransport extends Base {
     currency?: string;
     depositMethodId?: number;
   } = {}, callback?: Function): Promise<Object> {
-    const reqId = generateRequestId()
+    const reqId = generateRequestId();
     const msg: Object = {
       MsgType: MsgTypes.REQUEST_DEPOSIT,
       DepositReqID: reqId,
@@ -248,7 +248,7 @@ class BaseTransport extends Base {
   }
 
   requestDepositMethods(callback?: Function): Promise<Object> {
-    var msg = {
+    const msg = {
       MsgType: MsgTypes.REQUEST_DEPOSIT_METHODS,
       DepositMethodReqID: generateRequestId(),
     };
