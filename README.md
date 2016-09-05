@@ -529,8 +529,6 @@ BlinkTrade.subscribeTicker(["UOL:USDBRT", "BLINK:BTCUSD", "BLINK:BTCBRL"])
 
 ### Event Market Data
 
-```
-
 To get realtime updates on order book, you should listen to the following events.
 
 ```js
@@ -692,6 +690,10 @@ Used as test request to check the latency connection.
 | username     | String | Account username |
 | password     | String | Account password |
 | secondFactor | String | Optional secondFactor, if the authentication require second factor, you'll receive an error with `NeedSecondFactor = true` |
+
+### logout [websocket]
+
+`logout(Function? callback)` => Promise / callback
 
 ### profile [websocket]
 
