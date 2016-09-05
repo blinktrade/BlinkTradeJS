@@ -328,7 +328,7 @@ parseInt((0.57 * 1e8).toFixed(0)) => 57000000
 
 > Response
 
-The response is the same as the [Execution Report](#execution-report), if you're using it with Rest transport, it will response as an array together with a balance response.
+The response is the same as the [Execution Report](#executionreport-websocket), if you're using it with Rest transport, it will response as an array together with a balance response.
 
 ```json
 
@@ -510,8 +510,10 @@ can check the [withdraws methods required]() fields on API section...
 
 ## Event Emitters
 
-Using event emitters is easy and expressive way to keep you updated through our websocket api, you can listen individual events in order to match your needs,
-you can listen new orders, execution reports, tickers and balance changes, event emitters can also be used as promises to keep it chained.
+Using event emitters is easy and expressive way to keep you updated through our websocket api,
+you can listen to individual events in order to match your needs, you can listen new orders, execution reports, tickers and balance changes,
+event emitters can also be used as promises to keep it chained, event emitters are implemented with [`EventEmitter2`](https://github.com/asyncly/EventEmitter2),
+which gives you more flexibility to match events with multi-level wildcards and extends events such as `.onAny`, `.once`, `.many` and so on.
 
 ### Event Ticker
 
@@ -527,6 +529,16 @@ BlinkTrade.subscribeTicker(["UOL:USDBRT", "BLINK:BTCUSD", "BLINK:BTCBRL"])
 
 ```
 
+You can easily match all symbols at the same listener.
+
+```js
+
+BlinkTrade.subscribeTicker(["UOL:USDBRT", "BLINK:BTCUSD", "BLINK:BTCBRL"])
+.on("BLINK:*", function(symbol) {
+});
+
+```
+
 ### Event Market Data
 
 To get realtime updates on order book, you should listen to the following events.
@@ -534,11 +546,11 @@ To get realtime updates on order book, you should listen to the following events
 ```js
 
   BlinkTrade.subscribeOrderbook(["BTCUSD"])
-    .on("OB_NEW_ORDER", function(order) {
-  }).on("OB_UPDATE_ORDER", function(order) {
-  }).on("OB_DELETE_ORDER", function(order) {
-  }).on("OB_DELETE_ORDERS_THRU", function(order) {
-  }).on("OB_TRADE_NEW", function(order) {
+    .on("OB:NEW_ORDER", function(order) {
+  }).on("OB:UPDATE_ORDER", function(order) {
+  }).on("OB:DELETE_ORDER", function(order) {
+  }).on("OB:DELETE_ORDERS_THRU", function(order) {
+  }).on("OB:TRADE_NEW", function(order) {
   });
 
 ```
@@ -548,8 +560,8 @@ You can still return a promise when listen events...
 ```js
 
   BlinkTrade.subscribeOrderbook(["BTCUSD"])
-  .on("OB_NEW_ORDER", function(order) {
-  		console.log("New order received");
+  .on("OB:NEW_ORDER", function(order) {
+    console.log("New order received");
   }).then(function(orderbook) {
     console.log("Full orderbook", orderbook);
   });
@@ -575,13 +587,12 @@ In order the get when a order is executed, you can listen the execution report.
 ```js
 
   blinktrade.executionReport()
-    .on("EXECUTION_REPORT_NEW", function(data) {
-  }).on("EXECUTION_REPORT_PARTIAL", function(data) {
-  }).on("EXECUTION_REPORT_EXECUTION", function(data) {
-  }).on("EXECUTION_REPORT_CANCELED", function(data) {
-  }).on("EXECUTION_REPORT_REJECTED", function(data) {
+    .on("EXECUTION_REPORT:NEW", function(data) {
+  }).on("EXECUTION_REPORT:PARTIAL", function(data) {
+  }).on("EXECUTION_REPORT:EXECUTION", function(data) {
+  }).on("EXECUTION_REPORT:CANCELED", function(data) {
+  }).on("EXECUTION_REPORT:REJECTED", function(data) {
   });
-
 
 ```
 
@@ -634,11 +645,11 @@ In order the get when a order is executed, you can listen the execution report.
 | secret   | String  | API Secret generated on our platform, it only needed on the Trade endpoint |
 | currency | String  | Currency symbol to fetch public endpoint                                   |
 
-### Ticker [rest]
+### ticker [rest]
 
 `ticker(Function? callback)` => Promise / callback
 
-### Last Trades [rest]
+### trades [rest]
 
 `trades(Object params, Function? callback)` => Promise / callback
 
@@ -649,7 +660,7 @@ In order the get when a order is executed, you can listen the execution report.
 | limit | Number | Limit of trades that will be returned. <NUMBER> should be a positive integer. Optional; defaults to 1000 trades  |
 | since | Number | Date which executed trades must be fetched from. <TIMESTAMP> is in Unix Time date format. Optional; defaults to the date of the first executed trade |
 
-### OrderBook [rest]
+### orderbook [rest]
 
 `orderbook(Function? callback)` => Promise / callback
 
@@ -728,10 +739,10 @@ Symbols Available:
 
 | Event                 |  Description                                                                               |
 |-----------------------|--------------------------------------------------------------------------------------------|
-| OB_NEW_ORDER          | Callback when receives a new order                                                         |
-| OB_UPDATE_ORDER       | Callback when an order have been updated                                                   |
-| OB_DELETE_ORDER       | Callback when an order have been deleted                                                   |
-| OB_DELETE_ORDERS_THRU | Callback when one or more orders have been executed and consequently deleted from the book |
+| OB:NEW_ORDER          | Callback when receives a new order                                                         |
+| OB:UPDATE_ORDER       | Callback when an order have been updated                                                   |
+| OB:DELETE_ORDER       | Callback when an order have been deleted                                                   |
+| OB:DELETE_ORDERS_THRU | Callback when one or more orders have been executed and consequently deleted from the book |
 
 ### executionReport [websocket]
 
@@ -743,11 +754,11 @@ An event emitter to get execution reports.
 
 | Event                      |  Description                                         |
 |----------------------------|------------------------------------------------------|
-| EXECUTION_REPORT_NEW       | Callback when you send a new order                   |
-| EXECUTION_REPORT_PARTIAL   | Callback when your order have been partialy executed |
-| EXECUTION_REPORT_EXECUTION | Callback when an order have been sussefully executed |
-| EXECUTION_REPORT_CANCELED  | Callback when your order have been canceled          |
-| EXECUTION_REPORT_REJECTED  | Callback when your order have been rejected          |
+| EXECUTION_REPORT:NEW       | Callback when you send a new order                   |
+| EXECUTION_REPORT:PARTIAL   | Callback when your order have been partialy executed |
+| EXECUTION_REPORT:EXECUTION | Callback when an order have been sussefully executed |
+| EXECUTION_REPORT:CANCELED  | Callback when your order have been canceled          |
+| EXECUTION_REPORT:REJECTED  | Callback when your order have been rejected          |
 
 
 ### tradeHistory [websocket]
