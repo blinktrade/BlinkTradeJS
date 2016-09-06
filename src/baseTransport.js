@@ -83,26 +83,7 @@ class BaseTransport extends Base {
     return new Promise((resolve, reject) => {
       return this.send(msg, callback).then(data => {
         const { Columns, ...orders } = data;
-        const OrdListGrp = [];
-        data.OrdListGrp.map(order => {
-          return OrdListGrp.push({
-            ClOrdID: order[0],
-            OrderID: order[1],
-            CumQty: order[2],
-            OrdStatus: order[3],
-            LeavesQty: order[4],
-            CxlQty: order[5],
-            AvgPx: order[6],
-            Symbol: order[7],
-            Side: order[8],
-            OrdType: order[9],
-            OrderQty: order[10],
-            Price: order[11],
-            OrderDate: order[12],
-            Volume: order[13],
-            TimeInForce: order[14],
-          });
-        });
+        const OrdListGrp = _.map(data.OrdListGrp, order => _.zipObject(Columns, order));
         return resolve({
           ...orders,
           OrdListGrp,
@@ -176,31 +157,10 @@ class BaseTransport extends Base {
     return new Promise((resolve, reject) => {
       return this.send(msg, callback).then(data => {
         const { Columns, ...withdrawData } = data;
-        const WithdrawList = [];
-        data.WithdrawListGrp.map(withdraw => {
-          return WithdrawList.push({
-            WithdrawID: withdraw[0],
-            Method: withdraw[1],
-            Currency: withdraw[2],
-            Amount: withdraw[3],
-            Data: withdraw[4],
-            Created: withdraw[5],
-            Status: withdraw[6],
-            ReasonID: withdraw[7],
-            Reason: withdraw[8],
-            PercentFee: withdraw[9],
-            FixedFee: withdraw[10],
-            PaidAmount: withdraw[11],
-            UserID: withdraw[12],
-            Username: withdraw[13],
-            BrokerID: withdraw[14],
-            ClOrdID: withdraw[15],
-          });
-        });
-
+        const WithdrawListGrp = _.map(data.WithdrawListGrp, withdraw => _.zipObject(Columns, withdraw));
         return resolve({
           ...withdrawData,
-          WithdrawListGrp: WithdrawList,
+          WithdrawListGrp,
         });
       }).catch(reject);
     });
@@ -246,10 +206,10 @@ class BaseTransport extends Base {
     return new Promise((resolve, reject) => {
       return this.send(msg, callback).then(data => {
         const { Columns, ...depositData } = data;
-        const DepositList = _.map(data.DepositListGrp, deposit => _.zipObject(Columns, deposit));
+        const DepositListGrp = _.map(data.DepositListGrp, deposit => _.zipObject(Columns, deposit));
         return resolve({
           ...depositData,
-          DepositListGrp: DepositList,
+          DepositListGrp,
         });
       });
     });
