@@ -23,7 +23,7 @@ More examples can be found in the examples [directory.](./examples)
 # Usage
 
 All SDK supports either promises and callbacks, if a callback is provided as the last argument, it will be called as `callback(error, result)`,
-otherwise it will just return the original promise, we also provide event emitters that you can use in order to get realtime updates through our websocket api,
+otherwise it will just return the original promise, we also provide event emitters that you can use to get realtime updates through our websocket api,
 you can check the [Event Emitters section.](#event-emitters)
 
 
@@ -135,7 +135,7 @@ BlinkTrade.trades().then(function(trades) {
 ## Trade Rest API
 
 On our Rest-ful API, we provide a trade endpoint that you're allowed to send and cancel orders, request deposits and withdraws,
-you need to generate a API Key through our platform and set their respective permission to generate the API Key.
+you need to generate a API Key through our platform and set their respective permission that gives you access to it.
 
 > note that when generate the API Key and the API Secret, it will be only shown once, you should save it securely, the API Password is only used in the WebSocket api.
 
@@ -193,14 +193,14 @@ BlinkTrade.sendOrder({
 
 ### Authenticating
 
-Make sure that you're connected in order to send messages through websocket, most of the message also require that you're authenticated.
+Make sure that you're connected to send messages through websocket, most of the message also require that you're authenticated.
 
 ```js
 
 var BlinkTradeWS = require("blinktrade").BlinkTradeWS;
 var BlinkTrade = new BlinkTradeWS({ prod: true });
 
-BlinkTrade.connect().then(function(){
+BlinkTrade.connect().then(function() {
   // Connected
   return BlinkTrade.login({ username: "", password: "" });
 }).then(function() {
@@ -218,7 +218,7 @@ BlinkTrade.balance().then(function(balance) {
 
 ```
 
-You can pass a callback in order to receive balance updates.
+You can pass a callback to receive balance updates.
 
 ```js
 
@@ -257,7 +257,7 @@ BlinkTrade.subscribeOrderbook(["BTCUSD"]).then(function(orderbook) {
 
 ```
 
-In order to unsubscribe on orderbook, you should pass the `MDReqID` on `unSubscribeOrderbook()`.
+To unsubscribe from orderbook, you should pass the `MDReqID` on `unSubscribeOrderbook()`.
 
 ```js
 
@@ -272,7 +272,7 @@ BlinkTrade.subscribeOrderbook(["BTCUSD"]).then(function(orderbook) {
 
 ### Subscribe to ticker
 
-You can subscribe on one or more market symbols
+You can subscribe on one or more market symbols.
 
 ```js
 
@@ -282,7 +282,7 @@ BlinkTrade.subscribeTicker(["BLINK:BTCUSD"]).then(function(ticker) {
 
 ```
 
-To unsubscribe ticker, you do the same as `unSubscribeOrderbook`, but passing `SecurityStatusReqID` to `unSubscribeTicker()`.
+To unsubscribe from ticker, you do the same as `unSubscribeOrderbook`, but passing `SecurityStatusReqID` to `unSubscribeTicker()`.
 
 ```js
 
@@ -327,7 +327,7 @@ BlinkTrade.sendOrder({
 
 > Response
 
-The response is the same as the [Execution Report](#executionreport-websocket), if you're using it with Rest transport, it will response as an array together with a balance response.
+The response is the same as the [Execution Report](#executionreport-websocket), if you're using it with rest transport, it will response as an array together with the balance response.
 
 ```json
 
@@ -371,7 +371,7 @@ BlinkTrade.cancelOrder({ orderID: order.OrderID, clientId: order.ClOrdID }).then
 
 ### Last Trades
 
-A list of the last trades executed on an exchange since a chosen date.
+List the latest trades executed on an exchange since a chosen date.
 
 ```js
 
@@ -383,7 +383,7 @@ BlinkTrade.trades({ limit: 1000, since: "1472347212" }).then(function(data) {
 
 ### Requesting Deposits
 
-You can generate both bitcoin and FIAT deposits, if any arguments was provied, it will generate a bitcoin deposit along with the address.
+You can generate both bitcoin and FIAT deposits, if any arguments was passed, it will generate a bitcoin deposit along with the address.
 
 #### Generate bitcoin address to deposit
 
@@ -413,7 +413,7 @@ blinktrade.requestDeposit({
 
 > Response
 
-Both response for bitcoin and fiat deposits are very similar.
+Both response for bitcoin and fiat deposits is similar.
 
 ```json
 
@@ -454,7 +454,7 @@ Both response for bitcoin and fiat deposits are very similar.
 
 To request withdraws, you need to pass a "data" information, whichs represents the information to your withdraw,
 it's related to bank accounts, numbers, or a bitcoin address, these informations are dynamically and is diferrent from brokers by brokers,
-can check the [withdraws methods required]() fields on API section...
+can check the [withdraws methods required]() fields on API section.
 
 ```js
 
@@ -510,13 +510,13 @@ BlinkTrade.requestWithdraw({
 ## Event Emitters
 
 Using event emitters is easy and expressive way to keep you updated through our websocket api,
-you can listen to individual events in order to match your needs, you can listen new orders, execution reports, tickers and balance changes,
+you can listen to individual events to match your needs, you can listen new orders, execution reports, tickers and balance changes,
 event emitters can also be used as promises to keep it chained, event emitters are implemented with [`EventEmitter2`](https://github.com/asyncly/EventEmitter2),
 which gives you more flexibility to match events with multi-level wildcards and extends events such as `.onAny`, `.once`, `.many` and so on.
 
 ### Event Ticker
 
-In order to keep ticker update on new events, you can return a event emitter and match with the market.
+To keep ticker update on new events, you can return a event emitter and match with the market.
 
 ```js
 
@@ -554,7 +554,7 @@ BlinkTrade.subscribeOrderbook(["BTCUSD"])
 
 ```
 
-You can still return a promise when listen events...
+You can still return a promise when listen events.
 
 ```js
 
@@ -675,7 +675,7 @@ blinktrade.executionReport()
 |----------|---------|--------------------------------------------------------------|
 | prod     | Boolean | Production environment, default to false                     |
 | brokerId | Number  | [see brokers list]()                                         |
-| url      | String  | Custom url just in case if you're using a custom backend url |
+| url      | String  | Custom url in case if you're using a custom backend url |
 
 ### connect [websocket]
 
@@ -736,12 +736,12 @@ Symbols Available:
 
 #### Events
 
-| Event                 |  Description                                                                               |
-|-----------------------|--------------------------------------------------------------------------------------------|
-| OB:NEW_ORDER          | Callback when receives a new order                                                         |
-| OB:UPDATE_ORDER       | Callback when an order have been updated                                                   |
-| OB:DELETE_ORDER       | Callback when an order have been deleted                                                   |
-| OB:DELETE_ORDERS_THRU | Callback when one or more orders have been executed and consequently deleted from the book |
+| Event                 |  Description                                                                 |
+|-----------------------|------------------------------------------------------------------------------|
+| OB:NEW_ORDER          | Callback when receives a new order                                           |
+| OB:UPDATE_ORDER       | Callback when an order has been updated                                      |
+| OB:DELETE_ORDER       | Callback when an order has been deleted                                      |
+| OB:DELETE_ORDERS_THRU | Callback when one or more orders has been executed and deleted from the book |
 
 ### executionReport [websocket]
 
@@ -754,10 +754,10 @@ An event emitter to get execution reports.
 | Event                      |  Description                                         |
 |----------------------------|------------------------------------------------------|
 | EXECUTION_REPORT:NEW       | Callback when you send a new order                   |
-| EXECUTION_REPORT:PARTIAL   | Callback when your order have been partialy executed |
-| EXECUTION_REPORT:EXECUTION | Callback when an order have been sussefully executed |
-| EXECUTION_REPORT:CANCELED  | Callback when your order have been canceled          |
-| EXECUTION_REPORT:REJECTED  | Callback when your order have been rejected          |
+| EXECUTION_REPORT:PARTIAL   | Callback when your order has been partialy executed |
+| EXECUTION_REPORT:EXECUTION | Callback when an order has been sussefully executed |
+| EXECUTION_REPORT:CANCELED  | Callback when your order has been canceled          |
+| EXECUTION_REPORT:REJECTED  | Callback when order has been rejected          |
 
 
 ### tradeHistory [websocket]
@@ -769,7 +769,7 @@ An event emitter to get execution reports.
 | Name     | Type   | Description                                     |
 |----------|--------|-------------------------------------------------|
 | page     | Number | Current page to fetch, defaults to 0            |
-| pageSize | Number | Number of trades on the same page, limits to 80 |
+| pageSize | Number | Number of trades, limits to 80 |
 
 
 ## Trade Rest / Websocket
@@ -804,10 +804,10 @@ These methods bellow are both availabe under Rest and WebSocket API.
 
 #### Arguments
 
-| Name     | Type   | Description                                                          |
-|----------|--------|----------------------------------------------------------------------|
-| orderId  | Number | **Required** Order ID to be canceled                                 |
-| clientId | Number | You need to pass the clientId (`ClOrdID`) in order to get a response |
+| Name     | Type   | Description                                                 |
+|----------|--------|-------------------------------------------------------------|
+| orderId  | Number | **Required** Order ID to be canceled                        |
+| clientId | Number | You need to pass the clientId (`ClOrdID`) to get a response |
 
 
 ### myOrders [websocket, rest]
@@ -819,7 +819,7 @@ These methods bellow are both availabe under Rest and WebSocket API.
 | Name     | Type   | Description                                     |
 |----------|--------|-------------------------------------------------|
 | page     | Number | Current page to fetch, defaults to 0            |
-| pageSize | Number | Number of trades on the same page, limits to 40 |
+| pageSize | Number | Number of orders, limits to 40 |
 
 
 ### listWithdraws [websocket, rest]
@@ -829,7 +829,7 @@ These methods bellow are both availabe under Rest and WebSocket API.
 | Name       | Type   | Description                                        |
 |------------|--------|----------------------------------------------------|
 | page       | Number | Current page to fetch, defaults to 0               |
-| pageSize   | Number | Number of trades on the same page, limits to 20    |
+| pageSize   | Number | Number of withdraws, limits to 20    |
 | statusList | Array  | 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled |
 
 ### requestWithdraw [websocket, rest]
