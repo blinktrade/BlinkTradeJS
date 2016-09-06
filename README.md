@@ -12,10 +12,9 @@ BlinkTrade provides a simple and robust WebSocket API to integrate our platform,
 
 `$ npm install blinktrade`
 
-# Modules
+# Documentation
 
-* BlinkTradeWS
-* BlinkTradeRest
+You can also check our [Full API Documentation](https://blinktrade.com/docs)
 
 # Examples
 
@@ -586,13 +585,13 @@ In order the get when a order is executed, you can listen the execution report.
 
 ```js
 
-  blinktrade.executionReport()
-    .on("EXECUTION_REPORT:NEW", function(data) {
-  }).on("EXECUTION_REPORT:PARTIAL", function(data) {
-  }).on("EXECUTION_REPORT:EXECUTION", function(data) {
-  }).on("EXECUTION_REPORT:CANCELED", function(data) {
-  }).on("EXECUTION_REPORT:REJECTED", function(data) {
-  });
+blinktrade.executionReport()
+  .on("EXECUTION_REPORT:NEW", function(data) {
+}).on("EXECUTION_REPORT:PARTIAL", function(data) {
+}).on("EXECUTION_REPORT:EXECUTION", function(data) {
+}).on("EXECUTION_REPORT:CANCELED", function(data) {
+}).on("EXECUTION_REPORT:REJECTED", function(data) {
+});
 
 ```
 
