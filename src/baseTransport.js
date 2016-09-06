@@ -23,12 +23,13 @@
 import Base from './base';
 import MsgTypes from './constants/requests';
 import * as RequestTypes from './constants/requestTypes';
+import _ from 'lodash';
 import {
   deleteRequest,
   generateRequestId,
 } from './listener';
 
-type WithdrawStatus = '1' | '2' | '4' | '8';
+type StatusList = '1' | '2' | '4' | '8';
 
 class BaseTransport extends Base {
 
@@ -162,7 +163,7 @@ class BaseTransport extends Base {
   }: {
     page?: number;
     pageSize?: number;
-    statusList?: Array<WithdrawStatus>;
+    statusList?: Array<StatusList>;
   } = {}, callback?: Function): Promise<Object> {
     const msg = {
       MsgType: MsgTypes.REQUEST_WITHDRAW_LIST,
@@ -223,6 +224,35 @@ class BaseTransport extends Base {
     };
 
     return this.send(msg, callback);
+  }
+
+  requestDepositList({
+    page: Page = 0,
+    pageSize: PageSize = 20,
+    status: StatusList = ['1', '2', '4', '8']
+  }: {
+    page: number;
+    pageSize: number;
+    status: Array<StatusList>;
+  } = {}, callback?: Function): Promise<Object> {
+    const msg = {
+      MsgType: MsgTypes.REQUEST_DEPOSIT_LIST,
+      DepositListReqID: generateRequestId(),
+      Page,
+      PageSize,
+      StatusList,
+    };
+
+    return new Promise((resolve, reject) => {
+      return this.send(msg, callback).then(data => {
+        const { Columns, ...depositData } = data;
+        const DepositList = _.map(data.DepositListGrp, deposit => _.zipObject(Columns, deposit));
+        return resolve({
+          ...depositData,
+          DepositListGrp: DepositList,
+        });
+      });
+    });
   }
 
   requestDeposit({ currency = 'BTC', value, depositMethodId }: {

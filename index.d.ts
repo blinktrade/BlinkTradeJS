@@ -121,7 +121,7 @@ declare module blinktrade {
     /**
      * Returns all your withdraws.
      */
-    interface WithdrawList extends Pagination {
+    interface DepositWithdrawList extends Pagination {
         /**
          * 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled
          */
@@ -217,17 +217,22 @@ declare module blinktrade {
         /**
          * Returns a list of your withdraws
          */
-        requestWithdrawList(withdraw: WithdrawList, callback?: Function): Promise<Object>;
+        requestWithdrawList(params: DepositWithdrawList, callback?: Function): Promise<Object>;
 
         /**
          * Request a FIAT or bitcoin withdraw
          */
-        requestWithdraw(withdraw: Withdraw, callback?: Function): Promise<Object>;
+        requestWithdraw(params: Withdraw, callback?: Function): Promise<Object>;
+
+        /**
+         * Returns a list of your deposits
+         */
+        requestDepositList(params: DepositWithdrawList, callback?: Function): Promise<Object>;
 
         /**
          *  If any arguments was provied, it will generate a bitcoin deposit along with the address.
          */
-        requestDeposit(deposit: Deposit, callback?: Function): Promise<Object>;
+        requestDeposit(params: Deposit, callback?: Function): Promise<Object>;
 
         /**
          * Used to check the deposit methods codes to FIAT deposit
