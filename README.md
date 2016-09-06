@@ -625,6 +625,7 @@ blinktrade.executionReport()
 * [myOrders](#myorders-websocket-rest)
 * [requestWithdrawList](#requestWithdrawList-websocket-rest)
 * [requestWithdraw](#requestwithdraw-websocket-rest)
+* [requestDepositList](#requestdepositList-websocket-rest)
 * [requestDeposit](#requestdeposit-websocket-rest)
 * [requestDepositMethods](#requestdeposit-websocket-rest)
 
@@ -829,7 +830,7 @@ These methods bellow are both availabe under Rest and WebSocket API.
 | Name       | Type   | Description                                        |
 |------------|--------|----------------------------------------------------|
 | page       | Number | Current page to fetch, defaults to 0               |
-| pageSize   | Number | Number of withdraws, limits to 20    |
+| pageSize   | Number | Number of withdraws, limits to 20                  |
 | statusList | Array  | 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled |
 
 ### requestWithdraw [websocket, rest]
@@ -860,6 +861,16 @@ These methods bellow are both availabe under Rest and WebSocket API.
 | VPBankinternaltransfer | VPbankbranch, BankCity, AccountName, AccountNumber, BankSwift                                                    |
 | cashtoID               | BankName, BankBranch, BankCity, Clientname, ClientIDNr, Issue Date ID, Place of Issue, Phone Number of Recipient |
 
+
+### requestDepositList [websocket, rest]
+
+`requestDepositList(Object params, Function? callback)` => Promise / callback
+
+| Name       | Type   | Description                                        |
+|------------|--------|----------------------------------------------------|
+| page       | Number | Current page to fetch, defaults to 0               |
+| pageSize   | Number | Number of deposits, limits to 20                   |
+| statusList | Array  | 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled |
 
 ### requestDeposit [websocket, rest]
 
