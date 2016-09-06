@@ -315,14 +315,14 @@ parseInt((0.57 * 1e8).toFixed(0)) => 57000000
 
 ```js
 
-  BlinkTrade.sendOrder({
-    "side": "1", // Buy
-    "price": parseInt((550 * 1e8).toFixed(0)),
-    "amount": parseInt((0.05 * 1e8).toFixed(0)),
-    "symbol": "BTCUSD",
-  }).then(function(order) {
-    // Sent
-  });
+BlinkTrade.sendOrder({
+  "side": "1", // Buy
+  "price": parseInt((550 * 1e8).toFixed(0)),
+  "amount": parseInt((0.05 * 1e8).toFixed(0)),
+  "symbol": "BTCUSD",
+}).then(function(order) {
+  // Sent
+});
 
 ```
 
@@ -360,10 +360,10 @@ To cancel orders, you need to pass the OrderID, you'll also need to pass the ClO
 
 ```js
 
-  BlinkTrade.cancelOrder({ orderID: order.OrderID, clientId: order.ClOrdID }).then(function(order) {
-    console.log("Order Cancelled");
-  });
-  
+BlinkTrade.cancelOrder({ orderID: order.OrderID, clientId: order.ClOrdID }).then(function(order) {
+  console.log("Order Cancelled");
+});
+
 ```
 
 > The response will be the same as the sendOrder with `ExecType: "4"`
@@ -459,18 +459,18 @@ can check the [withdraws methods required]() fields on API section...
 
 ```js
 
-  BlinkTrade.requestWithdraw({
-    "amount": parseInt(400 * 1e8),
-    "currency": "BRL",
-    "method": "bradesco",
-    "data": {
-      "AccountBranch": "111",
-      "AccountNumber": "4444-5",
-      "AccountType": "corrente",
-      "CPF_CNPJ": "00000000000"
-    }
-  })
-  
+BlinkTrade.requestWithdraw({
+  "amount": parseInt(400 * 1e8),
+  "currency": "BRL",
+  "method": "bradesco",
+  "data": {
+    "AccountBranch": "111",
+    "AccountNumber": "4444-5",
+    "AccountType": "corrente",
+    "CPF_CNPJ": "00000000000"
+  }
+})
+
 ```
 
 > Response
@@ -545,13 +545,13 @@ To get realtime updates on order book, you should listen to the following events
 
 ```js
 
-  BlinkTrade.subscribeOrderbook(["BTCUSD"])
-    .on("OB:NEW_ORDER", function(order) {
-  }).on("OB:UPDATE_ORDER", function(order) {
-  }).on("OB:DELETE_ORDER", function(order) {
-  }).on("OB:DELETE_ORDERS_THRU", function(order) {
-  }).on("OB:TRADE_NEW", function(order) {
-  });
+BlinkTrade.subscribeOrderbook(["BTCUSD"])
+  .on("OB:NEW_ORDER", function(order) {
+}).on("OB:UPDATE_ORDER", function(order) {
+}).on("OB:DELETE_ORDER", function(order) {
+}).on("OB:DELETE_ORDERS_THRU", function(order) {
+}).on("OB:TRADE_NEW", function(order) {
+});
 
 ```
 
@@ -559,12 +559,12 @@ You can still return a promise when listen events...
 
 ```js
 
-  BlinkTrade.subscribeOrderbook(["BTCUSD"])
-  .on("OB:NEW_ORDER", function(order) {
-    console.log("New order received");
-  }).then(function(orderbook) {
-    console.log("Full orderbook", orderbook);
-  });
+BlinkTrade.subscribeOrderbook(["BTCUSD"])
+.on("OB:NEW_ORDER", function(order) {
+  console.log("New order received");
+}).then(function(orderbook) {
+  console.log("Full orderbook", orderbook);
+});
 
 ```
 
