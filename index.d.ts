@@ -121,7 +121,7 @@ declare module blinktrade {
     /**
      * Returns all your withdraws.
      */
-    interface ListWithdraws extends Pagination {
+    interface WithdrawList extends Pagination {
         /**
          * 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled
          */
@@ -217,7 +217,7 @@ declare module blinktrade {
         /**
          * Returns a list of your withdraws
          */
-        listWithdraws(withdraw: ListWithdraws, callback?: Function): Promise<Object>;
+        requestWithdrawList(withdraw: WithdrawList, callback?: Function): Promise<Object>;
 
         /**
          * Request a FIAT or bitcoin withdraw

@@ -623,7 +623,7 @@ blinktrade.executionReport()
 * [sendOrder](#sendorder-websocket-rest)
 * [cancelOrder](#cancelorder-websocket-rest)
 * [myOrders](#myorders-websocket-rest)
-* [listWithdraws](#listwithdraws-websocket-rest)
+* [requestWithdrawList](#requestWithdrawList-websocket-rest)
 * [requestWithdraw](#requestwithdraw-websocket-rest)
 * [requestDeposit](#requestdeposit-websocket-rest)
 * [requestDepositMethods](#requestdeposit-websocket-rest)
@@ -822,9 +822,9 @@ These methods bellow are both availabe under Rest and WebSocket API.
 | pageSize | Number | Number of orders, limits to 40 |
 
 
-### listWithdraws [websocket, rest]
+### requestWithdrawList [websocket, rest]
 
-`listWithdraws(Object pagination, Array<string> statusList, Function? callback)` => Promise / callback
+`requestWithdrawList(Object pagination, Array<string> statusList, Function? callback)` => Promise / callback
 
 | Name       | Type   | Description                                        |
 |------------|--------|----------------------------------------------------|

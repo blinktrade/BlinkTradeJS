@@ -155,7 +155,7 @@ class BaseTransport extends Base {
   /**
    * statusList: 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled
    */
-  listWithdraws({
+  requestWithdrawList({
     page: Page = 0,
     pageSize: PageSize = 20,
     statusList: StatusList = ['1', '2', '4', '8'],
