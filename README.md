@@ -810,9 +810,9 @@ These methods bellow are both availabe under Rest and WebSocket API.
 | clientId | Number | You need to pass the clientId (`ClOrdID`) in order to get a response |
 
 
-### myOrder [websocket, rest]
+### myOrders [websocket, rest]
 
-`myOrder(Object pagination, Function? callback)` => Promise / callback
+`myOrders(Object pagination, Function? callback)` => Promise / callback
 
 #### Arguments
 
