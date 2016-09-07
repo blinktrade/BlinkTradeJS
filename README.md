@@ -235,18 +235,18 @@ blinktrade.balance(function(err, balance) {
 ```json
 
 {
-    '5': {
-        BTC_locked: 0,
-        USD: 177911657052760,
-        BTC: 1468038442214,
-        USD_locked: 96750050000
+    "5": {
+        "BTC_locked": 0,
+        "USD": 177911657052760,
+        "BTC": 1468038442214,
+        "USD_locked": 96750050000
     },
-    MsgType: 'U3',
-    ClientID: 90800003,
-    BalanceReqID: 5019624,
-    Available: {
-        USD: 177814907002760,
-        BTC: 1468038442214
+    "MsgType": "U3",
+    "ClientID": 90800003,
+    "BalanceReqID": 5019624,
+    "Available": {
+        "USD": 177814907002760,
+        "BTC": 1468038442214
     }
 }
 
