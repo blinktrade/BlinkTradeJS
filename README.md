@@ -1,10 +1,10 @@
-# blinktradeJS SDK
+# BlinkTradeJS SDK
 
-blinktradeJS WebSocket and Rest official JavasScript client for node.js and browser.
+BlinkTradeJS WebSocket and Rest official JavasScript client for node.js and browser.
 
 # Getting Started
 
-blinktrade provides a simple and robust WebSocket API to integrate our platform, we strongly recommend you to use it over the Rest-ful API.
+BlinkTrade provides a simple and robust WebSocket API to integrate our platform, we strongly recommend you to use it over the Rest-ful API.
 
 ## Install
 
@@ -66,7 +66,7 @@ blinktrade.ticker().then(function(ticker) {
 
 ```js
 
-var blinktradeRest = require("blinktrade").BlinkTradeRest;
+var BlinkTradeRest = require("blinktrade").BlinkTradeRest;
 var blinktrade = new BlinkTradeRest({ currency: "BRL" });
 
 blinktrade.orderbook().then(function(orderbook) {
