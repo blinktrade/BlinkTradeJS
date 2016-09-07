@@ -1,10 +1,10 @@
-# BlinkTradeJS SDK
+# blinktradeJS SDK
 
-BlinkTradeJS WebSocket and Rest official JavasScript client for node.js and browser.
+blinktradeJS WebSocket and Rest official JavasScript client for node.js and browser.
 
 # Getting Started
 
-BlinkTrade provides a simple and robust WebSocket API to integrate our platform, we strongly recommend you to use it over the Rest-ful API.
+blinktrade provides a simple and robust WebSocket API to integrate our platform, we strongly recommend you to use it over the Rest-ful API.
 
 ## Install
 
@@ -36,9 +36,9 @@ The most simple way to get the ticker, orderbook and trades, is through our publ
 ```js
 
 var BlinkTradeRest = require("blinktrade").BlinkTradeRest;
-var BlinkTrade = new BlinkTradeRest({ currency: "BRL" });
+var blinktrade = new BlinkTradeRest({ currency: "BRL" });
 
-BlinkTrade.ticker().then(function(ticker) {
+blinktrade.ticker().then(function(ticker) {
   console.log(ticker);
 });
 
@@ -66,10 +66,10 @@ BlinkTrade.ticker().then(function(ticker) {
 
 ```js
 
-var BlinkTradeRest = require("blinktrade").BlinkTradeRest;
-var BlinkTrade = new BlinkTradeRest({ currency: "BRL" });
+var blinktradeRest = require("blinktrade").BlinkTradeRest;
+var blinktrade = new BlinkTradeRest({ currency: "BRL" });
 
-BlinkTrade.orderbook().then(function(orderbook) {
+blinktrade.orderbook().then(function(orderbook) {
   console.log(orderbook);
 });
 
@@ -98,9 +98,9 @@ BlinkTrade.orderbook().then(function(orderbook) {
 ```js
 
 var BlinkTradeRest = require("blinktrade").BlinkTradeRest;
-var BlinkTrade = new BlinkTradeRest({ currency: "BRL" });
+var blinktrade = new BlinkTradeRest({ currency: "BRL" });
 
-BlinkTrade.trades().then(function(trades) {
+blinktrade.trades().then(function(trades) {
   console.log(trades);
 });
 
@@ -137,18 +137,18 @@ BlinkTrade.trades().then(function(trades) {
 On our Rest-ful API, we provide a trade endpoint that you're allowed to send and cancel orders, request deposits and withdraws,
 you need to generate a API Key through our platform and set their respective permission that gives you access to it.
 
-> note that when generate the API Key and the API Secret, it will be only shown once, you should save it securely, the API Password is only used in the WebSocket api.
+> **NOTE** that when generate the API Key and the API Secret, it will be only shown once, you should save it securely, the API Password is only used in the WebSocket api.
 
 ```js
 var BlinkTradeRest = require("blinktrade").BlinkTradeRest;
-var BlinkTrade = new BlinkTradeRest({
+var blinktrade = new BlinkTradeRest({
   prod: false,
   key: "YOUR_API_KEY_GENERATED_IN_API_MODULE",
   secret: "YOUR_SECRET_KEY_GENERATED_IN_API_MODULE",
   currency: "BRL",
 });
 
-BlinkTrade.sendOrder({
+blinktrade.sendOrder({
   side: "1",
   price: parseInt(1800 * 1e8),
   amount: parseInt(0.5 * 1e8),
@@ -198,11 +198,11 @@ Make sure that you're connected to send messages through websocket, most of the 
 ```js
 
 var BlinkTradeWS = require("blinktrade").BlinkTradeWS;
-var BlinkTrade = new BlinkTradeWS({ prod: true });
+var blinktrade = new BlinkTradeWS({ prod: true });
 
-BlinkTrade.connect().then(function() {
+blinktrade.connect().then(function() {
   // Connected
-  return BlinkTrade.login({ username: "", password: "" });
+  return blinktrade.login({ username: "", password: "" });
 }).then(function() {
 });
 
@@ -210,9 +210,11 @@ BlinkTrade.connect().then(function() {
 
 ### Requesting Balance
 
+Will request your balance for each broker.
+
 ```js
 
-BlinkTrade.balance().then(function(balance) {
+blinktrade.balance().then(function(balance) {
   console.log(balance);
 });
 
@@ -222,9 +224,31 @@ You can pass a callback to receive balance updates.
 
 ```js
 
-BlinkTrade.balance(function(err, balance) {
+blinktrade.balance(function(err, balance) {
   console.log(balance);
 });
+
+```
+
+#### EXAMPLE RESPONSE
+
+```json
+
+{
+    '5': {
+        BTC_locked: 0,
+        USD: 177911657052760,
+        BTC: 1468038442214,
+        USD_locked: 96750050000
+    },
+    MsgType: 'U3',
+    ClientID: 90800003,
+    BalanceReqID: 5019624,
+    Available: {
+        USD: 177814907002760,
+        BTC: 1468038442214
+    }
+}
 
 ```
 
@@ -232,7 +256,7 @@ BlinkTrade.balance(function(err, balance) {
 
 ```js
 
-BlinkTrade.subscribeOrderbook(["BTCUSD"]).then(function(orderbook) {
+blinktrade.subscribeOrderbook(["BTCUSD"]).then(function(orderbook) {
   console.log(orderbook);
 });
 
@@ -261,13 +285,13 @@ To unsubscribe from orderbook, you should pass the `MDReqID` on `unSubscribeOrde
 
 ```js
 
-BlinkTrade.subscribeOrderbook(["BTCUSD"]).then(function(orderbook) {
-  BlinkTrade.unSubscribeOrderbook(orderbook.MDReqID);
+blinktrade.subscribeOrderbook(["BTCUSD"]).then(function(orderbook) {
+  blinktrade.unSubscribeOrderbook(orderbook.MDReqID);
 });
 
 ```
 
-> Note that there's not return when unsubscribe from orderbook.
+> Note that there's no return when unsubscribe from orderbook.
 
 
 ### Subscribe to ticker
@@ -276,7 +300,7 @@ You can subscribe on one or more market symbols.
 
 ```js
 
-BlinkTrade.subscribeTicker(["BLINK:BTCUSD"]).then(function(ticker) {
+blinktrade.subscribeTicker(["BLINK:BTCUSD"]).then(function(ticker) {
   console.log(ticker);
 });
 
@@ -286,8 +310,8 @@ To unsubscribe from ticker, you do the same as `unSubscribeOrderbook`, but passi
 
 ```js
 
-BlinkTrade.subscribeTicker(["BLINK:BTCUSD"]).then(function(ticker) {
-  BlinkTrade.unSubscribeTicker(ticker.SecurityStatusReqID);
+blinktrade.subscribeTicker(["BLINK:BTCUSD"]).then(function(ticker) {
+  blinktrade.unSubscribeTicker(ticker.SecurityStatusReqID);
 });
 
 ```
@@ -314,7 +338,7 @@ parseInt((0.57 * 1e8).toFixed(0)) => 57000000
 
 ```js
 
-BlinkTrade.sendOrder({
+blinktrade.sendOrder({
   "side": "1", // Buy
   "price": parseInt((550 * 1e8).toFixed(0)),
   "amount": parseInt((0.05 * 1e8).toFixed(0)),
@@ -359,7 +383,7 @@ To cancel orders, you need to pass the OrderID, you'll also need to pass the ClO
 
 ```js
 
-BlinkTrade.cancelOrder({ orderID: order.OrderID, clientId: order.ClOrdID }).then(function(order) {
+blinktrade.cancelOrder({ orderID: order.OrderID, clientId: order.ClOrdID }).then(function(order) {
   console.log("Order Cancelled");
 });
 
@@ -375,7 +399,7 @@ List the latest trades executed on an exchange since a chosen date.
 
 ```js
 
-BlinkTrade.trades({ limit: 1000, since: "1472347212" }).then(function(data) {
+blinktrade.trades({ limit: 1000, since: "1472347212" }).then(function(data) {
   console.log("Trades", data);
 });
 
@@ -449,6 +473,7 @@ Both response for bitcoin and fiat deposits is similar.
 
 ```
 
+**NOTE** The `Data.InputAddress` is the address that you have to deposit, **DO NOT DEPOSIT** on `Data.Destination` address.
 
 ### Requesting Withdraws
 
@@ -458,7 +483,7 @@ can check the [withdraws methods required]() fields on API section.
 
 ```js
 
-BlinkTrade.requestWithdraw({
+blinktrade.requestWithdraw({
   "amount": parseInt(400 * 1e8),
   "currency": "BRL",
   "method": "bradesco",
@@ -520,7 +545,7 @@ To keep ticker update on new events, you can return a event emitter and match wi
 
 ```js
 
-BlinkTrade.subscribeTicker(["UOL:USDBRT", "BLINK:BTCUSD", "BLINK:BTCBRL"])
+blinktrade.subscribeTicker(["UOL:USDBRT", "BLINK:BTCUSD", "BLINK:BTCBRL"])
   .on("UOL:USDBRT",   function(usdbrt) {
 }).on("BLINK:BTCUSD", function(btcusd) {
 }).on("BLINK:BTCBRL", function(btcbrl) {
@@ -532,7 +557,7 @@ You can easily match all symbols at the same listener.
 
 ```js
 
-BlinkTrade.subscribeTicker(["UOL:USDBRT", "BLINK:BTCUSD", "BLINK:BTCBRL"])
+blinktrade.subscribeTicker(["UOL:USDBRT", "BLINK:BTCUSD", "BLINK:BTCBRL"])
 .on("BLINK:*", function(symbol) {
 });
 
@@ -544,7 +569,7 @@ To get realtime updates on order book, you should listen to the following events
 
 ```js
 
-BlinkTrade.subscribeOrderbook(["BTCUSD"])
+blinktrade.subscribeOrderbook(["BTCUSD"])
   .on("OB:NEW_ORDER", function(order) {
 }).on("OB:UPDATE_ORDER", function(order) {
 }).on("OB:DELETE_ORDER", function(order) {
@@ -558,7 +583,7 @@ You can still return a promise when listen events.
 
 ```js
 
-BlinkTrade.subscribeOrderbook(["BTCUSD"])
+blinktrade.subscribeOrderbook(["BTCUSD"])
 .on("OB:NEW_ORDER", function(order) {
   console.log("New order received");
 }).then(function(orderbook) {
@@ -573,7 +598,7 @@ You listen the `BALANCE` event to receive balance updates
 
 ```js
 
-BlinkTrade.balance().on("BALANCE", function(balance) {
+blinktrade.balance().on("BALANCE", function(balance) {
   console.log(balance);
 });
 
