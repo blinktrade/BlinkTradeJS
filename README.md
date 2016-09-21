@@ -478,8 +478,7 @@ Both response for bitcoin and fiat deposits is similar.
 ### Requesting Withdraws
 
 To request withdraws, you need to pass a "data" information, whichs represents the information to your withdraw,
-it's related to bank accounts, numbers, or a bitcoin address, these informations are dynamically and is diferrent from brokers by brokers,
-can check the [withdraws methods required]() fields on API section.
+it's related to bank accounts, numbers, or a bitcoin address, these informations are dynamically and different by each broker.
 
 ```js
 
