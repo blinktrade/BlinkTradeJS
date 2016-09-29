@@ -12,7 +12,7 @@
     "flow": "flow check",
     "check": "npm run lint && npm run test ",
     "build:src": "babel src --out-dir lib",
-    "build:dev": "cross-env NODE_ENV=production webpack ./src/index.js dist/blinktrade.js",
+    "build:dev": "cross-env NODE_ENV=development webpack ./src/index.js dist/blinktrade.js",
     "build:prod": "cross-env NODE_ENV=production webpack ./src/index.js dist/blinktrade.min.js",
     "build": "npm run build:src && npm run build:dev && npm run build:prod",
     "test": "NODE_ENV=test mocha --compilers js:babel-register --recursive",
