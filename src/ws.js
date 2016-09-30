@@ -23,6 +23,7 @@
 import MsgTypes from './constants/requests';
 
 import WebSocketTransport from './wsTransport';
+import _ from 'lodash';
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import {
   registerListener,
@@ -300,29 +301,8 @@ class BlinkTradeWS extends WebSocketTransport {
 
     return new Promise((resolve, reject) => {
       return super.sendMessageAsPromise(msg, callback).then(data => {
-        let last = 0;
-        let IsPump = false;
         const { Columns, ...trades } = data;
-        const TradeHistory = {};
-
-        data.TradeHistoryGrp.reverse().map(trade => {
-          IsPump = last === trade[3] ? IsPump : last <= trade[3];
-
-          last = trade[3];
-          TradeHistory[trade[1]] = TradeHistory[trade[1]] || [];
-          return TradeHistory[trade[1]].unshift({
-            TradeID: trade[0],
-            Market: trade[1],
-            Side: trade[2],
-            Price: trade[3],
-            Size: trade[4],
-            Buyer: trade[5],
-            Seller: trade[6],
-            Created: trade[7],
-            IsPump,
-          });
-        });
-
+        const TradeHistory = _.groupBy(_.map(data.TradeHistoryGrp, trade => _.zipObject(Columns, trade)), trade => trade.Market);
         return resolve({
           ...trades,
           TradeHistoryGrp: TradeHistory,
