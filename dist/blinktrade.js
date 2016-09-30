@@ -1,8 +1,4156 @@
-!function(e){function t(n){if(r[n])return r[n].exports;var o=r[n]={exports:{},id:n,loaded:!1};return e[n].call(o.exports,o,o.exports,t),o.loaded=!0,o.exports}var r={};return t.m=e,t.c=r,t.p="",t(0)}([function(e,t,r){"use strict";function n(e){return e&&e.__esModule?e:{"default":e}}Object.defineProperty(t,"__esModule",{value:!0}),t.BlinkTradeRest=t.BlinkTradeWS=t.Brokers=void 0;var o=r(1),i=n(o),u=r(2),s=n(u),a=r(25),f=n(a);t.Brokers=i["default"],t.BlinkTradeWS=s["default"],t.BlinkTradeRest=f["default"]},function(e,t){"use strict";Object.defineProperty(t,"__esModule",{value:!0}),t["default"]={SURBITCOIN:1,VBTC:3,FOXBIT:4,TESTNET:5,URDUBIT:8,CHILEBIT:9}},function(e,t,r){"use strict";function n(e){return e&&e.__esModule?e:{"default":e}}function o(e,t,r){return t in e?Object.defineProperty(e,t,{value:r,enumerable:!0,configurable:!0,writable:!0}):e[t]=r,e}function i(e,t){var r={};for(var n in e)t.indexOf(n)<0&&Object.prototype.hasOwnProperty.call(e,n)&&(r[n]=e[n]);return r}function u(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function s(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t}function a(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}Object.defineProperty(t,"__esModule",{value:!0});var f=Object.assign||function(e){for(var t=1;arguments.length>t;t++){var r=arguments[t];for(var n in r)Object.prototype.hasOwnProperty.call(r,n)&&(e[n]=r[n])}return e},c=function(){function e(e,t){for(var r=0;t.length>r;r++){var n=t[r];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}return function(t,r,n){return r&&e(t.prototype,r),n&&e(t,n),t}}(),l=function _(e,t,r){null===e&&(e=Function.prototype);var n=Object.getOwnPropertyDescriptor(e,t);if(void 0===n){var o=Object.getPrototypeOf(e);return null===o?void 0:_(o,t,r)}if("value"in n)return n.value;var i=n.get;if(void 0!==i)return i.call(r)},h=r(3),p=n(h),d=r(4),y=n(d),E=(r(13),r(9)),g=r(24),v=function(e){function t(e){u(this,t);var r=s(this,(t.__proto__||Object.getPrototypeOf(t)).call(this,e));return r.session={},r}return a(t,e),c(t,[{key:"heartbeat",value:function(e){var r=this,n=new Date,o={MsgType:p["default"].HEARTBEAT,TestReqID:n.getTime(),SendTime:n.getTime()};return new Promise(function(n,i){return l(t.prototype.__proto__||Object.getPrototypeOf(t.prototype),"sendMessageAsPromise",r).call(r,o,e).then(function(e){return n(f({},e,{Latency:new Date(Date.now())-e.SendTime}))})["catch"](i)})}},{key:"login",value:function(e,r){var n=this,o=e.username,i=e.password,u=e.secondFactor,s=void 0;this.isNode||(s={UserAgent:window.navigator.userAgent,UserAgentLanguage:window.navigator.language,UserAgentPlatform:window.navigator.platform,UserAgentTimezoneOffset:(new Date).getTimezoneOffset()});var a=f({MsgType:p["default"].LOGIN,UserReqID:(0,E.generateRequestId)(),BrokerID:this.brokerId,Username:o,Password:i,UserReqTyp:"1"},s);return u&&(a.SecondFactor=u),new Promise(function(e,o){return l(t.prototype.__proto__||Object.getPrototypeOf(t.prototype),"sendMessageAsPromise",n).call(n,a,r).then(function(t){return 1===t.UserStatus?(n.session=t,e(t)):o(t)})["catch"](o)})}},{key:"logout",value:function(e){var r={MsgType:p["default"].LOGOUT,BrokerID:this.brokerId,UserReqID:(0,E.generateRequestId)(),Username:this.session.Username,UserReqTyp:"2"};return l(t.prototype.__proto__||Object.getPrototypeOf(t.prototype),"sendMessageAsPromise",this).call(this,r,e)}},{key:"profile",value:function r(e){var t=this.session.Profile,r=i(t,["VerificationData"]);return e?e(r):Promise.resolve(r)}},{key:"balance",value:function(e){var r=this;return(0,E.registerListener)("U3",function(t){return e&&e(null,t),r.eventEmitter.emit(g.BALANCE,t)}),l(t.prototype.__proto__||Object.getPrototypeOf(t.prototype),"emitterPromise",this).call(this,new Promise(function(n,o){return l(t.prototype.__proto__||Object.getPrototypeOf(t.prototype),"balance",r).call(r,e).then(n)["catch"](o)}))}},{key:"subscribeTicker",value:function(e,r){var n=this,o={MsgType:p["default"].SECURITY_STATUS,SecurityStatusReqID:(0,E.generateRequestId)(),SubscriptionRequestType:"1",Instruments:e},i=function(e){return f({},e,{SellVolume:e.SellVolume/1e8,LowPx:e.LowPx/1e8,LastPx:e.LastPx/1e8,BestAsk:e.BestAsk/1e8,HighPx:e.HighPx/1e8,BuyVolume:e.BuyVolume/1e8,BestBid:e.BestBid/1e8})};return l(t.prototype.__proto__||Object.getPrototypeOf(t.prototype),"emitterPromise",this).call(this,new Promise(function(e,u){return l(t.prototype.__proto__||Object.getPrototypeOf(t.prototype),"sendMessageAsPromise",n).call(n,o,r).then(function(t){e(i(t)),(0,E.registerEventEmitter)({SecurityStatusReqID:t.SecurityStatusReqID},function(e){return r&&r(null,i(e)),n.eventEmitter.emit("BLINK:"+e.Symbol,i(e))})})["catch"](u)}))}},{key:"unSubscribeTicker",value:function(e){var r={MsgType:p["default"].SECURITY_STATUS,SecurityStatusReqID:e,SubscriptionRequestType:"2"};return l(t.prototype.__proto__||Object.getPrototypeOf(t.prototype),"sendMessage",this).call(this,r),e}},{key:"subscribeOrderbook",value:function(e,r){var n=this,i={MsgType:p["default"].MARKET_DATA_FULL_REFRESH,MDReqID:(0,E.generateRequestId)(),SubscriptionRequestType:"1",MarketDepth:0,MDUpdateType:"1",MDEntryTypes:["0","1","2"],Instruments:e},u=function(e){"3"===e.MDBkTyp&&e.MDIncGrp.map(function(e){var t={index:e.MDEntryPositionNo,price:e.MDEntryPx/1e8,size:e.MDEntrySize/1e8,side:"0"===e.MDEntryType?"buy":"sell",userId:e.UserID,orderId:e.OrderID,symbol:e.Symbol,time:""+new Date(e.MDEntryDate+" "+e.MDEntryTime)};switch(r&&r(null,t),e.MDEntryType){case"0":case"1":var o=g.ORDER_BOOK+":"+g.EVENTS.ORDERBOOK[e.MDUpdateAction];return n.eventEmitter.emit(o,f({},t,{type:o}));case"2":var i=g.ORDER_BOOK+":"+g.EVENTS.TRADES[e.MDUpdateAction];return n.eventEmitter.emit(i,f({},t,{type:i}));case"4":break;default:return null}return null})};return l(t.prototype.__proto__||Object.getPrototypeOf(t.prototype),"emitterPromise",this).call(this,new Promise(function(e,s){return l(t.prototype.__proto__||Object.getPrototypeOf(t.prototype),"sendMessageAsPromise",n).call(n,i,r).then(function(t){if("W"===t.MsgType){var r=t.MDFullGrp.filter(function(e){return"0"===e.MDEntryType||"1"===e.MDEntryType}).reduce(function(e,t){var r="0"===t.MDEntryType?"bids":"asks";return(e[r]||(e[r]=[])).push([t.MDEntryPx/1e8,t.MDEntrySize/1e8,t.UserID]),e},[]),n=r.bids,i=r.asks;return(0,E.registerEventEmitter)({MDReqID:t.MDReqID},u),e(f({},t,{MDFullGrp:o({},t.Symbol,{bids:n,asks:i})}))}})["catch"](function(e){return s(e)})}))}},{key:"unSubscribeOrderbook",value:function(e){var r={MsgType:p["default"].MARKET_DATA_UNSUBSCRIBE,MDReqID:e,MarketDepth:0,SubscriptionRequestType:"2"};return l(t.prototype.__proto__||Object.getPrototypeOf(t.prototype),"sendMessage",this).call(this,r),e}},{key:"executionReport",value:function(e){var t=this;return(0,E.registerListener)("8",function(r){e&&e(r);var n=g.EVENTS.EXECUTION_REPORT[r.ExecType];return t.eventEmitter.emit(g.EXECUTION_REPORT+":"+n,r)}),this.eventEmitter}},{key:"tradeHistory",value:function(){var e=this,r=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},n=r.page,o=void 0===n?0:n,u=r.pageSize,s=void 0===u?80:u,a=arguments[1],c={MsgType:p["default"].TRADE_HISTORY,TradeHistoryReqID:(0,E.generateRequestId)(),Page:o,PageSize:s};return new Promise(function(r,n){return l(t.prototype.__proto__||Object.getPrototypeOf(t.prototype),"sendMessageAsPromise",e).call(e,c,a).then(function(e){var t=0,n=!1,o=i(e,["Columns"]),u={};return e.TradeHistoryGrp.reverse().map(function(e){return n=t===e[3]?n:e[3]>=t,t=e[3],u[e[1]]=u[e[1]]||[],u[e[1]].unshift({TradeID:e[0],Market:e[1],Side:e[2],Price:e[3],Size:e[4],Buyer:e[5],Seller:e[6],Created:e[7],IsPump:n})}),r(f({},o,{TradeHistoryGrp:u}))})["catch"](n)})}}]),t}(y["default"]);t["default"]=v},function(e,t){"use strict";Object.defineProperty(t,"__esModule",{value:!0}),t["default"]={HEARTBEAT:"1",LOGIN:"BE",LOGOUT:"BE",CHANGE_PASSWORD:"BE",MARKET_DATA_FULL_REFRESH:"V",MARKET_DATA_UNSUBSCRIBE:"V",ORDER_SEND:"D",ORDER_CANCEL:"F",SECURITY_LIST:"x",SECURITY_STATUS:"e",BALANCE:"U2",ORDER_LIST:"U4",BROKER_LIST:"U28",TRADE_HISTORY:"U32",PROFILE_UPDATE:"U38",REQUEST_DEPOSIT:"U18",REQUEST_DEPOSIT_METHODS:"U20",REQUEST_WITHDRAW:"U6",REQUEST_WITHDRAW_LIST:"U26"}},function(e,t,r){"use strict";function n(e){return e&&e.__esModule?e:{"default":e}}function o(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function i(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t}function u(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}Object.defineProperty(t,"__esModule",{value:!0});var s=function(){function e(e,t){for(var r=0;t.length>r;r++){var n=t[r];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}return function(t,r,n){return r&&e(t.prototype,r),n&&e(t,n),t}}(),a=r(5),f=n(a),c=r(11),l=n(c),h=r(12),p=n(h),d=r(13),y=r(9),E=function(e){function t(e){o(this,t);var r=i(this,(t.__proto__||Object.getPrototypeOf(t)).call(this,e,"ws"));return r.stun={local:null,"public":[]},r.getStun(),r.getFingerPrint(),r.eventEmitter=new d.EventEmitter2({wildcard:!0,delimiter:":"}),r}return u(t,e),s(t,[{key:"connect",value:function(e){var t=this;return p["default"].extend(new Promise(function(e,n){t.request={resolve:e,reject:n};var o=t.isNode?r(14):window.WebSocket;t.socket=new o(t.endpoint),t.socket.onopen=t.onOpen.bind(t),t.socket.onclose=t.onClose.bind(t),t.socket.onerror=t.onError.bind(t),t.socket.onmessage=t.onMessage.bind(t)})).nodeify(e)}},{key:"disconnect",value:function(){this.socket.close()}},{key:"onOpen",value:function(){this.request.resolve({connected:!0})}},{key:"onClose",value:function(){}},{key:"onError",value:function(){this.request.reject()}},{key:"sendMessage",value:function(e){if(1===this.socket.readyState){var t=e;t.STUNTIP=this.stun,t.FingerPrint=this.fingerPrint,this.socket.send(JSON.stringify(t))}}},{key:"sendMessageAsPromise",value:function(e,t){var r=this;return p["default"].extend(new Promise(function(t,n){var o={resolve:t,reject:n};return e?((0,y.registerRequest)(e,o),void r.sendMessage(e,o)):n("Missing Message")})).nodeify(t)}},{key:"onMessage",value:function(e){var t=JSON.parse(e.data);if("ERROR"===t.MsgType)throw Error("Error: "+t.Detail+" "+t.Description);var r=(0,y.getRequest)(t),n=(0,y.getListener)(t.MsgType);this.dispatchPromise(r,t),this.dispatchListeners(n,t)}},{key:"dispatchPromise",value:function(e,t){if(e)return e.resolve?e.resolve(t):e.callback?e.callback(t):null}},{key:"dispatchListeners",value:function(e,t){return e&&e(t)}},{key:"emitterPromise",value:function(e){var t=this;return e.on=function(r,n){return t.eventEmitter.on(r,n),e},e.onAny=function(r){return t.eventEmitter.onAny(r),e},e.offAny=function(r){return t.eventEmitter.offAny(r),e},e.once=function(r,n){return t.eventEmitter.once(r,n),e},e.many=function(r,n,o){return t.eventEmitter.many(r,n,o),e},e.removeListener=function(r,n){return t.eventEmitter.removeListener(r,n),e},e.removeAllListeners=function(r){return t.eventEmitter.removeAllListeners(r),e},e}},{key:"getFingerPrint",value:function(){var e=this;return this.isNode?r(15).getMac(function(t){e.fingerPrint=t}):(new l["default"]).get(function(t){e.fingerPrint=t})}},{key:"getStun",value:function(){var e=this;this.isNode&&r(17).getStun(function(t){e.stun=t})}}]),t}(f["default"]);t["default"]=E},function(e,t,r){"use strict";function n(e){if(e&&e.__esModule)return e;var t={};if(null!=e)for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&(t[r]=e[r]);return t["default"]=e,t}function o(e){return e&&e.__esModule?e:{"default":e}}function i(e,t){var r={};for(var n in e)t.indexOf(n)<0&&Object.prototype.hasOwnProperty.call(e,n)&&(r[n]=e[n]);return r}function u(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function s(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t}function a(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}Object.defineProperty(t,"__esModule",{value:!0});var f=Object.assign||function(e){for(var t=1;arguments.length>t;t++){var r=arguments[t];for(var n in r)Object.prototype.hasOwnProperty.call(r,n)&&(e[n]=r[n])}return e},c=function(){function e(e,t){for(var r=0;t.length>r;r++){var n=t[r];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}return function(t,r,n){return r&&e(t.prototype,r),n&&e(t,n),t}}(),l=r(6),h=o(l),p=r(3),d=o(p),y=r(8),E=n(y),g=r(9),v=function(e){function t(e,r){u(this,t);var n=s(this,(t.__proto__||Object.getPrototypeOf(t)).call(this,e,r));return n.send="ws"===r?n.sendMessageAsPromise:n.fetchTrade,n}return a(t,e),c(t,[{key:"balance",value:function(e){var t=this,r={MsgType:d["default"].BALANCE,BalanceReqID:(0,g.generateRequestId)()};return new Promise(function(n,o){return t.send(r,e).then(function(e){var r={},o=e[t.brokerId];return Object.keys(o).map(function(e){return e.includes("locked")||(r[e]=o[e]-o[e+"_locked"]),r}),n(f({},e,{Available:r}))})["catch"](o)})}},{key:"myOrders",value:function(){var e=this,t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},r=t.page,n=void 0===r?0:r,o=t.pageSize,u=void 0===o?40:o,s=arguments[1],a={MsgType:d["default"].ORDER_LIST,OrdersReqID:(0,g.generateRequestId)(),Page:n,PageSize:u};return new Promise(function(t,r){return e.send(a,s).then(function(e){var r=i(e,["Columns"]),n=[];return e.OrdListGrp.map(function(e){return n.push({ClOrdID:e[0],OrderID:e[1],CumQty:e[2],OrdStatus:e[3],LeavesQty:e[4],CxlQty:e[5],AvgPx:e[6],Symbol:e[7],Side:e[8],OrdType:e[9],OrderQty:e[10],Price:e[11],OrderDate:e[12],Volume:e[13],TimeInForce:e[14]})}),t(f({},r,{OrdListGrp:n}))})["catch"](r)})}},{key:"sendOrder",value:function(e,t){var r=this,n=e.side,o=e.amount,i=e.price,u=e.symbol,s={MsgType:d["default"].ORDER_SEND,ClOrdID:(0,g.generateRequestId)(),Symbol:u,Side:n,OrdType:"2",Price:i,OrderQty:o,BrokerID:this.brokerId};return new Promise(function(e,n){return r.send(s,t).then(function(t){(0,g.deleteRequest)(E.CLIENT_ORDER_ID),e(t)})["catch"](n)})}},{key:"cancelOrder",value:function(e,t){var r=e.orderId?e.orderId:e,n={MsgType:d["default"].ORDER_CANCEL,OrderID:r};return e.clientId&&(n.ClOrdID=e.clientId),this.send(n,t)}},{key:"listWithdraws",value:function(){var e=this,t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},r=t.page,n=void 0===r?0:r,o=t.pageSize,u=void 0===o?20:o,s=t.statusList,a=void 0===s?["1","2","4","8"]:s,c=arguments[1],l={MsgType:d["default"].REQUEST_WITHDRAW_LIST,WithdrawListReqID:(0,g.generateRequestId)(),Page:n,PageSize:u,StatusList:a};return new Promise(function(t,r){return e.send(l,c).then(function(e){var r=i(e,["Columns"]),n=[];return e.WithdrawListGrp.map(function(e){return n.push({WithdrawID:e[0],Method:e[1],Currency:e[2],Amount:e[3],Data:e[4],Created:e[5],Status:e[6],ReasonID:e[7],Reason:e[8],PercentFee:e[9],FixedFee:e[10],PaidAmount:e[11],UserID:e[12],Username:e[13],BrokerID:e[14],ClOrdID:e[15]})}),t(f({},r,{WithdrawListGrp:n}))})["catch"](r)})}},{key:"requestWithdraw",value:function(e,t){var r=e.amount,n=e.data,o=e.currency,i=void 0===o?"BTC":o,u=e.method,s=void 0===u?"bitcoin":u,a=(0,g.generateRequestId)(),f={MsgType:d["default"].REQUEST_WITHDRAW,WithdrawReqID:a,ClOrdID:a,Method:s,Amount:r,Currency:i,Data:n};return this.send(f,t)}},{key:"requestDeposit",value:function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},t=e.currency,r=void 0===t?"BTC":t,n=e.value,o=e.depositMethodId,i=arguments[1],u=(0,g.generateRequestId)(),s={MsgType:d["default"].REQUEST_DEPOSIT,DepositReqID:u,ClOrdID:u,Currency:r,BrokerID:this.brokerId};return"BTC"!==r&&(s.DepositMethodID=o,s.Value=n),this.send(s,i)}},{key:"requestDepositMethods",value:function(e){var t={MsgType:d["default"].REQUEST_DEPOSIT_METHODS,DepositMethodReqID:(0,g.generateRequestId)()};return this.send(t,e)}}]),t}(h["default"]);t["default"]=v},function(e,t,r){"use strict";function n(e){return e&&e.__esModule?e:{"default":e}}function o(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}Object.defineProperty(t,"__esModule",{value:!0});var i=r(7),u=n(i),s=function a(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},t=arguments[1];o(this,a);var r=e.url?e.url:e.prod?u["default"].prod[t]:u["default"].testnet[t];this.brokerId=e.brokerId||5,this.endpoint=r,this.isNode="undefined"==typeof window};t["default"]=s},function(e,t){"use strict";Object.defineProperty(t,"__esModule",{value:!0}),t["default"]={prod:{ws:"wss://api.blinktrade.com/trade/",rest:"https://api.blinktrade.com/"},testnet:{ws:"wss://api.testnet.blinktrade.com/trade/",rest:"https://api.testnet.blinktrade.com/"}}},function(e,t){"use strict";Object.defineProperty(t,"__esModule",{value:!0});t.SOCKET_ID="SocketID",t.REQUEST_ID="ReqID",t.TEST_REQUEST_ID="TestReqID",t.USER_REQUEST_ID="UserReqID",t.SECURITY_REQUEST_ID="SecurityReqID",t.RESET_PASSWORD_REQUEST_ID="ResetPasswordReqID",t.DEPOSIT_REQUEST_ID="DepositReqID",t.WITHDRAW_REQUEST_ID="WithdrawReqID",t.BALANCE_REQUEST_ID="BalanceReqID",t.ORDERS_REQUEST_ID="OrdersReqID",t.ENABLE_TWO_FACTOR_REQUEST_ID="EnableTwoFactorReqID",t.DEPOSIT_METHOD_REQUEST_ID="DepositMethodReqID",t.WITHDRAW_LIST_REQUEST_ID="WithdrawListReqID",t.BROKER_LIST_REQUEST_ID="BrokerListReqID",t.DEPOSIT_LIST_REQUEST_ID="DepositListReqID",t.TRADE_HISTORY_REQUEST_ID="TradeHistoryReqID",t.LEDGER_LIST_REQUEST_ID="LedgerListReqID",t.TRADERS_RANK_REQUEST_ID="TradersRankReqID",t.UPDATE_REQUEST_ID="UpdateReqID",t.POSITION_REQUEST_ID="PositionReqID",t.SECURITY_STATUS_REQUEST_ID="SecurityStatusReqID",t.API_KEY_LIST_REQUEST_ID="APIKeyListReqID",t.API_KEY_CREATE_REQUEST_ID="APIKeyCreateReqID",t.API_KEY_REVOKE_REQUEST_ID="APIKeyRevokeReqID",t.PROCESS_DEPOSIT_REQUEST_ID="ProcessDepositReqID",t.CUSTOMER_LIST_REQUEST_ID="CustomerListReqID",t.CUSTOMER_REQUEST_ID="CustomerReqID",t.PROCESS_WITHDRAW_REQUEST_ID="ProcessWithdrawReqID",t.VERIFY_CUSTOMER_REQUEST_ID="VerifyCustomerReqID",t.MD_REQUEST_ID="MDReqID",t.CLIENT_ORDER_ID="ClOrdID"},function(e,t,r){"use strict";function n(e){if(e&&e.__esModule)return e;var t={};if(null!=e)for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&(t[r]=e[r]);return t["default"]=e,t}function o(e){return e&&e.__esModule?e:{"default":e}}function i(){return v}function u(){return parseInt(1e7*Math.random()+"",10)}function s(e){return _[e]}function a(e){var t=void 0;return y["default"].mapKeys(g,function(r){y["default"].has(e,r)&&(t=y["default"].find(v[r],{ReqId:""+e[r]}))}),t}function f(e,t){return y["default"].mapKeys(g,function(r){y["default"].has(e,r)&&(v[r]=v[r]||[],v[r].push(p({ReqId:""+e[r]},t)))}),v}function c(e,t){return y["default"].mapKeys(g,function(r){if(y["default"].has(e,r)&&v[r]!==[]){var n=y["default"].findIndex(v[r],{ReqId:""+e[r]});v[r][n]=p({},v[r][n],{resolve:null,reject:null,callback:t})}}),v}function l(e,t){_[e]=_[e]||[],_[e]=t}function h(e){return v=y["default"].omit(v,[e])}Object.defineProperty(t,"__esModule",{value:!0});var p=Object.assign||function(e){for(var t=1;arguments.length>t;t++){var r=arguments[t];for(var n in r)Object.prototype.hasOwnProperty.call(r,n)&&(e[n]=r[n])}return e};t.getListeners=i,t.generateRequestId=u,t.getListener=s,t.getRequest=a,t.registerRequest=f,t.registerEventEmitter=c,t.registerListener=l,t.deleteRequest=h;var d=r(10),y=o(d),E=r(8),g=n(E),v={},_={}},function(e,t){e.exports=require("lodash")},function(e,t){e.exports=require("fingerprintjs2")},function(e,t){e.exports=require("nodeify")},function(e,t){e.exports=require("eventemitter2")},function(e,t){e.exports=require("ws")},function(e,t,r){"use strict";function n(e){return e&&e.__esModule?e:{"default":e}}function o(e){u["default"].all(function(t,r){var n=function(e){var t=0;if(0===e.length)return t;for(var r=0;e.length>r;r++)t=(t<<5)-t+e.charCodeAt(r),t&=t;return t},o="";Object.keys(r).forEach(function(e){o+=r[e].mac});var i=n(o);0>i&&(i*=-1),e(i)})}Object.defineProperty(t,"__esModule",{value:!0}),t.getMac=o;var i=r(16),u=n(i)},function(e,t){e.exports=require("macaddress")},function(e,t,r){(function(e){"use strict";function n(e){return e&&e.__esModule?e:{"default":e}}function o(e){e.match(/^(192\.168\.|169\.254\.|10\.|172\.(1[6-9]|2\d|3[01]))/)?l.local=e:l["public"].indexOf(e)===-1&&l["public"].push(e)}function i(t){var r=c["default"].createSocket("udp4"),n=20,i=new e(n),s=0,f=1,h=554869826,p=Math.pow(2,32),d=1,y=32800,E=32,g=Math.random()*p,v=[[3478,"stun.services.mozilla.com"],[19302,"stun.l.google.com"],[3478,"stun.stunprotocol.org"],[3478,"stun.softjoys.com"],[3478,"stun.samsungsmartcam.com"],[3478,"stun.sonetel.com"],[3478,"stun.tagan.ru"],[3478,"stun.voipgain.com"],[3478,"stunserver.org"],[3478,"stun.advfn.com"],[3478,"stun.annatel.net"],[3478,"stun.freevoipdeal.com"]];i.writeUInt16BE(16383&(f|s),0),i.writeUInt16BE(0,2),i.writeUInt32BE(h,4),i.writeUInt32BE(0,8),i.writeUInt32BE(0,12),i.writeUInt32BE(g,16),r.on("message",function(r){var i=function(t,r){var n=[];if(r.length>t.length){var o=t;t=r,r=o}for(var i=0,u=t.length;u>i;i++)n.push(t[i]^r[i]);return new e(n)},u=r.readUInt8(0),s=128&u,f=64&u;if(0===s&&0===f){for(var c=r.slice(0,n),h=r.slice(n,r.length),p=0;h.length>p;){var g=h.readUInt16BE(p);p+=2;var v=h.readUInt16BE(p),_=v%4;_>0&&(v+=4-_),p+=2;var R=h.slice(p,p+v);p+=v;var T=void 0,b=void 0;switch(g){case d:T=2===R.readUInt16BE(0)?6:4,b=a["default"].toString(R,4,T),o(b);break;case y:case E:T=2===R.readUInt16BE(0)?6:4;var O=c.slice(4,8),m=c.slice(8,20),w=R.slice(4,4===T?8:20),I=i(w,4===T?O:R.concat([O,m]));b=a["default"].toString(I,0,T),o(b)}}t(l)}}),v.map(function(e){var t=u(e,2),n=t[0],o=t[1];return r.send(i,0,i.length,n,o)})}Object.defineProperty(t,"__esModule",{value:!0});var u=function(){function e(e,t){var r=[],n=!0,o=!1,i=void 0;try{for(var u,s=e[Symbol.iterator]();!(n=(u=s.next()).done)&&(r.push(u.value),!t||r.length!==t);n=!0);}catch(a){o=!0,i=a}finally{try{!n&&s["return"]&&s["return"]()}finally{if(o)throw i}}return r}return function(t,r){if(Array.isArray(t))return t;if(Symbol.iterator in Object(t))return e(t,r);throw new TypeError("Invalid attempt to destructure non-iterable instance")}}();t.getStun=i;var s=r(22),a=n(s),f=r(23),c=n(f),l={local:null,"public":[]}}).call(t,r(18).Buffer)},function(e,t,r){(function(e,n){/*!
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+/******/
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			exports: {},
+/******/ 			id: moduleId,
+/******/ 			loaded: false
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.BlinkTradeRest = exports.BlinkTradeWS = exports.Brokers = undefined;
+	
+	var _brokers = __webpack_require__(1);
+	
+	var _brokers2 = _interopRequireDefault(_brokers);
+	
+	var _ws = __webpack_require__(2);
+	
+	var _ws2 = _interopRequireDefault(_ws);
+	
+	var _rest = __webpack_require__(25);
+	
+	var _rest2 = _interopRequireDefault(_rest);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.Brokers = _brokers2.default;
+	exports.BlinkTradeWS = _ws2.default;
+	exports.BlinkTradeRest = _rest2.default; /**
+	                                          * BlinkTradeJS SDK
+	                                          * (c) 2016-present BlinkTrade, Inc.
+	                                          *
+	                                          * This file is part of BlinkTradeJS
+	                                          *
+	                                          * This program is free software: you can redistribute it and/or modify
+	                                          * it under the terms of the GNU General Public License as published by
+	                                          * the Free Software Foundation, either version 3 of the License, or
+	                                          * (at your option) any later version.
+	                                         
+	                                          * This program is distributed in the hope that it will be useful,
+	                                          * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	                                          * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	                                          * GNU General Public License for more details.
+	                                         
+	                                          * You should have received a copy of the GNU General Public License
+	                                          * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	                                          *
+	                                          * 
+	                                          */
+
+/***/ },
+/* 1 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = {
+	  SURBITCOIN: 1,
+	  VBTC: 3,
+	  FOXBIT: 4,
+	  TESTNET: 5,
+	  URDUBIT: 8,
+	  CHILEBIT: 9
+	};
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+	
+	var _requests = __webpack_require__(3);
+	
+	var _requests2 = _interopRequireDefault(_requests);
+	
+	var _wsTransport = __webpack_require__(4);
+	
+	var _wsTransport2 = _interopRequireDefault(_wsTransport);
+	
+	var _lodash = __webpack_require__(9);
+	
+	var _lodash2 = _interopRequireDefault(_lodash);
+	
+	var _eventemitter = __webpack_require__(13);
+	
+	var _listener = __webpack_require__(10);
+	
+	var _actionTypes = __webpack_require__(24);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+	
+	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * BlinkTradeJS SDK
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * (c) 2016-present BlinkTrade, Inc.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This file is part of BlinkTradeJS
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This program is free software: you can redistribute it and/or modify
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * it under the terms of the GNU General Public License as published by
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * the Free Software Foundation, either version 3 of the License, or
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * (at your option) any later version.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This program is distributed in the hope that it will be useful,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * GNU General Public License for more details.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * You should have received a copy of the GNU General Public License
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+	
+	var BlinkTradeWS = function (_WebSocketTransport) {
+	  _inherits(BlinkTradeWS, _WebSocketTransport);
+	
+	  function BlinkTradeWS(params) {
+	    _classCallCheck(this, BlinkTradeWS);
+	
+	    var _this = _possibleConstructorReturn(this, (BlinkTradeWS.__proto__ || Object.getPrototypeOf(BlinkTradeWS)).call(this, params));
+	
+	    _this.session = {};
+	    return _this;
+	  }
+	
+	  /**
+	   * Session to store login information
+	   */
+	
+	
+	  _createClass(BlinkTradeWS, [{
+	    key: 'heartbeat',
+	    value: function heartbeat(callback) {
+	      var _this2 = this;
+	
+	      var d = new Date();
+	      var msg = {
+	        MsgType: _requests2.default.HEARTBEAT,
+	        TestReqID: d.getTime(),
+	        SendTime: d.getTime()
+	      };
+	
+	      return new Promise(function (resolve, reject) {
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this2).call(_this2, msg, callback).then(function (data) {
+	          return resolve(_extends({}, data, {
+	            Latency: new Date(Date.now()) - data.SendTime
+	          }));
+	        }).catch(reject);
+	      });
+	    }
+	  }, {
+	    key: 'login',
+	    value: function login(_ref, callback) {
+	      var _this3 = this;
+	
+	      var username = _ref.username;
+	      var password = _ref.password;
+	      var secondFactor = _ref.secondFactor;
+	
+	      var userAgent = void 0;
+	      if (!this.isNode) {
+	        userAgent = {
+	          UserAgent: window.navigator.userAgent,
+	          UserAgentLanguage: window.navigator.language,
+	          UserAgentPlatform: window.navigator.platform,
+	          UserAgentTimezoneOffset: new Date().getTimezoneOffset()
+	        };
+	      }
+	
+	      var msg = _extends({
+	        MsgType: _requests2.default.LOGIN,
+	        UserReqID: (0, _listener.generateRequestId)(),
+	        BrokerID: this.brokerId,
+	        Username: username,
+	        Password: password,
+	        UserReqTyp: '1'
+	      }, userAgent);
+	
+	      if (secondFactor) {
+	        msg.SecondFactor = secondFactor;
+	      }
+	
+	      return new Promise(function (resolve, reject) {
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this3).call(_this3, msg, callback).then(function (data) {
+	          if (data.UserStatus === 1) {
+	            _this3.session = data;
+	            return resolve(data);
+	          }
+	
+	          return reject(data);
+	        }).catch(reject);
+	      });
+	    }
+	  }, {
+	    key: 'logout',
+	    value: function logout(callback) {
+	      var msg = {
+	        MsgType: _requests2.default.LOGOUT,
+	        BrokerID: this.brokerId,
+	        UserReqID: (0, _listener.generateRequestId)(),
+	        Username: this.session.Username,
+	        UserReqTyp: '2'
+	      };
+	
+	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', this).call(this, msg, callback);
+	    }
+	  }, {
+	    key: 'profile',
+	    value: function profile(callback) {
+	      var _session$Profile = this.session.Profile;
+	      var VerificationData = _session$Profile.VerificationData;
+	
+	      var profile = _objectWithoutProperties(_session$Profile, ['VerificationData']);
+	
+	      return callback ? callback(profile) : Promise.resolve(profile);
+	    }
+	  }, {
+	    key: 'balance',
+	    value: function balance(callback) {
+	      var _this4 = this;
+	
+	      (0, _listener.registerListener)('U3', function (balance) {
+	        callback && callback(null, balance);
+	        return _this4.eventEmitter.emit(_actionTypes.BALANCE, balance);
+	      });
+	
+	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'emitterPromise', this).call(this, new Promise(function (resolve, reject) {
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'balance', _this4).call(_this4, callback).then(resolve).catch(reject);
+	      }));
+	    }
+	  }, {
+	    key: 'subscribeTicker',
+	    value: function subscribeTicker(symbols, callback) {
+	      var _this5 = this;
+	
+	      var msg = {
+	        MsgType: _requests2.default.SECURITY_STATUS,
+	        SecurityStatusReqID: (0, _listener.generateRequestId)(),
+	        SubscriptionRequestType: '1',
+	        Instruments: symbols
+	      };
+	
+	      var formatTicker = function formatTicker(data) {
+	        return _extends({}, data, {
+	          SellVolume: data.SellVolume / 1e8,
+	          LowPx: data.LowPx / 1e8,
+	          LastPx: data.LastPx / 1e8,
+	          BestAsk: data.BestAsk / 1e8,
+	          HighPx: data.HighPx / 1e8,
+	          BuyVolume: data.BuyVolume / 1e8,
+	          BestBid: data.BestBid / 1e8
+	        });
+	      };
+	
+	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'emitterPromise', this).call(this, new Promise(function (resolve, reject) {
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this5).call(_this5, msg, callback).then(function (data) {
+	          resolve(formatTicker(data));
+	          (0, _listener.registerEventEmitter)({ SecurityStatusReqID: data.SecurityStatusReqID }, function (ticker) {
+	            callback && callback(null, formatTicker(ticker));
+	            return _this5.eventEmitter.emit('BLINK:' + ticker.Symbol, formatTicker(ticker));
+	          });
+	        }).catch(reject);
+	      }));
+	    }
+	  }, {
+	    key: 'unSubscribeTicker',
+	    value: function unSubscribeTicker(SecurityStatusReqID) {
+	      var msg = {
+	        MsgType: _requests2.default.SECURITY_STATUS,
+	        SecurityStatusReqID: SecurityStatusReqID,
+	        SubscriptionRequestType: '2'
+	      };
+	
+	      _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessage', this).call(this, msg);
+	      return SecurityStatusReqID;
+	    }
+	  }, {
+	    key: 'subscribeOrderbook',
+	    value: function subscribeOrderbook(symbols, callback) {
+	      var _this6 = this;
+	
+	      var msg = {
+	        MsgType: _requests2.default.MARKET_DATA_FULL_REFRESH,
+	        MDReqID: (0, _listener.generateRequestId)(),
+	        SubscriptionRequestType: '1',
+	        MarketDepth: 0,
+	        MDUpdateType: '1', // Incremental refresh
+	        MDEntryTypes: ['0', '1', '2'],
+	        Instruments: symbols
+	      };
+	
+	      var subscribeEvent = function subscribeEvent(data) {
+	        if (data.MDBkTyp === '3') {
+	          data.MDIncGrp.map(function (order) {
+	            var dataOrder = {
+	              index: order.MDEntryPositionNo,
+	              price: order.MDEntryPx / 1e8,
+	              size: order.MDEntrySize / 1e8,
+	              side: order.MDEntryType === '0' ? 'buy' : 'sell',
+	              userId: order.UserID,
+	              orderId: order.OrderID,
+	              symbol: order.Symbol,
+	              time: new Date(order.MDEntryDate + ' ' + order.MDEntryTime).toString()
+	            };
+	
+	            callback && callback(null, dataOrder);
+	
+	            switch (order.MDEntryType) {
+	              case '0':
+	              case '1':
+	                var orderbookEvent = _actionTypes.ORDER_BOOK + ':' + _actionTypes.EVENTS.ORDERBOOK[order.MDUpdateAction];
+	                return _this6.eventEmitter.emit(orderbookEvent, _extends({}, dataOrder, {
+	                  type: orderbookEvent
+	                }));
+	              case '2':
+	                var tradeEvent = _actionTypes.ORDER_BOOK + ':' + _actionTypes.EVENTS.TRADES[order.MDUpdateAction];
+	                return _this6.eventEmitter.emit(tradeEvent, _extends({}, dataOrder, {
+	                  type: tradeEvent
+	                }));
+	              case '4':
+	                break;
+	              default:
+	                return null;
+	            }
+	            return null;
+	          });
+	        }
+	      };
+	
+	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'emitterPromise', this).call(this, new Promise(function (resolve, reject) {
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this6).call(_this6, msg, callback).then(function (data) {
+	          if (data.MsgType === 'W') {
+	            // Split orders in bids and asks
+	            /* eslint-disable no-param-reassign */
+	            var _data$MDFullGrp$filte = data.MDFullGrp.filter(function (order) {
+	              return order.MDEntryType === '0' || order.MDEntryType === '1';
+	            }).reduce(function (prev, order) {
+	              var side = order.MDEntryType === '0' ? 'bids' : 'asks';
+	              (prev[side] || (prev[side] = [])).push([order.MDEntryPx / 1e8, order.MDEntrySize / 1e8, order.UserID]);
+	              return prev;
+	            }, []);
+	
+	            var bids = _data$MDFullGrp$filte.bids;
+	            var asks = _data$MDFullGrp$filte.asks;
+	            /* eslint-enable no-param-reassign */
+	
+	            (0, _listener.registerEventEmitter)({ MDReqID: data.MDReqID }, subscribeEvent);
+	
+	            return resolve(_extends({}, data, {
+	              MDFullGrp: _defineProperty({}, data.Symbol, {
+	                bids: bids,
+	                asks: asks
+	              })
+	            }));
+	          }
+	        }).catch(function (err) {
+	          return reject(err);
+	        });
+	      }));
+	    }
+	  }, {
+	    key: 'unSubscribeOrderbook',
+	    value: function unSubscribeOrderbook(MDReqID) {
+	      var msg = {
+	        MsgType: _requests2.default.MARKET_DATA_UNSUBSCRIBE,
+	        MDReqID: MDReqID,
+	        MarketDepth: 0,
+	        SubscriptionRequestType: '2'
+	      };
+	
+	      _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessage', this).call(this, msg);
+	      return MDReqID;
+	    }
+	  }, {
+	    key: 'executionReport',
+	    value: function executionReport(callback) {
+	      var _this7 = this;
+	
+	      (0, _listener.registerListener)('8', function (data) {
+	        callback && callback(data);
+	        var event = _actionTypes.EVENTS.EXECUTION_REPORT[data.ExecType];
+	        return _this7.eventEmitter.emit(_actionTypes.EXECUTION_REPORT + ':' + event, data);
+	      });
+	
+	      return this.eventEmitter;
+	    }
+	  }, {
+	    key: 'tradeHistory',
+	    value: function tradeHistory() {
+	      var _this8 = this;
+	
+	      var _ref2 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	      var _ref2$page = _ref2.page;
+	      var Page = _ref2$page === undefined ? 0 : _ref2$page;
+	      var _ref2$pageSize = _ref2.pageSize;
+	      var PageSize = _ref2$pageSize === undefined ? 80 : _ref2$pageSize;
+	      var callback = arguments[1];
+	
+	      var msg = {
+	        MsgType: _requests2.default.TRADE_HISTORY,
+	        TradeHistoryReqID: (0, _listener.generateRequestId)(),
+	        Page: Page,
+	        PageSize: PageSize
+	      };
+	
+	      return new Promise(function (resolve, reject) {
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this8).call(_this8, msg, callback).then(function (data) {
+	          var Columns = data.Columns;
+	
+	          var trades = _objectWithoutProperties(data, ['Columns']);
+	
+	          var TradeHistory = _lodash2.default.groupBy(_lodash2.default.map(data.TradeHistoryGrp, function (trade) {
+	            return _lodash2.default.zipObject(Columns, trade);
+	          }), function (trade) {
+	            return trade.Market;
+	          });
+	          return resolve(_extends({}, trades, {
+	            TradeHistoryGrp: TradeHistory
+	          }));
+	        }).catch(reject);
+	      });
+	    }
+	  }]);
+	
+	  return BlinkTradeWS;
+	}(_wsTransport2.default);
+	
+	exports.default = BlinkTradeWS;
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = {
+	  HEARTBEAT: '1',
+	  LOGIN: 'BE',
+	  LOGOUT: 'BE',
+	  CHANGE_PASSWORD: 'BE',
+	
+	  MARKET_DATA_FULL_REFRESH: 'V',
+	  MARKET_DATA_UNSUBSCRIBE: 'V',
+	
+	  ORDER_SEND: 'D',
+	  ORDER_CANCEL: 'F',
+	
+	  SECURITY_LIST: 'x',
+	  SECURITY_STATUS: 'e',
+	  BALANCE: 'U2',
+	  ORDER_LIST: 'U4',
+	  BROKER_LIST: 'U28',
+	  TRADE_HISTORY: 'U32',
+	  PROFILE_UPDATE: 'U38',
+	
+	  REQUEST_DEPOSIT: 'U18',
+	  REQUEST_DEPOSIT_LIST: 'U30',
+	  REQUEST_DEPOSIT_METHODS: 'U20',
+	  REQUEST_WITHDRAW: 'U6',
+	  REQUEST_WITHDRAW_LIST: 'U26'
+	};
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _baseTransport = __webpack_require__(5);
+	
+	var _baseTransport2 = _interopRequireDefault(_baseTransport);
+	
+	var _fingerprintjs = __webpack_require__(11);
+	
+	var _fingerprintjs2 = _interopRequireDefault(_fingerprintjs);
+	
+	var _nodeify = __webpack_require__(12);
+	
+	var _nodeify2 = _interopRequireDefault(_nodeify);
+	
+	var _eventemitter = __webpack_require__(13);
+	
+	var _listener = __webpack_require__(10);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * BlinkTradeJS SDK
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * (c) 2016-present BlinkTrade, Inc.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This file is part of BlinkTradeJS
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This program is free software: you can redistribute it and/or modify
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * it under the terms of the GNU General Public License as published by
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * the Free Software Foundation, either version 3 of the License, or
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * (at your option) any later version.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This program is distributed in the hope that it will be useful,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * GNU General Public License for more details.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * You should have received a copy of the GNU General Public License
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+	
+	/* eslint-disable global-require */
+	
+	var WebSocketTransport = function (_BaseTransport) {
+	  _inherits(WebSocketTransport, _BaseTransport);
+	
+	  /*
+	   * Transport Promise
+	   */
+	
+	
+	  /*
+	   * FingerPrint
+	   */
+	  function WebSocketTransport(params) {
+	    _classCallCheck(this, WebSocketTransport);
+	
+	    var _this = _possibleConstructorReturn(this, (WebSocketTransport.__proto__ || Object.getPrototypeOf(WebSocketTransport)).call(this, params, 'ws'));
+	
+	    _this.stun = { local: null, public: [] };
+	
+	    _this.getStun();
+	    _this.getFingerPrint();
+	
+	    _this.eventEmitter = new _eventemitter.EventEmitter2({ wildcard: true, delimiter: ':' });
+	    return _this;
+	  }
+	
+	  /*
+	   * Event emitter to dispatch websocket updates
+	   */
+	
+	
+	  /*
+	   * Stun object
+	   */
+	
+	
+	  /*
+	   * WebSocket Instance
+	   */
+	
+	
+	  _createClass(WebSocketTransport, [{
+	    key: 'connect',
+	    value: function connect(callback) {
+	      var _this2 = this;
+	
+	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
+	        _this2.request = { resolve: resolve, reject: reject };
+	
+	        var WebSocket = _this2.isNode ? __webpack_require__(14) : window.WebSocket;
+	
+	        _this2.socket = new WebSocket(_this2.endpoint);
+	        _this2.socket.onopen = _this2.onOpen.bind(_this2);
+	        _this2.socket.onclose = _this2.onClose.bind(_this2);
+	        _this2.socket.onerror = _this2.onError.bind(_this2);
+	        _this2.socket.onmessage = _this2.onMessage.bind(_this2);
+	      })).nodeify(callback);
+	    }
+	  }, {
+	    key: 'disconnect',
+	    value: function disconnect() {
+	      this.socket.close();
+	    }
+	  }, {
+	    key: 'onOpen',
+	    value: function onOpen() {
+	      this.request.resolve({ connected: true });
+	    }
+	  }, {
+	    key: 'onClose',
+	    value: function onClose() {}
+	  }, {
+	    key: 'onError',
+	    value: function onError() {
+	      this.request.reject();
+	    }
+	  }, {
+	    key: 'sendMessage',
+	    value: function sendMessage(msg) {
+	      if (this.socket.readyState === 1) {
+	        var data = msg;
+	
+	        data.STUNTIP = this.stun;
+	        data.FingerPrint = this.fingerPrint;
+	
+	        this.socket.send(JSON.stringify(data));
+	      }
+	    }
+	  }, {
+	    key: 'sendMessageAsPromise',
+	    value: function sendMessageAsPromise(msg, callback) {
+	      var _this3 = this;
+	
+	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
+	        var promise = { resolve: resolve, reject: reject };
+	
+	        if (!msg) {
+	          return reject('Missing Message');
+	        }
+	
+	        (0, _listener.registerRequest)(msg, promise);
+	
+	        // Send promise to sendMessage to we can mock it.
+	        _this3.sendMessage(msg, promise);
+	      })).nodeify(callback);
+	    }
+	  }, {
+	    key: 'onMessage',
+	    value: function onMessage(msg) {
+	      var data = JSON.parse(msg.data);
+	      if (data.MsgType === 'ERROR') {
+	        throw new Error('Error: ' + data.Detail + ' ' + data.Description);
+	      }
+	
+	      var request = (0, _listener.getRequest)(data);
+	      var listener = (0, _listener.getListener)(data.MsgType);
+	      this.dispatchPromise(request, data);
+	      this.dispatchListeners(listener, data);
+	    }
+	  }, {
+	    key: 'dispatchPromise',
+	    value: function dispatchPromise(request, data) {
+	      if (request) {
+	        return request.resolve ? request.resolve(data) : request.callback ? request.callback(data) : null;
+	      }
+	    }
+	  }, {
+	    key: 'dispatchListeners',
+	    value: function dispatchListeners(listener, data) {
+	      return listener && listener(data);
+	    }
+	
+	    /* eslint-disable no-param-reassign */
+	
+	  }, {
+	    key: 'emitterPromise',
+	    value: function emitterPromise(promise) {
+	      var _this4 = this;
+	
+	      promise.on = function (event, listener) {
+	        _this4.eventEmitter.on(event, listener);
+	        return promise;
+	      };
+	      promise.onAny = function (listener) {
+	        _this4.eventEmitter.onAny(listener);
+	        return promise;
+	      };
+	      promise.offAny = function (listener) {
+	        _this4.eventEmitter.offAny(listener);
+	        return promise;
+	      };
+	      promise.once = function (event, listener) {
+	        _this4.eventEmitter.once(event, listener);
+	        return promise;
+	      };
+	      promise.many = function (event, times, listener) {
+	        _this4.eventEmitter.many(event, times, listener);
+	        return promise;
+	      };
+	      promise.removeListener = function (event, listener) {
+	        _this4.eventEmitter.removeListener(event, listener);
+	        return promise;
+	      };
+	      promise.removeAllListeners = function (events) {
+	        _this4.eventEmitter.removeAllListeners(events);
+	        return promise;
+	      };
+	
+	      return promise;
+	    }
+	    /* eslint-enable no-param-reassign */
+	
+	  }, {
+	    key: 'getFingerPrint',
+	    value: function getFingerPrint() {
+	      var _this5 = this;
+	
+	      if (this.isNode) {
+	        return __webpack_require__(15).getMac(function (macAddress) {
+	          _this5.fingerPrint = macAddress;
+	        });
+	      }
+	      return new _fingerprintjs2.default().get(function (fingerPrint) {
+	        _this5.fingerPrint = fingerPrint;
+	      });
+	    }
+	  }, {
+	    key: 'getStun',
+	    value: function getStun() {
+	      var _this6 = this;
+	
+	      if (this.isNode) {
+	        __webpack_require__(17).getStun(function (data) {
+	          _this6.stun = data;
+	        });
+	      }
+	    }
+	  }]);
+	
+	  return WebSocketTransport;
+	}(_baseTransport2.default);
+	
+	exports.default = WebSocketTransport;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _base = __webpack_require__(6);
+	
+	var _base2 = _interopRequireDefault(_base);
+	
+	var _requests = __webpack_require__(3);
+	
+	var _requests2 = _interopRequireDefault(_requests);
+	
+	var _requestTypes = __webpack_require__(8);
+	
+	var RequestTypes = _interopRequireWildcard(_requestTypes);
+	
+	var _lodash = __webpack_require__(9);
+	
+	var _lodash2 = _interopRequireDefault(_lodash);
+	
+	var _listener = __webpack_require__(10);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * BlinkTradeJS SDK
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * (c) 2016-present BlinkTrade, Inc.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This file is part of BlinkTradeJS
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This program is free software: you can redistribute it and/or modify
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * it under the terms of the GNU General Public License as published by
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * the Free Software Foundation, either version 3 of the License, or
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * (at your option) any later version.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This program is distributed in the hope that it will be useful,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * GNU General Public License for more details.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * You should have received a copy of the GNU General Public License
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+	
+	var BaseTransport = function (_Base) {
+	  _inherits(BaseTransport, _Base);
+	
+	  function BaseTransport(params, env) {
+	    _classCallCheck(this, BaseTransport);
+	
+	    var _this = _possibleConstructorReturn(this, (BaseTransport.__proto__ || Object.getPrototypeOf(BaseTransport)).call(this, params, env));
+	
+	    _this.send = env === 'ws' ? _this.sendMessageAsPromise : _this.fetchTrade;
+	    return _this;
+	  }
+	
+	  _createClass(BaseTransport, [{
+	    key: 'balance',
+	    value: function balance(callback) {
+	      var _this2 = this;
+	
+	      var msg = {
+	        MsgType: _requests2.default.BALANCE,
+	        BalanceReqID: (0, _listener.generateRequestId)()
+	      };
+	
+	      return new Promise(function (resolve, reject) {
+	        return _this2.send(msg, callback).then(function (data) {
+	          var Available = {};
+	          var balances = data[_this2.brokerId];
+	          Object.keys(balances).map(function (currency) {
+	            if (!currency.includes('locked')) {
+	              Available[currency] = balances[currency] - balances[currency + '_locked'];
+	            }
+	            return Available;
+	          });
+	
+	          return resolve(_extends({}, data, { Available: Available }));
+	        }).catch(reject);
+	      });
+	    }
+	  }, {
+	    key: 'myOrders',
+	    value: function myOrders() {
+	      var _this3 = this;
+	
+	      var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	      var _ref$page = _ref.page;
+	      var Page = _ref$page === undefined ? 0 : _ref$page;
+	      var _ref$pageSize = _ref.pageSize;
+	      var PageSize = _ref$pageSize === undefined ? 40 : _ref$pageSize;
+	      var callback = arguments[1];
+	
+	      var msg = {
+	        MsgType: _requests2.default.ORDER_LIST,
+	        OrdersReqID: (0, _listener.generateRequestId)(),
+	        Page: Page,
+	        PageSize: PageSize
+	      };
+	
+	      return new Promise(function (resolve, reject) {
+	        return _this3.send(msg, callback).then(function (data) {
+	          var Columns = data.Columns;
+	
+	          var orders = _objectWithoutProperties(data, ['Columns']);
+	
+	          var OrdListGrp = _lodash2.default.map(data.OrdListGrp, function (order) {
+	            return _lodash2.default.zipObject(Columns, order);
+	          });
+	          return resolve(_extends({}, orders, {
+	            OrdListGrp: OrdListGrp
+	          }));
+	        }).catch(reject);
+	      });
+	    }
+	  }, {
+	    key: 'sendOrder',
+	    value: function sendOrder(_ref2, callback) {
+	      var _this4 = this;
+	
+	      var side = _ref2.side;
+	      var amount = _ref2.amount;
+	      var price = _ref2.price;
+	      var symbol = _ref2.symbol;
+	
+	      var msg = {
+	        MsgType: _requests2.default.ORDER_SEND,
+	        ClOrdID: (0, _listener.generateRequestId)(),
+	        Symbol: symbol,
+	        Side: side,
+	        OrdType: '2',
+	        Price: price,
+	        OrderQty: amount,
+	        BrokerID: this.brokerId
+	      };
+	
+	      return new Promise(function (resolve, reject) {
+	        return _this4.send(msg, callback).then(function (data) {
+	          (0, _listener.deleteRequest)(RequestTypes.CLIENT_ORDER_ID);
+	          resolve(data);
+	        }).catch(reject);
+	      });
+	    }
+	  }, {
+	    key: 'cancelOrder',
+	    value: function cancelOrder(param, callback) {
+	      var orderId = param.orderId ? param.orderId : param;
+	      var msg = {
+	        MsgType: _requests2.default.ORDER_CANCEL,
+	        OrderID: orderId
+	      };
+	
+	      if (param.clientId) {
+	        msg.ClOrdID = param.clientId;
+	      }
+	
+	      return this.send(msg, callback);
+	    }
+	
+	    /**
+	     * statusList: 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled
+	     */
+	
+	  }, {
+	    key: 'requestWithdrawList',
+	    value: function requestWithdrawList() {
+	      var _this5 = this;
+	
+	      var _ref3 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	      var _ref3$page = _ref3.page;
+	      var Page = _ref3$page === undefined ? 0 : _ref3$page;
+	      var _ref3$pageSize = _ref3.pageSize;
+	      var PageSize = _ref3$pageSize === undefined ? 20 : _ref3$pageSize;
+	      var _ref3$statusList = _ref3.statusList;
+	      var StatusList = _ref3$statusList === undefined ? ['1', '2', '4', '8'] : _ref3$statusList;
+	      var callback = arguments[1];
+	
+	      var msg = {
+	        MsgType: _requests2.default.REQUEST_WITHDRAW_LIST,
+	        WithdrawListReqID: (0, _listener.generateRequestId)(),
+	        Page: Page,
+	        PageSize: PageSize,
+	        StatusList: StatusList
+	      };
+	
+	      return new Promise(function (resolve, reject) {
+	        return _this5.send(msg, callback).then(function (data) {
+	          var Columns = data.Columns;
+	
+	          var withdrawData = _objectWithoutProperties(data, ['Columns']);
+	
+	          var WithdrawListGrp = _lodash2.default.map(data.WithdrawListGrp, function (withdraw) {
+	            return _lodash2.default.zipObject(Columns, withdraw);
+	          });
+	          return resolve(_extends({}, withdrawData, {
+	            WithdrawListGrp: WithdrawListGrp
+	          }));
+	        }).catch(reject);
+	      });
+	    }
+	  }, {
+	    key: 'requestWithdraw',
+	    value: function requestWithdraw(_ref4, callback) {
+	      var amount = _ref4.amount;
+	      var data = _ref4.data;
+	      var _ref4$currency = _ref4.currency;
+	      var currency = _ref4$currency === undefined ? 'BTC' : _ref4$currency;
+	      var _ref4$method = _ref4.method;
+	      var method = _ref4$method === undefined ? 'bitcoin' : _ref4$method;
+	
+	      var reqId = (0, _listener.generateRequestId)();
+	      var msg = {
+	        MsgType: _requests2.default.REQUEST_WITHDRAW,
+	        WithdrawReqID: reqId,
+	        ClOrdID: reqId,
+	        Method: method,
+	        Amount: amount,
+	        Currency: currency,
+	        Data: data
+	      };
+	
+	      return this.send(msg, callback);
+	    }
+	  }, {
+	    key: 'requestDepositList',
+	    value: function requestDepositList() {
+	      var _this6 = this;
+	
+	      var _ref5 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	      var _ref5$page = _ref5.page;
+	      var Page = _ref5$page === undefined ? 0 : _ref5$page;
+	      var _ref5$pageSize = _ref5.pageSize;
+	      var PageSize = _ref5$pageSize === undefined ? 20 : _ref5$pageSize;
+	      var _ref5$status = _ref5.status;
+	      var StatusList = _ref5$status === undefined ? ['1', '2', '4', '8'] : _ref5$status;
+	      var callback = arguments[1];
+	
+	      var msg = {
+	        MsgType: _requests2.default.REQUEST_DEPOSIT_LIST,
+	        DepositListReqID: (0, _listener.generateRequestId)(),
+	        Page: Page,
+	        PageSize: PageSize,
+	        StatusList: StatusList
+	      };
+	
+	      return new Promise(function (resolve, reject) {
+	        return _this6.send(msg, callback).then(function (data) {
+	          var Columns = data.Columns;
+	
+	          var depositData = _objectWithoutProperties(data, ['Columns']);
+	
+	          var DepositListGrp = _lodash2.default.map(data.DepositListGrp, function (deposit) {
+	            return _lodash2.default.zipObject(Columns, deposit);
+	          });
+	          return resolve(_extends({}, depositData, {
+	            DepositListGrp: DepositListGrp
+	          }));
+	        });
+	      });
+	    }
+	  }, {
+	    key: 'requestDeposit',
+	    value: function requestDeposit() {
+	      var _ref6 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	      var _ref6$currency = _ref6.currency;
+	      var currency = _ref6$currency === undefined ? 'BTC' : _ref6$currency;
+	      var value = _ref6.value;
+	      var depositMethodId = _ref6.depositMethodId;
+	      var callback = arguments[1];
+	
+	      var reqId = (0, _listener.generateRequestId)();
+	      var msg = {
+	        MsgType: _requests2.default.REQUEST_DEPOSIT,
+	        DepositReqID: reqId,
+	        ClOrdID: reqId,
+	        Currency: currency,
+	        BrokerID: this.brokerId
+	      };
+	
+	      if (currency !== 'BTC') {
+	        msg.DepositMethodID = depositMethodId;
+	        msg.Value = value;
+	      }
+	
+	      return this.send(msg, callback);
+	    }
+	  }, {
+	    key: 'requestDepositMethods',
+	    value: function requestDepositMethods(callback) {
+	      var msg = {
+	        MsgType: _requests2.default.REQUEST_DEPOSIT_METHODS,
+	        DepositMethodReqID: (0, _listener.generateRequestId)()
+	      };
+	
+	      return this.send(msg, callback);
+	    }
+	  }]);
+	
+	  return BaseTransport;
+	}(_base2.default);
+	
+	exports.default = BaseTransport;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _common = __webpack_require__(7);
+	
+	var _common2 = _interopRequireDefault(_common);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } } /**
+	                                                                                                                                                           * BlinkTradeJS SDK
+	                                                                                                                                                           * (c) 2016-present BlinkTrade, Inc.
+	                                                                                                                                                           *
+	                                                                                                                                                           * This file is part of BlinkTradeJS
+	                                                                                                                                                           *
+	                                                                                                                                                           * This program is free software: you can redistribute it and/or modify
+	                                                                                                                                                           * it under the terms of the GNU General Public License as published by
+	                                                                                                                                                           * the Free Software Foundation, either version 3 of the License, or
+	                                                                                                                                                           * (at your option) any later version.
+	                                                                                                                                                          
+	                                                                                                                                                           * This program is distributed in the hope that it will be useful,
+	                                                                                                                                                           * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	                                                                                                                                                           * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	                                                                                                                                                           * GNU General Public License for more details.
+	                                                                                                                                                          
+	                                                                                                                                                           * You should have received a copy of the GNU General Public License
+	                                                                                                                                                           * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	                                                                                                                                                           *
+	                                                                                                                                                           * 
+	                                                                                                                                                           */
+	
+	var Base =
+	
+	/*
+	 * Broker id
+	 */
+	function Base() {
+	  var params = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	  var env = arguments[1];
+	
+	  _classCallCheck(this, Base);
+	
+	  var endpoint = params.url ? params.url : params.prod ? _common2.default.prod[env] : _common2.default.testnet[env];
+	
+	  this.brokerId = params.brokerId || 5;
+	
+	  this.endpoint = endpoint;
+	
+	  this.isNode = typeof window === 'undefined';
+	}
+	
+	/*
+	 * Is node.js environment.
+	 */
+	
+	
+	/*
+	 * url endpoint.
+	 */
+	;
+	
+	exports.default = Base;
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = {
+	  prod: {
+	    ws: 'wss://api.blinktrade.com/trade/',
+	    rest: 'https://api.blinktrade.com/'
+	  },
+	  testnet: {
+	    ws: 'wss://api.testnet.blinktrade.com/trade/',
+	    rest: 'https://api.testnet.blinktrade.com/'
+	  }
+	};
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var SOCKET_ID = exports.SOCKET_ID = 'SocketID';
+	var REQUEST_ID = exports.REQUEST_ID = 'ReqID';
+	var TEST_REQUEST_ID = exports.TEST_REQUEST_ID = 'TestReqID';
+	var USER_REQUEST_ID = exports.USER_REQUEST_ID = 'UserReqID';
+	var SECURITY_REQUEST_ID = exports.SECURITY_REQUEST_ID = 'SecurityReqID';
+	var RESET_PASSWORD_REQUEST_ID = exports.RESET_PASSWORD_REQUEST_ID = 'ResetPasswordReqID';
+	var DEPOSIT_REQUEST_ID = exports.DEPOSIT_REQUEST_ID = 'DepositReqID';
+	var WITHDRAW_REQUEST_ID = exports.WITHDRAW_REQUEST_ID = 'WithdrawReqID';
+	var BALANCE_REQUEST_ID = exports.BALANCE_REQUEST_ID = 'BalanceReqID';
+	var ORDERS_REQUEST_ID = exports.ORDERS_REQUEST_ID = 'OrdersReqID';
+	var ENABLE_TWO_FACTOR_REQUEST_ID = exports.ENABLE_TWO_FACTOR_REQUEST_ID = 'EnableTwoFactorReqID';
+	var DEPOSIT_METHOD_REQUEST_ID = exports.DEPOSIT_METHOD_REQUEST_ID = 'DepositMethodReqID';
+	var WITHDRAW_LIST_REQUEST_ID = exports.WITHDRAW_LIST_REQUEST_ID = 'WithdrawListReqID';
+	var BROKER_LIST_REQUEST_ID = exports.BROKER_LIST_REQUEST_ID = 'BrokerListReqID';
+	var DEPOSIT_LIST_REQUEST_ID = exports.DEPOSIT_LIST_REQUEST_ID = 'DepositListReqID';
+	var TRADE_HISTORY_REQUEST_ID = exports.TRADE_HISTORY_REQUEST_ID = 'TradeHistoryReqID';
+	var LEDGER_LIST_REQUEST_ID = exports.LEDGER_LIST_REQUEST_ID = 'LedgerListReqID';
+	var TRADERS_RANK_REQUEST_ID = exports.TRADERS_RANK_REQUEST_ID = 'TradersRankReqID';
+	var UPDATE_REQUEST_ID = exports.UPDATE_REQUEST_ID = 'UpdateReqID';
+	var POSITION_REQUEST_ID = exports.POSITION_REQUEST_ID = 'PositionReqID';
+	var SECURITY_STATUS_REQUEST_ID = exports.SECURITY_STATUS_REQUEST_ID = 'SecurityStatusReqID';
+	var API_KEY_LIST_REQUEST_ID = exports.API_KEY_LIST_REQUEST_ID = 'APIKeyListReqID';
+	var API_KEY_CREATE_REQUEST_ID = exports.API_KEY_CREATE_REQUEST_ID = 'APIKeyCreateReqID';
+	var API_KEY_REVOKE_REQUEST_ID = exports.API_KEY_REVOKE_REQUEST_ID = 'APIKeyRevokeReqID';
+	var PROCESS_DEPOSIT_REQUEST_ID = exports.PROCESS_DEPOSIT_REQUEST_ID = 'ProcessDepositReqID';
+	var CUSTOMER_LIST_REQUEST_ID = exports.CUSTOMER_LIST_REQUEST_ID = 'CustomerListReqID';
+	var CUSTOMER_REQUEST_ID = exports.CUSTOMER_REQUEST_ID = 'CustomerReqID';
+	var PROCESS_WITHDRAW_REQUEST_ID = exports.PROCESS_WITHDRAW_REQUEST_ID = 'ProcessWithdrawReqID';
+	var VERIFY_CUSTOMER_REQUEST_ID = exports.VERIFY_CUSTOMER_REQUEST_ID = 'VerifyCustomerReqID';
+	var MD_REQUEST_ID = exports.MD_REQUEST_ID = 'MDReqID';
+	var CLIENT_ORDER_ID = exports.CLIENT_ORDER_ID = 'ClOrdID';
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	module.exports = require("lodash");
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; /**
+	                                                                                                                                                                                                                                                                   * BlinkTradeJS SDK
+	                                                                                                                                                                                                                                                                   * (c) 2016-present BlinkTrade, Inc.
+	                                                                                                                                                                                                                                                                   *
+	                                                                                                                                                                                                                                                                   * This file is part of BlinkTradeJS
+	                                                                                                                                                                                                                                                                   *
+	                                                                                                                                                                                                                                                                   * This program is free software: you can redistribute it and/or modify
+	                                                                                                                                                                                                                                                                   * it under the terms of the GNU General Public License as published by
+	                                                                                                                                                                                                                                                                   * the Free Software Foundation, either version 3 of the License, or
+	                                                                                                                                                                                                                                                                   * (at your option) any later version.
+	                                                                                                                                                                                                                                                                  
+	                                                                                                                                                                                                                                                                   * This program is distributed in the hope that it will be useful,
+	                                                                                                                                                                                                                                                                   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	                                                                                                                                                                                                                                                                   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	                                                                                                                                                                                                                                                                   * GNU General Public License for more details.
+	                                                                                                                                                                                                                                                                  
+	                                                                                                                                                                                                                                                                   * You should have received a copy of the GNU General Public License
+	                                                                                                                                                                                                                                                                   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	                                                                                                                                                                                                                                                                   *
+	                                                                                                                                                                                                                                                                   * 
+	                                                                                                                                                                                                                                                                   */
+	
+	exports.getListeners = getListeners;
+	exports.generateRequestId = generateRequestId;
+	exports.getListener = getListener;
+	exports.getRequest = getRequest;
+	exports.registerRequest = registerRequest;
+	exports.registerEventEmitter = registerEventEmitter;
+	exports.registerListener = registerListener;
+	exports.deleteRequest = deleteRequest;
+	
+	var _lodash = __webpack_require__(9);
+	
+	var _lodash2 = _interopRequireDefault(_lodash);
+	
+	var _requestTypes = __webpack_require__(8);
+	
+	var RequestTypes = _interopRequireWildcard(_requestTypes);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var requests = {};
+	var listeners = {};
+	
+	function getListeners() {
+	  return requests;
+	}
+	
+	function generateRequestId() {
+	  return parseInt(String(1e7 * Math.random()), 10);
+	}
+	
+	function getListener(msgType) {
+	  return listeners[msgType];
+	}
+	
+	function getRequest(message) {
+	  var result = void 0;
+	  _lodash2.default.mapKeys(RequestTypes, function (key) {
+	    if (_lodash2.default.has(message, key)) {
+	      result = _lodash2.default.find(requests[key], { ReqId: message[key].toString() });
+	    }
+	  });
+	
+	  return result;
+	}
+	
+	function registerRequest(message, promise) {
+	  _lodash2.default.mapKeys(RequestTypes, function (key) {
+	    if (_lodash2.default.has(message, key)) {
+	      requests[key] = requests[key] || [];
+	      requests[key].push(_extends({ ReqId: message[key].toString() }, promise));
+	    }
+	  });
+	
+	  return requests;
+	}
+	
+	function registerEventEmitter(message, callback) {
+	  _lodash2.default.mapKeys(RequestTypes, function (key) {
+	    if (_lodash2.default.has(message, key)) {
+	      if (requests[key] !== []) {
+	        var index = _lodash2.default.findIndex(requests[key], { ReqId: message[key].toString() });
+	        requests[key][index] = _extends({}, requests[key][index], {
+	          resolve: null,
+	          reject: null,
+	          callback: callback
+	        });
+	      }
+	    }
+	  });
+	
+	  return requests;
+	}
+	
+	function registerListener(msgType, callback) {
+	  listeners[msgType] = listeners[msgType] || [];
+	  listeners[msgType] = callback;
+	}
+	
+	function deleteRequest(key) {
+	  requests = _lodash2.default.omit(requests, [key]);
+	  return requests;
+	}
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	module.exports = require("fingerprintjs2");
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	module.exports = require("nodeify");
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	module.exports = require("eventemitter2");
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	module.exports = require("ws");
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.getMac = getMac;
+	
+	var _macaddress = __webpack_require__(16);
+	
+	var _macaddress2 = _interopRequireDefault(_macaddress);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function getMac(callback) {
+	  _macaddress2.default.all(function (err, all) {
+	    var hashCode = function hashCode(str) {
+	      var hash = 0;
+	      if (str.length === 0) return hash;
+	      for (var i = 0; i < str.length; i++) {
+	        hash = (hash << 5) - hash + str.charCodeAt(i);
+	        hash = hash & hash; // Convert to 32bit integer
+	      }
+	      return hash;
+	    };
+	
+	    var macAddresses = '';
+	    Object.keys(all).forEach(function (iface) {
+	      macAddresses += all[iface].mac;
+	    });
+	
+	    var fingerPrint = hashCode(macAddresses);
+	    if (fingerPrint < 0) {
+	      fingerPrint *= -1;
+	    }
+	
+	    callback(fingerPrint);
+	  });
+	} /**
+	   * BlinkTradeJS SDK
+	   * (c) 2016-present BlinkTrade, Inc.
+	   *
+	   * This file is part of BlinkTradeJS
+	   *
+	   * This program is free software: you can redistribute it and/or modify
+	   * it under the terms of the GNU General Public License as published by
+	   * the Free Software Foundation, either version 3 of the License, or
+	   * (at your option) any later version.
+	  
+	   * This program is distributed in the hope that it will be useful,
+	   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	   * GNU General Public License for more details.
+	  
+	   * You should have received a copy of the GNU General Public License
+	   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	   *
+	   * 
+	   */
+
+/***/ },
+/* 16 */
+/***/ function(module, exports) {
+
+	module.exports = require("macaddress");
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }(); /**
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          * BlinkTradeJS SDK
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          * (c) 2016-present BlinkTrade, Inc.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          * This file is part of BlinkTradeJS
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          * This program is free software: you can redistribute it and/or modify
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          * it under the terms of the GNU General Public License as published by
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          * the Free Software Foundation, either version 3 of the License, or
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          * (at your option) any later version.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          * This program is distributed in the hope that it will be useful,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          * GNU General Public License for more details.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          * You should have received a copy of the GNU General Public License
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          */
+	
+	/* eslint-disable no-param-reassign */
+	
+	exports.getStun = getStun;
+	
+	var _ip = __webpack_require__(22);
+	
+	var _ip2 = _interopRequireDefault(_ip);
+	
+	var _dgram = __webpack_require__(23);
+	
+	var _dgram2 = _interopRequireDefault(_dgram);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var stunIp = { local: null, public: [] };
+	
+	function addIPAddress(ipAddress) {
+	  if (ipAddress.match(/^(192\.168\.|169\.254\.|10\.|172\.(1[6-9]|2\d|3[01]))/)) {
+	    stunIp.local = ipAddress;
+	  } else {
+	    if (stunIp.public.indexOf(ipAddress) === -1) {
+	      stunIp.public.push(ipAddress);
+	    }
+	  }
+	}
+	
+	function getStun(callback) {
+	  var socket = _dgram2.default.createSocket('udp4');
+	
+	  var STUN_HEADER_LENGTH = 20;
+	  var stunRequest = new Buffer(STUN_HEADER_LENGTH);
+	
+	  var STUN_METHOD_REQUEST = 0x000;
+	  var STUN_BINDING_CLASS = 0x0001;
+	  var STUN_MAGIC_COOKIE = 0x2112A442;
+	  var STUN_TID_MAX = Math.pow(2, 32);
+	
+	  var STUN_ATTR_MAPPED_ADDRESS = 0x0001;
+	  var STUN_ATTR_XOR_MAPPED_ADDRESS = 0x8020;
+	  var STUN_ATTR_XOR_MAPPED_ADDRESS_ALT = 0x0020;
+	
+	  var stunTxId = Math.random() * STUN_TID_MAX;
+	
+	  var stunServers = [[3478, 'stun.services.mozilla.com'], [19302, 'stun.l.google.com'], [3478, 'stun.stunprotocol.org'], [3478, 'stun.softjoys.com'], [3478, 'stun.samsungsmartcam.com'], [3478, 'stun.sonetel.com'], [3478, 'stun.tagan.ru'], [3478, 'stun.voipgain.com'], [3478, 'stunserver.org'], [3478, 'stun.advfn.com'], [3478, 'stun.annatel.net'], [3478, 'stun.freevoipdeal.com']];
+	
+	  stunRequest.writeUInt16BE((STUN_BINDING_CLASS | STUN_METHOD_REQUEST) & 0x3fff, 0);
+	  stunRequest.writeUInt16BE(0, 2);
+	  stunRequest.writeUInt32BE(STUN_MAGIC_COOKIE, 4);
+	  stunRequest.writeUInt32BE(0, 8);
+	  stunRequest.writeUInt32BE(0, 12);
+	  stunRequest.writeUInt32BE(stunTxId, 16);
+	
+	  socket.on('message', function (msg) {
+	    var xor = function xor(a, b) {
+	      var data = [];
+	      if (b.length > a.length) {
+	        var tmp = a;
+	        a = b;
+	        b = tmp;
+	      }
+	      for (var i = 0, len = a.length; i < len; i++) {
+	        data.push(a[i] ^ b[i]);
+	      }
+	
+	      return new Buffer(data);
+	    };
+	
+	    var block = msg.readUInt8(0);
+	    var bit1 = block & 0x80;
+	    var bit2 = block & 0x40;
+	
+	    if (!(bit1 === 0 && bit2 === 0)) {
+	      return;
+	    }
+	
+	    var msgHeader = msg.slice(0, STUN_HEADER_LENGTH);
+	    var msgAttrs = msg.slice(STUN_HEADER_LENGTH, msg.length);
+	
+	    var offset = 0;
+	
+	    while (offset < msgAttrs.length) {
+	      var attrType = msgAttrs.readUInt16BE(offset);
+	      offset += 2;
+	
+	      var attrBuffLength = msgAttrs.readUInt16BE(offset);
+	      var blockOut = attrBuffLength % 4;
+	      if (blockOut > 0) {
+	        attrBuffLength += 4 - blockOut;
+	      }
+	      offset += 2;
+	
+	      var value = msgAttrs.slice(offset, offset + attrBuffLength);
+	      offset += attrBuffLength;
+	
+	      var family = void 0;
+	      var address = void 0;
+	      switch (attrType) {
+	        case STUN_ATTR_MAPPED_ADDRESS:
+	          family = value.readUInt16BE(0) === 0x02 ? 6 : 4;
+	          address = _ip2.default.toString(value, 4, family);
+	          addIPAddress(address);
+	          break;
+	
+	        case STUN_ATTR_XOR_MAPPED_ADDRESS:
+	        case STUN_ATTR_XOR_MAPPED_ADDRESS_ALT:
+	          family = value.readUInt16BE(0) === 0x02 ? 6 : 4;
+	          var magic = msgHeader.slice(4, 8);
+	          var tid = msgHeader.slice(8, 20);
+	          var xaddr = value.slice(4, family === 4 ? 8 : 20);
+	          var addr = xor(xaddr, family === 4 ? magic : value.concat([magic, tid]));
+	          address = _ip2.default.toString(addr, 0, family);
+	          addIPAddress(address);
+	          break;
+	        default:
+	      }
+	    }
+	
+	    callback(stunIp);
+	  });
+	
+	  stunServers.map(function (_ref) {
+	    var _ref2 = _slicedToArray(_ref, 2);
+	
+	    var port = _ref2[0];
+	    var host = _ref2[1];
+	    return socket.send(stunRequest, 0, stunRequest.length, port, host);
+	  });
+	}
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18).Buffer))
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Buffer, global) {/*!
 	 * The buffer module from node.js, for the browser.
 	 *
 	 * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
 	 * @license  MIT
 	 */
-"use strict";function o(){try{var e=new Uint8Array(1);return e.__proto__={__proto__:Uint8Array.prototype,foo:function(){return 42}},42===e.foo()&&"function"==typeof e.subarray&&0===e.subarray(1,1).byteLength}catch(t){return!1}}function i(){return e.TYPED_ARRAY_SUPPORT?2147483647:1073741823}function u(t,r){if(i()<r)throw new RangeError("Invalid typed array length");return e.TYPED_ARRAY_SUPPORT?(t=new Uint8Array(r),t.__proto__=e.prototype):(null===t&&(t=new e(r)),t.length=r),t}function e(t,r,n){if(!(e.TYPED_ARRAY_SUPPORT||this instanceof e))return new e(t,r,n);if("number"==typeof t){if("string"==typeof r)throw Error("If encoding is specified then the first argument must be a string");return c(this,t)}return s(this,t,r,n)}function s(e,t,r,n){if("number"==typeof t)throw new TypeError('"value" argument must not be a number');return"undefined"!=typeof ArrayBuffer&&t instanceof ArrayBuffer?p(e,t,r,n):"string"==typeof t?l(e,t,r):d(e,t)}function a(e){if("number"!=typeof e)throw new TypeError('"size" argument must be a number');if(0>e)throw new RangeError('"size" argument must not be negative')}function f(e,t,r,n){return a(t),t>0&&void 0!==r?"string"==typeof n?u(e,t).fill(r,n):u(e,t).fill(r):u(e,t)}function c(t,r){if(a(r),t=u(t,0>r?0:0|y(r)),!e.TYPED_ARRAY_SUPPORT)for(var n=0;r>n;++n)t[n]=0;return t}function l(t,r,n){if("string"==typeof n&&""!==n||(n="utf8"),!e.isEncoding(n))throw new TypeError('"encoding" must be a valid string encoding');var o=0|g(r,n);t=u(t,o);var i=t.write(r,n);return i!==o&&(t=t.slice(0,i)),t}function h(e,t){var r=0>t.length?0:0|y(t.length);e=u(e,r);for(var n=0;r>n;n+=1)e[n]=255&t[n];return e}function p(t,r,n,o){if(0>n||n>r.byteLength)throw new RangeError("'offset' is out of bounds");if(n+(o||0)>r.byteLength)throw new RangeError("'length' is out of bounds");return r=void 0===n&&void 0===o?new Uint8Array(r):void 0===o?new Uint8Array(r,n):new Uint8Array(r,n,o),e.TYPED_ARRAY_SUPPORT?(t=r,t.__proto__=e.prototype):t=h(t,r),t}function d(t,r){if(e.isBuffer(r)){var n=0|y(r.length);return t=u(t,n),0===t.length?t:(r.copy(t,0,0,n),t)}if(r){if("undefined"!=typeof ArrayBuffer&&r.buffer instanceof ArrayBuffer||"length"in r)return"number"!=typeof r.length||X(r.length)?u(t,0):h(t,r);if("Buffer"===r.type&&Z(r.data))return h(t,r.data)}throw new TypeError("First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.")}function y(e){if(e>=i())throw new RangeError("Attempt to allocate Buffer larger than maximum size: 0x"+i().toString(16)+" bytes");return 0|e}function E(t){return+t!=t&&(t=0),e.alloc(+t)}function g(t,r){if(e.isBuffer(t))return t.length;if("undefined"!=typeof ArrayBuffer&&"function"==typeof ArrayBuffer.isView&&(ArrayBuffer.isView(t)||t instanceof ArrayBuffer))return t.byteLength;"string"!=typeof t&&(t=""+t);var n=t.length;if(0===n)return 0;for(var o=!1;;)switch(r){case"ascii":case"latin1":case"binary":return n;case"utf8":case"utf-8":case void 0:return K(t).length;case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return 2*n;case"hex":return n>>>1;case"base64":return V(t).length;default:if(o)return K(t).length;r=(""+r).toLowerCase(),o=!0}}function v(e,t,r){var n=!1;if((void 0===t||0>t)&&(t=0),t>this.length)return"";if((void 0===r||r>this.length)&&(r=this.length),0>=r)return"";if(r>>>=0,t>>>=0,t>=r)return"";for(e||(e="utf8");;)switch(e){case"hex":return M(this,t,r);case"utf8":case"utf-8":return S(this,t,r);case"ascii":return U(this,t,r);case"latin1":case"binary":return B(this,t,r);case"base64":return P(this,t,r);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return k(this,t,r);default:if(n)throw new TypeError("Unknown encoding: "+e);e=(e+"").toLowerCase(),n=!0}}function _(e,t,r){var n=e[t];e[t]=e[r],e[r]=n}function R(t,r,n,o,i){if(0===t.length)return-1;if("string"==typeof n?(o=n,n=0):n>2147483647?n=2147483647:-2147483648>n&&(n=-2147483648),n=+n,isNaN(n)&&(n=i?0:t.length-1),0>n&&(n=t.length+n),t.length>n){if(0>n){if(!i)return-1;n=0}}else{if(i)return-1;n=t.length-1}if("string"==typeof r&&(r=e.from(r,o)),e.isBuffer(r))return 0===r.length?-1:T(t,r,n,o,i);if("number"==typeof r)return r=255&r,e.TYPED_ARRAY_SUPPORT&&"function"==typeof Uint8Array.prototype.indexOf?i?Uint8Array.prototype.indexOf.call(t,r,n):Uint8Array.prototype.lastIndexOf.call(t,r,n):T(t,[r],n,o,i);throw new TypeError("val must be string, number or Buffer")}function T(e,t,r,n,o){function i(e,t){return 1===u?e[t]:e.readUInt16BE(t*u)}var u=1,s=e.length,a=t.length;if(void 0!==n&&(n=(n+"").toLowerCase(),"ucs2"===n||"ucs-2"===n||"utf16le"===n||"utf-16le"===n)){if(2>e.length||2>t.length)return-1;u=2,s/=2,a/=2,r/=2}var f;if(o){var c=-1;for(f=r;s>f;f++)if(i(e,f)===i(t,c===-1?0:f-c)){if(c===-1&&(c=f),f-c+1===a)return c*u}else c!==-1&&(f-=f-c),c=-1}else for(r+a>s&&(r=s-a),f=r;f>=0;f--){for(var l=!0,h=0;a>h;h++)if(i(e,f+h)!==i(t,h)){l=!1;break}if(l)return f}return-1}function b(e,t,r,n){r=+r||0;var o=e.length-r;n?(n=+n,n>o&&(n=o)):n=o;var i=t.length;if(i%2!==0)throw new TypeError("Invalid hex string");n>i/2&&(n=i/2);for(var u=0;n>u;++u){var s=parseInt(t.substr(2*u,2),16);if(isNaN(s))return u;e[r+u]=s}return u}function O(e,t,r,n){return G(K(t,e.length-r),e,r,n)}function m(e,t,r,n){return G(H(t),e,r,n)}function w(e,t,r,n){return m(e,t,r,n)}function I(e,t,r,n){return G(V(t),e,r,n)}function D(e,t,r,n){return G(z(t,e.length-r),e,r,n)}function P(e,t,r){return J.fromByteArray(0===t&&r===e.length?e:e.slice(t,r))}function S(e,t,r){r=Math.min(e.length,r);for(var n=[],o=t;r>o;){var i=e[o],u=null,s=i>239?4:i>223?3:i>191?2:1;if(r>=o+s){var a,f,c,l;switch(s){case 1:128>i&&(u=i);break;case 2:a=e[o+1],128===(192&a)&&(l=(31&i)<<6|63&a,l>127&&(u=l));break;case 3:a=e[o+1],f=e[o+2],128===(192&a)&&128===(192&f)&&(l=(15&i)<<12|(63&a)<<6|63&f,l>2047&&(55296>l||l>57343)&&(u=l));break;case 4:a=e[o+1],f=e[o+2],c=e[o+3],128===(192&a)&&128===(192&f)&&128===(192&c)&&(l=(15&i)<<18|(63&a)<<12|(63&f)<<6|63&c,l>65535&&1114112>l&&(u=l))}}null===u?(u=65533,s=1):u>65535&&(u-=65536,n.push(u>>>10&1023|55296),u=56320|1023&u),n.push(u),o+=s}return A(n)}function A(e){var t=e.length;if(ee>=t)return String.fromCharCode.apply(String,e);for(var r="",n=0;t>n;)r+=String.fromCharCode.apply(String,e.slice(n,n+=ee));return r}function U(e,t,r){var n="";r=Math.min(e.length,r);for(var o=t;r>o;++o)n+=String.fromCharCode(127&e[o]);return n}function B(e,t,r){var n="";r=Math.min(e.length,r);for(var o=t;r>o;++o)n+=String.fromCharCode(e[o]);return n}function M(e,t,r){var n=e.length;t&&t>=0||(t=0),(!r||0>r||r>n)&&(r=n);for(var o="",i=t;r>i;++i)o+=F(e[i]);return o}function k(e,t,r){for(var n=e.slice(t,r),o="",i=0;n.length>i;i+=2)o+=String.fromCharCode(n[i]+256*n[i+1]);return o}function L(e,t,r){if(e%1!==0||0>e)throw new RangeError("offset is not uint");if(e+t>r)throw new RangeError("Trying to access beyond buffer length")}function C(t,r,n,o,i,u){if(!e.isBuffer(t))throw new TypeError('"buffer" argument must be a Buffer instance');if(r>i||u>r)throw new RangeError('"value" argument is out of bounds');if(n+o>t.length)throw new RangeError("Index out of range")}function j(e,t,r,n){0>t&&(t=65535+t+1);for(var o=0,i=Math.min(e.length-r,2);i>o;++o)e[r+o]=(t&255<<8*(n?o:1-o))>>>8*(n?o:1-o)}function q(e,t,r,n){0>t&&(t=4294967295+t+1);for(var o=0,i=Math.min(e.length-r,4);i>o;++o)e[r+o]=t>>>8*(n?o:3-o)&255}function x(e,t,r,n,o,i){if(r+n>e.length)throw new RangeError("Index out of range");if(0>r)throw new RangeError("Index out of range")}function N(e,t,r,n,o){return o||x(e,t,r,4,3.4028234663852886e38,-3.4028234663852886e38),$.write(e,t,r,n,23,4),r+4}function Y(e,t,r,n,o){return o||x(e,t,r,8,1.7976931348623157e308,-1.7976931348623157e308),$.write(e,t,r,n,52,8),r+8}function Q(e){if(e=W(e).replace(te,""),2>e.length)return"";for(;e.length%4!==0;)e+="=";return e}function W(e){return e.trim?e.trim():e.replace(/^\s+|\s+$/g,"")}function F(e){return 16>e?"0"+e.toString(16):e.toString(16)}function K(e,t){t=t||1/0;for(var r,n=e.length,o=null,i=[],u=0;n>u;++u){if(r=e.charCodeAt(u),r>55295&&57344>r){if(!o){if(r>56319){(t-=3)>-1&&i.push(239,191,189);continue}if(u+1===n){(t-=3)>-1&&i.push(239,191,189);continue}o=r;continue}if(56320>r){(t-=3)>-1&&i.push(239,191,189),o=r;continue}r=(o-55296<<10|r-56320)+65536}else o&&(t-=3)>-1&&i.push(239,191,189);if(o=null,128>r){if((t-=1)<0)break;i.push(r)}else if(2048>r){if((t-=2)<0)break;i.push(r>>6|192,63&r|128)}else if(65536>r){if((t-=3)<0)break;i.push(r>>12|224,r>>6&63|128,63&r|128)}else{if(r>=1114112)throw Error("Invalid code point");if((t-=4)<0)break;i.push(r>>18|240,r>>12&63|128,r>>6&63|128,63&r|128)}}return i}function H(e){for(var t=[],r=0;e.length>r;++r)t.push(255&e.charCodeAt(r));return t}function z(e,t){for(var r,n,o,i=[],u=0;e.length>u&&(t-=2)>=0;++u)r=e.charCodeAt(u),n=r>>8,o=r%256,i.push(o),i.push(n);return i}function V(e){return J.toByteArray(Q(e))}function G(e,t,r,n){for(var o=0;n>o&&(o+r<t.length&&o<e.length);++o)t[o+r]=e[o];return o}function X(e){return e!==e}var J=r(19),$=r(20),Z=r(21);t.Buffer=e,t.SlowBuffer=E,t.INSPECT_MAX_BYTES=50,e.TYPED_ARRAY_SUPPORT=void 0!==n.TYPED_ARRAY_SUPPORT?n.TYPED_ARRAY_SUPPORT:o(),t.kMaxLength=i(),e.poolSize=8192,e._augment=function(t){return t.__proto__=e.prototype,t},e.from=function(e,t,r){return s(null,e,t,r)},e.TYPED_ARRAY_SUPPORT&&(e.prototype.__proto__=Uint8Array.prototype,e.__proto__=Uint8Array,"undefined"!=typeof Symbol&&Symbol.species&&e[Symbol.species]===e&&Object.defineProperty(e,Symbol.species,{value:null,configurable:!0})),e.alloc=function(e,t,r){return f(null,e,t,r)},e.allocUnsafe=function(e){return c(null,e)},e.allocUnsafeSlow=function(e){return c(null,e)},e.isBuffer=function(e){return!(null==e||!e._isBuffer)},e.compare=function(t,r){if(!e.isBuffer(t)||!e.isBuffer(r))throw new TypeError("Arguments must be Buffers");if(t===r)return 0;for(var n=t.length,o=r.length,i=0,u=Math.min(n,o);u>i;++i)if(t[i]!==r[i]){n=t[i],o=r[i];break}return o>n?-1:n>o?1:0},e.isEncoding=function(e){switch((e+"").toLowerCase()){case"hex":case"utf8":case"utf-8":case"ascii":case"latin1":case"binary":case"base64":case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return!0;default:return!1}},e.concat=function(t,r){if(!Z(t))throw new TypeError('"list" argument must be an Array of Buffers');if(0===t.length)return e.alloc(0);var n;if(void 0===r)for(r=0,n=0;t.length>n;++n)r+=t[n].length;var o=e.allocUnsafe(r),i=0;for(n=0;t.length>n;++n){var u=t[n];if(!e.isBuffer(u))throw new TypeError('"list" argument must be an Array of Buffers');u.copy(o,i),i+=u.length}return o},e.byteLength=g,e.prototype._isBuffer=!0,e.prototype.swap16=function(){var e=this.length;if(e%2!==0)throw new RangeError("Buffer size must be a multiple of 16-bits");for(var t=0;e>t;t+=2)_(this,t,t+1);return this},e.prototype.swap32=function(){var e=this.length;if(e%4!==0)throw new RangeError("Buffer size must be a multiple of 32-bits");for(var t=0;e>t;t+=4)_(this,t,t+3),_(this,t+1,t+2);return this},e.prototype.swap64=function(){var e=this.length;if(e%8!==0)throw new RangeError("Buffer size must be a multiple of 64-bits");for(var t=0;e>t;t+=8)_(this,t,t+7),_(this,t+1,t+6),_(this,t+2,t+5),_(this,t+3,t+4);return this},e.prototype.toString=function(){var e=0|this.length;return 0===e?"":0===arguments.length?S(this,0,e):v.apply(this,arguments)},e.prototype.equals=function(t){if(!e.isBuffer(t))throw new TypeError("Argument must be a Buffer");return this===t||0===e.compare(this,t)},e.prototype.inspect=function(){var e="",r=t.INSPECT_MAX_BYTES;return this.length>0&&(e=this.toString("hex",0,r).match(/.{2}/g).join(" "),this.length>r&&(e+=" ... ")),"<Buffer "+e+">"},e.prototype.compare=function(t,r,n,o,i){if(!e.isBuffer(t))throw new TypeError("Argument must be a Buffer");if(void 0===r&&(r=0),void 0===n&&(n=t?t.length:0),void 0===o&&(o=0),void 0===i&&(i=this.length),0>r||n>t.length||0>o||i>this.length)throw new RangeError("out of range index");if(o>=i&&r>=n)return 0;if(o>=i)return-1;if(r>=n)return 1;if(r>>>=0,n>>>=0,o>>>=0,i>>>=0,this===t)return 0;for(var u=i-o,s=n-r,a=Math.min(u,s),f=this.slice(o,i),c=t.slice(r,n),l=0;a>l;++l)if(f[l]!==c[l]){u=f[l],s=c[l];break}return s>u?-1:u>s?1:0},e.prototype.includes=function(e,t,r){return this.indexOf(e,t,r)!==-1},e.prototype.indexOf=function(e,t,r){return R(this,e,t,r,!0)},e.prototype.lastIndexOf=function(e,t,r){return R(this,e,t,r,!1)},e.prototype.write=function(e,t,r,n){if(void 0===t)n="utf8",r=this.length,t=0;else if(void 0===r&&"string"==typeof t)n=t,r=this.length,t=0;else{if(!isFinite(t))throw Error("Buffer.write(string, encoding, offset[, length]) is no longer supported");t=0|t,isFinite(r)?(r=0|r,void 0===n&&(n="utf8")):(n=r,r=void 0)}var o=this.length-t;if((void 0===r||r>o)&&(r=o),e.length>0&&(0>r||0>t)||t>this.length)throw new RangeError("Attempt to write outside buffer bounds");n||(n="utf8");for(var i=!1;;)switch(n){case"hex":return b(this,e,t,r);case"utf8":case"utf-8":return O(this,e,t,r);case"ascii":return m(this,e,t,r);case"latin1":case"binary":return w(this,e,t,r);case"base64":return I(this,e,t,r);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return D(this,e,t,r);default:if(i)throw new TypeError("Unknown encoding: "+n);n=(""+n).toLowerCase(),i=!0}},e.prototype.toJSON=function(){return{type:"Buffer",data:Array.prototype.slice.call(this._arr||this,0)}};var ee=4096;e.prototype.slice=function(t,r){var n=this.length;t=~~t,r=void 0===r?n:~~r,0>t?(t+=n,0>t&&(t=0)):t>n&&(t=n),0>r?(r+=n,0>r&&(r=0)):r>n&&(r=n),t>r&&(r=t);var o;if(e.TYPED_ARRAY_SUPPORT)o=this.subarray(t,r),o.__proto__=e.prototype;else{var i=r-t;o=new e(i,(void 0));for(var u=0;i>u;++u)o[u]=this[u+t]}return o},e.prototype.readUIntLE=function(e,t,r){e=0|e,t=0|t,r||L(e,t,this.length);for(var n=this[e],o=1,i=0;++i<t&&(o*=256);)n+=this[e+i]*o;return n},e.prototype.readUIntBE=function(e,t,r){e=0|e,t=0|t,r||L(e,t,this.length);for(var n=this[e+--t],o=1;t>0&&(o*=256);)n+=this[e+--t]*o;return n},e.prototype.readUInt8=function(e,t){return t||L(e,1,this.length),this[e]},e.prototype.readUInt16LE=function(e,t){return t||L(e,2,this.length),this[e]|this[e+1]<<8},e.prototype.readUInt16BE=function(e,t){return t||L(e,2,this.length),this[e]<<8|this[e+1]},e.prototype.readUInt32LE=function(e,t){return t||L(e,4,this.length),(this[e]|this[e+1]<<8|this[e+2]<<16)+16777216*this[e+3]},e.prototype.readUInt32BE=function(e,t){return t||L(e,4,this.length),16777216*this[e]+(this[e+1]<<16|this[e+2]<<8|this[e+3])},e.prototype.readIntLE=function(e,t,r){e=0|e,t=0|t,r||L(e,t,this.length);for(var n=this[e],o=1,i=0;++i<t&&(o*=256);)n+=this[e+i]*o;return o*=128,o>n||(n-=Math.pow(2,8*t)),n},e.prototype.readIntBE=function(e,t,r){e=0|e,t=0|t,r||L(e,t,this.length);for(var n=t,o=1,i=this[e+--n];n>0&&(o*=256);)i+=this[e+--n]*o;return o*=128,o>i||(i-=Math.pow(2,8*t)),i},e.prototype.readInt8=function(e,t){return t||L(e,1,this.length),128&this[e]?(255-this[e]+1)*-1:this[e]},e.prototype.readInt16LE=function(e,t){t||L(e,2,this.length);var r=this[e]|this[e+1]<<8;return 32768&r?4294901760|r:r},e.prototype.readInt16BE=function(e,t){t||L(e,2,this.length);var r=this[e+1]|this[e]<<8;return 32768&r?4294901760|r:r},e.prototype.readInt32LE=function(e,t){return t||L(e,4,this.length),this[e]|this[e+1]<<8|this[e+2]<<16|this[e+3]<<24},e.prototype.readInt32BE=function(e,t){return t||L(e,4,this.length),this[e]<<24|this[e+1]<<16|this[e+2]<<8|this[e+3]},e.prototype.readFloatLE=function(e,t){return t||L(e,4,this.length),$.read(this,e,!0,23,4)},e.prototype.readFloatBE=function(e,t){return t||L(e,4,this.length),$.read(this,e,!1,23,4)},e.prototype.readDoubleLE=function(e,t){return t||L(e,8,this.length),$.read(this,e,!0,52,8)},e.prototype.readDoubleBE=function(e,t){return t||L(e,8,this.length),$.read(this,e,!1,52,8)},e.prototype.writeUIntLE=function(e,t,r,n){if(e=+e,t=0|t,r=0|r,!n){var o=Math.pow(2,8*r)-1;C(this,e,t,r,o,0)}var i=1,u=0;for(this[t]=255&e;++u<r&&(i*=256);)this[t+u]=e/i&255;return t+r},e.prototype.writeUIntBE=function(e,t,r,n){if(e=+e,t=0|t,r=0|r,!n){var o=Math.pow(2,8*r)-1;C(this,e,t,r,o,0)}var i=r-1,u=1;for(this[t+i]=255&e;--i>=0&&(u*=256);)this[t+i]=e/u&255;return t+r},e.prototype.writeUInt8=function(t,r,n){return t=+t,r=0|r,n||C(this,t,r,1,255,0),e.TYPED_ARRAY_SUPPORT||(t=Math.floor(t)),this[r]=255&t,r+1},e.prototype.writeUInt16LE=function(t,r,n){return t=+t,r=0|r,n||C(this,t,r,2,65535,0),e.TYPED_ARRAY_SUPPORT?(this[r]=255&t,this[r+1]=t>>>8):j(this,t,r,!0),r+2},e.prototype.writeUInt16BE=function(t,r,n){return t=+t,r=0|r,n||C(this,t,r,2,65535,0),e.TYPED_ARRAY_SUPPORT?(this[r]=t>>>8,this[r+1]=255&t):j(this,t,r,!1),r+2},e.prototype.writeUInt32LE=function(t,r,n){return t=+t,r=0|r,n||C(this,t,r,4,4294967295,0),e.TYPED_ARRAY_SUPPORT?(this[r+3]=t>>>24,this[r+2]=t>>>16,this[r+1]=t>>>8,this[r]=255&t):q(this,t,r,!0),r+4},e.prototype.writeUInt32BE=function(t,r,n){return t=+t,r=0|r,n||C(this,t,r,4,4294967295,0),e.TYPED_ARRAY_SUPPORT?(this[r]=t>>>24,this[r+1]=t>>>16,this[r+2]=t>>>8,this[r+3]=255&t):q(this,t,r,!1),r+4},e.prototype.writeIntLE=function(e,t,r,n){if(e=+e,t=0|t,!n){var o=Math.pow(2,8*r-1);C(this,e,t,r,o-1,-o)}var i=0,u=1,s=0;for(this[t]=255&e;++i<r&&(u*=256);)0>e&&0===s&&0!==this[t+i-1]&&(s=1),this[t+i]=(e/u>>0)-s&255;return t+r},e.prototype.writeIntBE=function(e,t,r,n){if(e=+e,t=0|t,!n){var o=Math.pow(2,8*r-1);C(this,e,t,r,o-1,-o)}var i=r-1,u=1,s=0;for(this[t+i]=255&e;--i>=0&&(u*=256);)0>e&&0===s&&0!==this[t+i+1]&&(s=1),this[t+i]=(e/u>>0)-s&255;return t+r},e.prototype.writeInt8=function(t,r,n){return t=+t,r=0|r,n||C(this,t,r,1,127,-128),e.TYPED_ARRAY_SUPPORT||(t=Math.floor(t)),0>t&&(t=255+t+1),this[r]=255&t,r+1},e.prototype.writeInt16LE=function(t,r,n){return t=+t,r=0|r,n||C(this,t,r,2,32767,-32768),e.TYPED_ARRAY_SUPPORT?(this[r]=255&t,this[r+1]=t>>>8):j(this,t,r,!0),r+2},e.prototype.writeInt16BE=function(t,r,n){return t=+t,r=0|r,n||C(this,t,r,2,32767,-32768),e.TYPED_ARRAY_SUPPORT?(this[r]=t>>>8,this[r+1]=255&t):j(this,t,r,!1),r+2},e.prototype.writeInt32LE=function(t,r,n){return t=+t,r=0|r,n||C(this,t,r,4,2147483647,-2147483648),e.TYPED_ARRAY_SUPPORT?(this[r]=255&t,this[r+1]=t>>>8,this[r+2]=t>>>16,this[r+3]=t>>>24):q(this,t,r,!0),r+4},e.prototype.writeInt32BE=function(t,r,n){return t=+t,r=0|r,n||C(this,t,r,4,2147483647,-2147483648),0>t&&(t=4294967295+t+1),e.TYPED_ARRAY_SUPPORT?(this[r]=t>>>24,this[r+1]=t>>>16,this[r+2]=t>>>8,this[r+3]=255&t):q(this,t,r,!1),r+4},e.prototype.writeFloatLE=function(e,t,r){return N(this,e,t,!0,r)},e.prototype.writeFloatBE=function(e,t,r){return N(this,e,t,!1,r)},e.prototype.writeDoubleLE=function(e,t,r){return Y(this,e,t,!0,r)},e.prototype.writeDoubleBE=function(e,t,r){return Y(this,e,t,!1,r)},e.prototype.copy=function(t,r,n,o){if(n||(n=0),o||0===o||(o=this.length),t.length>r||(r=t.length),r||(r=0),o>0&&n>o&&(o=n),o===n)return 0;if(0===t.length||0===this.length)return 0;if(0>r)throw new RangeError("targetStart out of bounds");if(0>n||n>=this.length)throw new RangeError("sourceStart out of bounds");if(0>o)throw new RangeError("sourceEnd out of bounds");o>this.length&&(o=this.length),o-n>t.length-r&&(o=t.length-r+n);var i,u=o-n;if(this===t&&r>n&&o>r)for(i=u-1;i>=0;--i)t[i+r]=this[i+n];else if(1e3>u||!e.TYPED_ARRAY_SUPPORT)for(i=0;u>i;++i)t[i+r]=this[i+n];else Uint8Array.prototype.set.call(t,this.subarray(n,n+u),r);return u},e.prototype.fill=function(t,r,n,o){if("string"==typeof t){if("string"==typeof r?(o=r,r=0,n=this.length):"string"==typeof n&&(o=n,n=this.length),1===t.length){var i=t.charCodeAt(0);256>i&&(t=i)}if(void 0!==o&&"string"!=typeof o)throw new TypeError("encoding must be a string");if("string"==typeof o&&!e.isEncoding(o))throw new TypeError("Unknown encoding: "+o)}else"number"==typeof t&&(t=255&t);if(0>r||r>this.length||n>this.length)throw new RangeError("Out of range index");if(r>=n)return this;r>>>=0,n=void 0===n?this.length:n>>>0,t||(t=0);var u;if("number"==typeof t)for(u=r;n>u;++u)this[u]=t;else{var s=e.isBuffer(t)?t:K(""+new e(t,o)),a=s.length;for(u=0;n-r>u;++u)this[u+r]=s[u%a]}return this};var te=/[^+\/0-9A-Za-z-_]/g}).call(t,r(18).Buffer,function(){return this}())},function(e,t){e.exports=require("base64-js")},function(e,t){e.exports=require("ieee754")},function(e,t){e.exports=require("isarray")},function(e,t){e.exports=require("ip")},function(e,t){},function(e,t){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var r=(t.BALANCE="BALANCE",t.ORDER_BOOK="OB",t.ORDER_BOOK_TRADE_NEW="TRADE_NEW"),n=t.ORDER_BOOK_NEW_ORDER="NEW_ORDER",o=t.ORDER_BOOK_UPDATE_ORDER="UPDATE_ORDER",i=t.ORDER_BOOK_DELETE_ORDER="DELETE_ORDER",u=t.ORDER_BOOK_DELETE_ORDERS_THRU="DELETE_ORDERS_THRU",s=(t.EXECUTION_REPORT="EXECUTION_REPORT",t.EXECUTION_REPORT_NEW="NEW"),a=t.EXECUTION_REPORT_PARTIAL="PARTIAL",f=t.EXECUTION_REPORT_EXECUTION="EXECUTION",c=t.EXECUTION_REPORT_CANCELED="CANCELED",l=t.EXECUTION_REPORT_REJECTED="REJECTED";t.EVENTS={ORDERBOOK:{0:n,1:o,2:i,3:u},TRADES:{0:r},EXECUTION_REPORT:{0:s,1:a,2:f,4:c,8:l}}},function(e,t,r){"use strict";function n(e){return e&&e.__esModule?e:{"default":e}}function o(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function i(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t}function u(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}Object.defineProperty(t,"__esModule",{value:!0});var s=function(){function e(e,t){for(var r=0;t.length>r;r++){var n=t[r];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}return function(t,r,n){return r&&e(t.prototype,r),n&&e(t,n),t}}(),a=function p(e,t,r){null===e&&(e=Function.prototype);var n=Object.getOwnPropertyDescriptor(e,t);if(void 0===n){var o=Object.getPrototypeOf(e);return null===o?void 0:p(o,t,r)}if("value"in n)return n.value;var i=n.get;if(void 0!==i)return i.call(r)},f=r(3),c=(n(f),r(26)),l=n(c),h=(r(9),function(e){function t(){return o(this,t),i(this,(t.__proto__||Object.getPrototypeOf(t)).apply(this,arguments))}return u(t,e),s(t,[{key:"ticker",value:function(e){return a(t.prototype.__proto__||Object.getPrototypeOf(t.prototype),"fetchPublic",this).call(this,"ticker",e)}},{key:"trades",value:function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},r=e.limit,n=void 0===r?1e3:r,o=e.since,i=void 0===o?"0":o,u=arguments[1];return a(t.prototype.__proto__||Object.getPrototypeOf(t.prototype),"fetchPublic",this).call(this,"trades?limit="+n+"&since="+i,u)}},{key:"orderbook",value:function(e){return a(t.prototype.__proto__||Object.getPrototypeOf(t.prototype),"fetchPublic",this).call(this,"orderbook",e)}}]),t}(l["default"]));t["default"]=h},function(e,t,r){"use strict";function n(e){return e&&e.__esModule?e:{"default":e}}function o(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function i(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t}function u(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}Object.defineProperty(t,"__esModule",{value:!0});var s=function(){function e(e,t){for(var r=0;t.length>r;r++){var n=t[r];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}return function(t,r,n){return r&&e(t.prototype,r),n&&e(t,n),t}}(),a=r(6),f=(n(a),r(5)),c=n(f),l=r(27),h=n(l),p=r(12),d=n(p),y=r(28),E=n(y),g=r(29),v=n(g),_=function(e){function t(e){o(this,t);var n=i(this,(t.__proto__||Object.getPrototypeOf(t)).call(this,e,"rest"));return n.key=e.key,n.secret=e.secret,n.currency=e.currency||"USD",n.fetchRequest=r(n.isNode?31:32),n}return u(t,e),s(t,[{key:"headers",value:function(e,t){var r=""+Date.now(),n=h["default"].codec.utf8String.toBits(this.secret),o=new h["default"].misc.hmac(n,h["default"].hash.sha256),i=h["default"].codec.hex.fromBits(o.encrypt(r));return{method:e,headers:{"Content-Type":"application/json",Nonce:r,APIKey:this.key,Signature:i},body:JSON.stringify(t)}}},{key:"fetch",value:function(e,t){var r=arguments.length>2&&void 0!==arguments[2]?arguments[2]:{};return this.fetchRequest(E["default"].resolve(this.endpoint,t),r).then(function(e){return e.json()})}},{key:"fetchPublic",value:function(e,t){return(0,d["default"])(this.fetch({},v["default"].join("api/v1",this.currency,e)),t)}},{key:"fetchTrade",value:function(e,t){var r=this.headers("POST",e);return(0,d["default"])(this.fetch(e,"tapi/v1/message",r,t).then(function(e){return 500===e.Status?Promise.reject(e):e.Responses}).then(function(e){return 1===e.length?e[0]:e}),t)}}]),t}(c["default"]);t["default"]=_},function(e,t){e.exports=require("sjcl")},function(e,t){e.exports=require("url")},function(e,t,r){(function(e){function r(e,t){for(var r=0,n=e.length-1;n>=0;n--){var o=e[n];"."===o?e.splice(n,1):".."===o?(e.splice(n,1),r++):r&&(e.splice(n,1),r--)}if(t)for(;r--;r)e.unshift("..");return e}function n(e,t){if(e.filter)return e.filter(t);for(var r=[],n=0;e.length>n;n++)t(e[n],n,e)&&r.push(e[n]);return r}var o=/^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/,i=function(e){return o.exec(e).slice(1)};t.resolve=function(){for(var t="",o=!1,i=arguments.length-1;i>=-1&&!o;i--){var u=0>i?e.cwd():arguments[i];if("string"!=typeof u)throw new TypeError("Arguments to path.resolve must be strings");u&&(t=u+"/"+t,o="/"===u.charAt(0))}return t=r(n(t.split("/"),function(e){return!!e}),!o).join("/"),(o?"/":"")+t||"."},t.normalize=function(e){var o=t.isAbsolute(e),i="/"===u(e,-1);return e=r(n(e.split("/"),function(e){return!!e}),!o).join("/"),e||o||(e="."),e&&i&&(e+="/"),(o?"/":"")+e},t.isAbsolute=function(e){return"/"===e.charAt(0)},t.join=function(){var e=Array.prototype.slice.call(arguments,0);return t.normalize(n(e,function(e,t){if("string"!=typeof e)throw new TypeError("Arguments to path.join must be strings");return e}).join("/"))},t.relative=function(e,r){function n(e){for(var t=0;e.length>t&&""===e[t];t++);for(var r=e.length-1;r>=0&&""===e[r];r--);return t>r?[]:e.slice(t,r-t+1)}e=t.resolve(e).substr(1),r=t.resolve(r).substr(1);for(var o=n(e.split("/")),i=n(r.split("/")),u=Math.min(o.length,i.length),s=u,a=0;u>a;a++)if(o[a]!==i[a]){s=a;break}for(var f=[],a=s;o.length>a;a++)f.push("..");return f=f.concat(i.slice(s)),f.join("/")},t.sep="/",t.delimiter=":",t.dirname=function(e){var t=i(e),r=t[0],n=t[1];return r||n?(n&&(n=n.substr(0,n.length-1)),r+n):"."},t.basename=function(e,t){var r=i(e)[2];return t&&r.substr(-1*t.length)===t&&(r=r.substr(0,r.length-t.length)),r},t.extname=function(e){return i(e)[3]};var u="b"==="ab".substr(-1)?function(e,t,r){return e.substr(t,r)}:function(e,t,r){return 0>t&&(t=e.length+t),e.substr(t,r)}}).call(t,r(30))},function(e,t){function r(e){if(a===setTimeout)return setTimeout(e,0);try{return a(e,0)}catch(t){try{return a.call(null,e,0)}catch(t){return a.call(this,e,0)}}}function n(e){if(f===clearTimeout)return clearTimeout(e);try{return f(e)}catch(t){try{return f.call(null,e)}catch(t){return f.call(this,e)}}}function o(){p&&l&&(p=!1,l.length?h=l.concat(h):d=-1,h.length&&i())}function i(){if(!p){var e=r(o);p=!0;for(var t=h.length;t;){for(l=h,h=[];++d<t;)l&&l[d].run();d=-1,t=h.length}l=null,p=!1,n(e)}}function u(e,t){this.fun=e,this.array=t}function s(){}var a,f,c=e.exports={};!function(){try{a=setTimeout}catch(e){a=function(){throw Error("setTimeout is not defined")}}try{f=clearTimeout}catch(e){f=function(){throw Error("clearTimeout is not defined")}}}();var l,h=[],p=!1,d=-1;c.nextTick=function(e){var t=Array(arguments.length-1);if(arguments.length>1)for(var n=1;arguments.length>n;n++)t[n-1]=arguments[n];h.push(new u(e,t)),1!==h.length||p||r(i)},u.prototype.run=function(){this.fun.apply(null,this.array)},c.title="browser",c.browser=!0,c.env={},c.argv=[],c.version="",c.versions={},c.on=s,c.addListener=s,c.once=s,c.off=s,c.removeListener=s,c.removeAllListeners=s,c.emit=s,c.binding=function(e){throw Error("process.binding is not supported")},c.cwd=function(){return"/"},c.chdir=function(e){throw Error("process.chdir is not supported")},c.umask=function(){return 0}},function(e,t){e.exports=require("isomorphic-fetch")},function(e,t){e.exports=require("fetch-jsonp")}]);
+	/* eslint-disable no-proto */
+	
+	'use strict'
+	
+	var base64 = __webpack_require__(19)
+	var ieee754 = __webpack_require__(20)
+	var isArray = __webpack_require__(21)
+	
+	exports.Buffer = Buffer
+	exports.SlowBuffer = SlowBuffer
+	exports.INSPECT_MAX_BYTES = 50
+	
+	/**
+	 * If `Buffer.TYPED_ARRAY_SUPPORT`:
+	 *   === true    Use Uint8Array implementation (fastest)
+	 *   === false   Use Object implementation (most compatible, even IE6)
+	 *
+	 * Browsers that support typed arrays are IE 10+, Firefox 4+, Chrome 7+, Safari 5.1+,
+	 * Opera 11.6+, iOS 4.2+.
+	 *
+	 * Due to various browser bugs, sometimes the Object implementation will be used even
+	 * when the browser supports typed arrays.
+	 *
+	 * Note:
+	 *
+	 *   - Firefox 4-29 lacks support for adding new properties to `Uint8Array` instances,
+	 *     See: https://bugzilla.mozilla.org/show_bug.cgi?id=695438.
+	 *
+	 *   - Chrome 9-10 is missing the `TypedArray.prototype.subarray` function.
+	 *
+	 *   - IE10 has a broken `TypedArray.prototype.subarray` function which returns arrays of
+	 *     incorrect length in some situations.
+	
+	 * We detect these buggy browsers and set `Buffer.TYPED_ARRAY_SUPPORT` to `false` so they
+	 * get the Object implementation, which is slower but behaves correctly.
+	 */
+	Buffer.TYPED_ARRAY_SUPPORT = global.TYPED_ARRAY_SUPPORT !== undefined
+	  ? global.TYPED_ARRAY_SUPPORT
+	  : typedArraySupport()
+	
+	/*
+	 * Export kMaxLength after typed array support is determined.
+	 */
+	exports.kMaxLength = kMaxLength()
+	
+	function typedArraySupport () {
+	  try {
+	    var arr = new Uint8Array(1)
+	    arr.__proto__ = {__proto__: Uint8Array.prototype, foo: function () { return 42 }}
+	    return arr.foo() === 42 && // typed array instances can be augmented
+	        typeof arr.subarray === 'function' && // chrome 9-10 lack `subarray`
+	        arr.subarray(1, 1).byteLength === 0 // ie10 has broken `subarray`
+	  } catch (e) {
+	    return false
+	  }
+	}
+	
+	function kMaxLength () {
+	  return Buffer.TYPED_ARRAY_SUPPORT
+	    ? 0x7fffffff
+	    : 0x3fffffff
+	}
+	
+	function createBuffer (that, length) {
+	  if (kMaxLength() < length) {
+	    throw new RangeError('Invalid typed array length')
+	  }
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    // Return an augmented `Uint8Array` instance, for best performance
+	    that = new Uint8Array(length)
+	    that.__proto__ = Buffer.prototype
+	  } else {
+	    // Fallback: Return an object instance of the Buffer class
+	    if (that === null) {
+	      that = new Buffer(length)
+	    }
+	    that.length = length
+	  }
+	
+	  return that
+	}
+	
+	/**
+	 * The Buffer constructor returns instances of `Uint8Array` that have their
+	 * prototype changed to `Buffer.prototype`. Furthermore, `Buffer` is a subclass of
+	 * `Uint8Array`, so the returned instances will have all the node `Buffer` methods
+	 * and the `Uint8Array` methods. Square bracket notation works as expected -- it
+	 * returns a single octet.
+	 *
+	 * The `Uint8Array` prototype remains unmodified.
+	 */
+	
+	function Buffer (arg, encodingOrOffset, length) {
+	  if (!Buffer.TYPED_ARRAY_SUPPORT && !(this instanceof Buffer)) {
+	    return new Buffer(arg, encodingOrOffset, length)
+	  }
+	
+	  // Common case.
+	  if (typeof arg === 'number') {
+	    if (typeof encodingOrOffset === 'string') {
+	      throw new Error(
+	        'If encoding is specified then the first argument must be a string'
+	      )
+	    }
+	    return allocUnsafe(this, arg)
+	  }
+	  return from(this, arg, encodingOrOffset, length)
+	}
+	
+	Buffer.poolSize = 8192 // not used by this implementation
+	
+	// TODO: Legacy, not needed anymore. Remove in next major version.
+	Buffer._augment = function (arr) {
+	  arr.__proto__ = Buffer.prototype
+	  return arr
+	}
+	
+	function from (that, value, encodingOrOffset, length) {
+	  if (typeof value === 'number') {
+	    throw new TypeError('"value" argument must not be a number')
+	  }
+	
+	  if (typeof ArrayBuffer !== 'undefined' && value instanceof ArrayBuffer) {
+	    return fromArrayBuffer(that, value, encodingOrOffset, length)
+	  }
+	
+	  if (typeof value === 'string') {
+	    return fromString(that, value, encodingOrOffset)
+	  }
+	
+	  return fromObject(that, value)
+	}
+	
+	/**
+	 * Functionally equivalent to Buffer(arg, encoding) but throws a TypeError
+	 * if value is a number.
+	 * Buffer.from(str[, encoding])
+	 * Buffer.from(array)
+	 * Buffer.from(buffer)
+	 * Buffer.from(arrayBuffer[, byteOffset[, length]])
+	 **/
+	Buffer.from = function (value, encodingOrOffset, length) {
+	  return from(null, value, encodingOrOffset, length)
+	}
+	
+	if (Buffer.TYPED_ARRAY_SUPPORT) {
+	  Buffer.prototype.__proto__ = Uint8Array.prototype
+	  Buffer.__proto__ = Uint8Array
+	  if (typeof Symbol !== 'undefined' && Symbol.species &&
+	      Buffer[Symbol.species] === Buffer) {
+	    // Fix subarray() in ES2016. See: https://github.com/feross/buffer/pull/97
+	    Object.defineProperty(Buffer, Symbol.species, {
+	      value: null,
+	      configurable: true
+	    })
+	  }
+	}
+	
+	function assertSize (size) {
+	  if (typeof size !== 'number') {
+	    throw new TypeError('"size" argument must be a number')
+	  } else if (size < 0) {
+	    throw new RangeError('"size" argument must not be negative')
+	  }
+	}
+	
+	function alloc (that, size, fill, encoding) {
+	  assertSize(size)
+	  if (size <= 0) {
+	    return createBuffer(that, size)
+	  }
+	  if (fill !== undefined) {
+	    // Only pay attention to encoding if it's a string. This
+	    // prevents accidentally sending in a number that would
+	    // be interpretted as a start offset.
+	    return typeof encoding === 'string'
+	      ? createBuffer(that, size).fill(fill, encoding)
+	      : createBuffer(that, size).fill(fill)
+	  }
+	  return createBuffer(that, size)
+	}
+	
+	/**
+	 * Creates a new filled Buffer instance.
+	 * alloc(size[, fill[, encoding]])
+	 **/
+	Buffer.alloc = function (size, fill, encoding) {
+	  return alloc(null, size, fill, encoding)
+	}
+	
+	function allocUnsafe (that, size) {
+	  assertSize(size)
+	  that = createBuffer(that, size < 0 ? 0 : checked(size) | 0)
+	  if (!Buffer.TYPED_ARRAY_SUPPORT) {
+	    for (var i = 0; i < size; ++i) {
+	      that[i] = 0
+	    }
+	  }
+	  return that
+	}
+	
+	/**
+	 * Equivalent to Buffer(num), by default creates a non-zero-filled Buffer instance.
+	 * */
+	Buffer.allocUnsafe = function (size) {
+	  return allocUnsafe(null, size)
+	}
+	/**
+	 * Equivalent to SlowBuffer(num), by default creates a non-zero-filled Buffer instance.
+	 */
+	Buffer.allocUnsafeSlow = function (size) {
+	  return allocUnsafe(null, size)
+	}
+	
+	function fromString (that, string, encoding) {
+	  if (typeof encoding !== 'string' || encoding === '') {
+	    encoding = 'utf8'
+	  }
+	
+	  if (!Buffer.isEncoding(encoding)) {
+	    throw new TypeError('"encoding" must be a valid string encoding')
+	  }
+	
+	  var length = byteLength(string, encoding) | 0
+	  that = createBuffer(that, length)
+	
+	  var actual = that.write(string, encoding)
+	
+	  if (actual !== length) {
+	    // Writing a hex string, for example, that contains invalid characters will
+	    // cause everything after the first invalid character to be ignored. (e.g.
+	    // 'abxxcd' will be treated as 'ab')
+	    that = that.slice(0, actual)
+	  }
+	
+	  return that
+	}
+	
+	function fromArrayLike (that, array) {
+	  var length = array.length < 0 ? 0 : checked(array.length) | 0
+	  that = createBuffer(that, length)
+	  for (var i = 0; i < length; i += 1) {
+	    that[i] = array[i] & 255
+	  }
+	  return that
+	}
+	
+	function fromArrayBuffer (that, array, byteOffset, length) {
+	  array.byteLength // this throws if `array` is not a valid ArrayBuffer
+	
+	  if (byteOffset < 0 || array.byteLength < byteOffset) {
+	    throw new RangeError('\'offset\' is out of bounds')
+	  }
+	
+	  if (array.byteLength < byteOffset + (length || 0)) {
+	    throw new RangeError('\'length\' is out of bounds')
+	  }
+	
+	  if (byteOffset === undefined && length === undefined) {
+	    array = new Uint8Array(array)
+	  } else if (length === undefined) {
+	    array = new Uint8Array(array, byteOffset)
+	  } else {
+	    array = new Uint8Array(array, byteOffset, length)
+	  }
+	
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    // Return an augmented `Uint8Array` instance, for best performance
+	    that = array
+	    that.__proto__ = Buffer.prototype
+	  } else {
+	    // Fallback: Return an object instance of the Buffer class
+	    that = fromArrayLike(that, array)
+	  }
+	  return that
+	}
+	
+	function fromObject (that, obj) {
+	  if (Buffer.isBuffer(obj)) {
+	    var len = checked(obj.length) | 0
+	    that = createBuffer(that, len)
+	
+	    if (that.length === 0) {
+	      return that
+	    }
+	
+	    obj.copy(that, 0, 0, len)
+	    return that
+	  }
+	
+	  if (obj) {
+	    if ((typeof ArrayBuffer !== 'undefined' &&
+	        obj.buffer instanceof ArrayBuffer) || 'length' in obj) {
+	      if (typeof obj.length !== 'number' || isnan(obj.length)) {
+	        return createBuffer(that, 0)
+	      }
+	      return fromArrayLike(that, obj)
+	    }
+	
+	    if (obj.type === 'Buffer' && isArray(obj.data)) {
+	      return fromArrayLike(that, obj.data)
+	    }
+	  }
+	
+	  throw new TypeError('First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.')
+	}
+	
+	function checked (length) {
+	  // Note: cannot use `length < kMaxLength()` here because that fails when
+	  // length is NaN (which is otherwise coerced to zero.)
+	  if (length >= kMaxLength()) {
+	    throw new RangeError('Attempt to allocate Buffer larger than maximum ' +
+	                         'size: 0x' + kMaxLength().toString(16) + ' bytes')
+	  }
+	  return length | 0
+	}
+	
+	function SlowBuffer (length) {
+	  if (+length != length) { // eslint-disable-line eqeqeq
+	    length = 0
+	  }
+	  return Buffer.alloc(+length)
+	}
+	
+	Buffer.isBuffer = function isBuffer (b) {
+	  return !!(b != null && b._isBuffer)
+	}
+	
+	Buffer.compare = function compare (a, b) {
+	  if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b)) {
+	    throw new TypeError('Arguments must be Buffers')
+	  }
+	
+	  if (a === b) return 0
+	
+	  var x = a.length
+	  var y = b.length
+	
+	  for (var i = 0, len = Math.min(x, y); i < len; ++i) {
+	    if (a[i] !== b[i]) {
+	      x = a[i]
+	      y = b[i]
+	      break
+	    }
+	  }
+	
+	  if (x < y) return -1
+	  if (y < x) return 1
+	  return 0
+	}
+	
+	Buffer.isEncoding = function isEncoding (encoding) {
+	  switch (String(encoding).toLowerCase()) {
+	    case 'hex':
+	    case 'utf8':
+	    case 'utf-8':
+	    case 'ascii':
+	    case 'latin1':
+	    case 'binary':
+	    case 'base64':
+	    case 'ucs2':
+	    case 'ucs-2':
+	    case 'utf16le':
+	    case 'utf-16le':
+	      return true
+	    default:
+	      return false
+	  }
+	}
+	
+	Buffer.concat = function concat (list, length) {
+	  if (!isArray(list)) {
+	    throw new TypeError('"list" argument must be an Array of Buffers')
+	  }
+	
+	  if (list.length === 0) {
+	    return Buffer.alloc(0)
+	  }
+	
+	  var i
+	  if (length === undefined) {
+	    length = 0
+	    for (i = 0; i < list.length; ++i) {
+	      length += list[i].length
+	    }
+	  }
+	
+	  var buffer = Buffer.allocUnsafe(length)
+	  var pos = 0
+	  for (i = 0; i < list.length; ++i) {
+	    var buf = list[i]
+	    if (!Buffer.isBuffer(buf)) {
+	      throw new TypeError('"list" argument must be an Array of Buffers')
+	    }
+	    buf.copy(buffer, pos)
+	    pos += buf.length
+	  }
+	  return buffer
+	}
+	
+	function byteLength (string, encoding) {
+	  if (Buffer.isBuffer(string)) {
+	    return string.length
+	  }
+	  if (typeof ArrayBuffer !== 'undefined' && typeof ArrayBuffer.isView === 'function' &&
+	      (ArrayBuffer.isView(string) || string instanceof ArrayBuffer)) {
+	    return string.byteLength
+	  }
+	  if (typeof string !== 'string') {
+	    string = '' + string
+	  }
+	
+	  var len = string.length
+	  if (len === 0) return 0
+	
+	  // Use a for loop to avoid recursion
+	  var loweredCase = false
+	  for (;;) {
+	    switch (encoding) {
+	      case 'ascii':
+	      case 'latin1':
+	      case 'binary':
+	        return len
+	      case 'utf8':
+	      case 'utf-8':
+	      case undefined:
+	        return utf8ToBytes(string).length
+	      case 'ucs2':
+	      case 'ucs-2':
+	      case 'utf16le':
+	      case 'utf-16le':
+	        return len * 2
+	      case 'hex':
+	        return len >>> 1
+	      case 'base64':
+	        return base64ToBytes(string).length
+	      default:
+	        if (loweredCase) return utf8ToBytes(string).length // assume utf8
+	        encoding = ('' + encoding).toLowerCase()
+	        loweredCase = true
+	    }
+	  }
+	}
+	Buffer.byteLength = byteLength
+	
+	function slowToString (encoding, start, end) {
+	  var loweredCase = false
+	
+	  // No need to verify that "this.length <= MAX_UINT32" since it's a read-only
+	  // property of a typed array.
+	
+	  // This behaves neither like String nor Uint8Array in that we set start/end
+	  // to their upper/lower bounds if the value passed is out of range.
+	  // undefined is handled specially as per ECMA-262 6th Edition,
+	  // Section 13.3.3.7 Runtime Semantics: KeyedBindingInitialization.
+	  if (start === undefined || start < 0) {
+	    start = 0
+	  }
+	  // Return early if start > this.length. Done here to prevent potential uint32
+	  // coercion fail below.
+	  if (start > this.length) {
+	    return ''
+	  }
+	
+	  if (end === undefined || end > this.length) {
+	    end = this.length
+	  }
+	
+	  if (end <= 0) {
+	    return ''
+	  }
+	
+	  // Force coersion to uint32. This will also coerce falsey/NaN values to 0.
+	  end >>>= 0
+	  start >>>= 0
+	
+	  if (end <= start) {
+	    return ''
+	  }
+	
+	  if (!encoding) encoding = 'utf8'
+	
+	  while (true) {
+	    switch (encoding) {
+	      case 'hex':
+	        return hexSlice(this, start, end)
+	
+	      case 'utf8':
+	      case 'utf-8':
+	        return utf8Slice(this, start, end)
+	
+	      case 'ascii':
+	        return asciiSlice(this, start, end)
+	
+	      case 'latin1':
+	      case 'binary':
+	        return latin1Slice(this, start, end)
+	
+	      case 'base64':
+	        return base64Slice(this, start, end)
+	
+	      case 'ucs2':
+	      case 'ucs-2':
+	      case 'utf16le':
+	      case 'utf-16le':
+	        return utf16leSlice(this, start, end)
+	
+	      default:
+	        if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
+	        encoding = (encoding + '').toLowerCase()
+	        loweredCase = true
+	    }
+	  }
+	}
+	
+	// The property is used by `Buffer.isBuffer` and `is-buffer` (in Safari 5-7) to detect
+	// Buffer instances.
+	Buffer.prototype._isBuffer = true
+	
+	function swap (b, n, m) {
+	  var i = b[n]
+	  b[n] = b[m]
+	  b[m] = i
+	}
+	
+	Buffer.prototype.swap16 = function swap16 () {
+	  var len = this.length
+	  if (len % 2 !== 0) {
+	    throw new RangeError('Buffer size must be a multiple of 16-bits')
+	  }
+	  for (var i = 0; i < len; i += 2) {
+	    swap(this, i, i + 1)
+	  }
+	  return this
+	}
+	
+	Buffer.prototype.swap32 = function swap32 () {
+	  var len = this.length
+	  if (len % 4 !== 0) {
+	    throw new RangeError('Buffer size must be a multiple of 32-bits')
+	  }
+	  for (var i = 0; i < len; i += 4) {
+	    swap(this, i, i + 3)
+	    swap(this, i + 1, i + 2)
+	  }
+	  return this
+	}
+	
+	Buffer.prototype.swap64 = function swap64 () {
+	  var len = this.length
+	  if (len % 8 !== 0) {
+	    throw new RangeError('Buffer size must be a multiple of 64-bits')
+	  }
+	  for (var i = 0; i < len; i += 8) {
+	    swap(this, i, i + 7)
+	    swap(this, i + 1, i + 6)
+	    swap(this, i + 2, i + 5)
+	    swap(this, i + 3, i + 4)
+	  }
+	  return this
+	}
+	
+	Buffer.prototype.toString = function toString () {
+	  var length = this.length | 0
+	  if (length === 0) return ''
+	  if (arguments.length === 0) return utf8Slice(this, 0, length)
+	  return slowToString.apply(this, arguments)
+	}
+	
+	Buffer.prototype.equals = function equals (b) {
+	  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
+	  if (this === b) return true
+	  return Buffer.compare(this, b) === 0
+	}
+	
+	Buffer.prototype.inspect = function inspect () {
+	  var str = ''
+	  var max = exports.INSPECT_MAX_BYTES
+	  if (this.length > 0) {
+	    str = this.toString('hex', 0, max).match(/.{2}/g).join(' ')
+	    if (this.length > max) str += ' ... '
+	  }
+	  return '<Buffer ' + str + '>'
+	}
+	
+	Buffer.prototype.compare = function compare (target, start, end, thisStart, thisEnd) {
+	  if (!Buffer.isBuffer(target)) {
+	    throw new TypeError('Argument must be a Buffer')
+	  }
+	
+	  if (start === undefined) {
+	    start = 0
+	  }
+	  if (end === undefined) {
+	    end = target ? target.length : 0
+	  }
+	  if (thisStart === undefined) {
+	    thisStart = 0
+	  }
+	  if (thisEnd === undefined) {
+	    thisEnd = this.length
+	  }
+	
+	  if (start < 0 || end > target.length || thisStart < 0 || thisEnd > this.length) {
+	    throw new RangeError('out of range index')
+	  }
+	
+	  if (thisStart >= thisEnd && start >= end) {
+	    return 0
+	  }
+	  if (thisStart >= thisEnd) {
+	    return -1
+	  }
+	  if (start >= end) {
+	    return 1
+	  }
+	
+	  start >>>= 0
+	  end >>>= 0
+	  thisStart >>>= 0
+	  thisEnd >>>= 0
+	
+	  if (this === target) return 0
+	
+	  var x = thisEnd - thisStart
+	  var y = end - start
+	  var len = Math.min(x, y)
+	
+	  var thisCopy = this.slice(thisStart, thisEnd)
+	  var targetCopy = target.slice(start, end)
+	
+	  for (var i = 0; i < len; ++i) {
+	    if (thisCopy[i] !== targetCopy[i]) {
+	      x = thisCopy[i]
+	      y = targetCopy[i]
+	      break
+	    }
+	  }
+	
+	  if (x < y) return -1
+	  if (y < x) return 1
+	  return 0
+	}
+	
+	// Finds either the first index of `val` in `buffer` at offset >= `byteOffset`,
+	// OR the last index of `val` in `buffer` at offset <= `byteOffset`.
+	//
+	// Arguments:
+	// - buffer - a Buffer to search
+	// - val - a string, Buffer, or number
+	// - byteOffset - an index into `buffer`; will be clamped to an int32
+	// - encoding - an optional encoding, relevant is val is a string
+	// - dir - true for indexOf, false for lastIndexOf
+	function bidirectionalIndexOf (buffer, val, byteOffset, encoding, dir) {
+	  // Empty buffer means no match
+	  if (buffer.length === 0) return -1
+	
+	  // Normalize byteOffset
+	  if (typeof byteOffset === 'string') {
+	    encoding = byteOffset
+	    byteOffset = 0
+	  } else if (byteOffset > 0x7fffffff) {
+	    byteOffset = 0x7fffffff
+	  } else if (byteOffset < -0x80000000) {
+	    byteOffset = -0x80000000
+	  }
+	  byteOffset = +byteOffset  // Coerce to Number.
+	  if (isNaN(byteOffset)) {
+	    // byteOffset: it it's undefined, null, NaN, "foo", etc, search whole buffer
+	    byteOffset = dir ? 0 : (buffer.length - 1)
+	  }
+	
+	  // Normalize byteOffset: negative offsets start from the end of the buffer
+	  if (byteOffset < 0) byteOffset = buffer.length + byteOffset
+	  if (byteOffset >= buffer.length) {
+	    if (dir) return -1
+	    else byteOffset = buffer.length - 1
+	  } else if (byteOffset < 0) {
+	    if (dir) byteOffset = 0
+	    else return -1
+	  }
+	
+	  // Normalize val
+	  if (typeof val === 'string') {
+	    val = Buffer.from(val, encoding)
+	  }
+	
+	  // Finally, search either indexOf (if dir is true) or lastIndexOf
+	  if (Buffer.isBuffer(val)) {
+	    // Special case: looking for empty string/buffer always fails
+	    if (val.length === 0) {
+	      return -1
+	    }
+	    return arrayIndexOf(buffer, val, byteOffset, encoding, dir)
+	  } else if (typeof val === 'number') {
+	    val = val & 0xFF // Search for a byte value [0-255]
+	    if (Buffer.TYPED_ARRAY_SUPPORT &&
+	        typeof Uint8Array.prototype.indexOf === 'function') {
+	      if (dir) {
+	        return Uint8Array.prototype.indexOf.call(buffer, val, byteOffset)
+	      } else {
+	        return Uint8Array.prototype.lastIndexOf.call(buffer, val, byteOffset)
+	      }
+	    }
+	    return arrayIndexOf(buffer, [ val ], byteOffset, encoding, dir)
+	  }
+	
+	  throw new TypeError('val must be string, number or Buffer')
+	}
+	
+	function arrayIndexOf (arr, val, byteOffset, encoding, dir) {
+	  var indexSize = 1
+	  var arrLength = arr.length
+	  var valLength = val.length
+	
+	  if (encoding !== undefined) {
+	    encoding = String(encoding).toLowerCase()
+	    if (encoding === 'ucs2' || encoding === 'ucs-2' ||
+	        encoding === 'utf16le' || encoding === 'utf-16le') {
+	      if (arr.length < 2 || val.length < 2) {
+	        return -1
+	      }
+	      indexSize = 2
+	      arrLength /= 2
+	      valLength /= 2
+	      byteOffset /= 2
+	    }
+	  }
+	
+	  function read (buf, i) {
+	    if (indexSize === 1) {
+	      return buf[i]
+	    } else {
+	      return buf.readUInt16BE(i * indexSize)
+	    }
+	  }
+	
+	  var i
+	  if (dir) {
+	    var foundIndex = -1
+	    for (i = byteOffset; i < arrLength; i++) {
+	      if (read(arr, i) === read(val, foundIndex === -1 ? 0 : i - foundIndex)) {
+	        if (foundIndex === -1) foundIndex = i
+	        if (i - foundIndex + 1 === valLength) return foundIndex * indexSize
+	      } else {
+	        if (foundIndex !== -1) i -= i - foundIndex
+	        foundIndex = -1
+	      }
+	    }
+	  } else {
+	    if (byteOffset + valLength > arrLength) byteOffset = arrLength - valLength
+	    for (i = byteOffset; i >= 0; i--) {
+	      var found = true
+	      for (var j = 0; j < valLength; j++) {
+	        if (read(arr, i + j) !== read(val, j)) {
+	          found = false
+	          break
+	        }
+	      }
+	      if (found) return i
+	    }
+	  }
+	
+	  return -1
+	}
+	
+	Buffer.prototype.includes = function includes (val, byteOffset, encoding) {
+	  return this.indexOf(val, byteOffset, encoding) !== -1
+	}
+	
+	Buffer.prototype.indexOf = function indexOf (val, byteOffset, encoding) {
+	  return bidirectionalIndexOf(this, val, byteOffset, encoding, true)
+	}
+	
+	Buffer.prototype.lastIndexOf = function lastIndexOf (val, byteOffset, encoding) {
+	  return bidirectionalIndexOf(this, val, byteOffset, encoding, false)
+	}
+	
+	function hexWrite (buf, string, offset, length) {
+	  offset = Number(offset) || 0
+	  var remaining = buf.length - offset
+	  if (!length) {
+	    length = remaining
+	  } else {
+	    length = Number(length)
+	    if (length > remaining) {
+	      length = remaining
+	    }
+	  }
+	
+	  // must be an even number of digits
+	  var strLen = string.length
+	  if (strLen % 2 !== 0) throw new TypeError('Invalid hex string')
+	
+	  if (length > strLen / 2) {
+	    length = strLen / 2
+	  }
+	  for (var i = 0; i < length; ++i) {
+	    var parsed = parseInt(string.substr(i * 2, 2), 16)
+	    if (isNaN(parsed)) return i
+	    buf[offset + i] = parsed
+	  }
+	  return i
+	}
+	
+	function utf8Write (buf, string, offset, length) {
+	  return blitBuffer(utf8ToBytes(string, buf.length - offset), buf, offset, length)
+	}
+	
+	function asciiWrite (buf, string, offset, length) {
+	  return blitBuffer(asciiToBytes(string), buf, offset, length)
+	}
+	
+	function latin1Write (buf, string, offset, length) {
+	  return asciiWrite(buf, string, offset, length)
+	}
+	
+	function base64Write (buf, string, offset, length) {
+	  return blitBuffer(base64ToBytes(string), buf, offset, length)
+	}
+	
+	function ucs2Write (buf, string, offset, length) {
+	  return blitBuffer(utf16leToBytes(string, buf.length - offset), buf, offset, length)
+	}
+	
+	Buffer.prototype.write = function write (string, offset, length, encoding) {
+	  // Buffer#write(string)
+	  if (offset === undefined) {
+	    encoding = 'utf8'
+	    length = this.length
+	    offset = 0
+	  // Buffer#write(string, encoding)
+	  } else if (length === undefined && typeof offset === 'string') {
+	    encoding = offset
+	    length = this.length
+	    offset = 0
+	  // Buffer#write(string, offset[, length][, encoding])
+	  } else if (isFinite(offset)) {
+	    offset = offset | 0
+	    if (isFinite(length)) {
+	      length = length | 0
+	      if (encoding === undefined) encoding = 'utf8'
+	    } else {
+	      encoding = length
+	      length = undefined
+	    }
+	  // legacy write(string, encoding, offset, length) - remove in v0.13
+	  } else {
+	    throw new Error(
+	      'Buffer.write(string, encoding, offset[, length]) is no longer supported'
+	    )
+	  }
+	
+	  var remaining = this.length - offset
+	  if (length === undefined || length > remaining) length = remaining
+	
+	  if ((string.length > 0 && (length < 0 || offset < 0)) || offset > this.length) {
+	    throw new RangeError('Attempt to write outside buffer bounds')
+	  }
+	
+	  if (!encoding) encoding = 'utf8'
+	
+	  var loweredCase = false
+	  for (;;) {
+	    switch (encoding) {
+	      case 'hex':
+	        return hexWrite(this, string, offset, length)
+	
+	      case 'utf8':
+	      case 'utf-8':
+	        return utf8Write(this, string, offset, length)
+	
+	      case 'ascii':
+	        return asciiWrite(this, string, offset, length)
+	
+	      case 'latin1':
+	      case 'binary':
+	        return latin1Write(this, string, offset, length)
+	
+	      case 'base64':
+	        // Warning: maxLength not taken into account in base64Write
+	        return base64Write(this, string, offset, length)
+	
+	      case 'ucs2':
+	      case 'ucs-2':
+	      case 'utf16le':
+	      case 'utf-16le':
+	        return ucs2Write(this, string, offset, length)
+	
+	      default:
+	        if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
+	        encoding = ('' + encoding).toLowerCase()
+	        loweredCase = true
+	    }
+	  }
+	}
+	
+	Buffer.prototype.toJSON = function toJSON () {
+	  return {
+	    type: 'Buffer',
+	    data: Array.prototype.slice.call(this._arr || this, 0)
+	  }
+	}
+	
+	function base64Slice (buf, start, end) {
+	  if (start === 0 && end === buf.length) {
+	    return base64.fromByteArray(buf)
+	  } else {
+	    return base64.fromByteArray(buf.slice(start, end))
+	  }
+	}
+	
+	function utf8Slice (buf, start, end) {
+	  end = Math.min(buf.length, end)
+	  var res = []
+	
+	  var i = start
+	  while (i < end) {
+	    var firstByte = buf[i]
+	    var codePoint = null
+	    var bytesPerSequence = (firstByte > 0xEF) ? 4
+	      : (firstByte > 0xDF) ? 3
+	      : (firstByte > 0xBF) ? 2
+	      : 1
+	
+	    if (i + bytesPerSequence <= end) {
+	      var secondByte, thirdByte, fourthByte, tempCodePoint
+	
+	      switch (bytesPerSequence) {
+	        case 1:
+	          if (firstByte < 0x80) {
+	            codePoint = firstByte
+	          }
+	          break
+	        case 2:
+	          secondByte = buf[i + 1]
+	          if ((secondByte & 0xC0) === 0x80) {
+	            tempCodePoint = (firstByte & 0x1F) << 0x6 | (secondByte & 0x3F)
+	            if (tempCodePoint > 0x7F) {
+	              codePoint = tempCodePoint
+	            }
+	          }
+	          break
+	        case 3:
+	          secondByte = buf[i + 1]
+	          thirdByte = buf[i + 2]
+	          if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80) {
+	            tempCodePoint = (firstByte & 0xF) << 0xC | (secondByte & 0x3F) << 0x6 | (thirdByte & 0x3F)
+	            if (tempCodePoint > 0x7FF && (tempCodePoint < 0xD800 || tempCodePoint > 0xDFFF)) {
+	              codePoint = tempCodePoint
+	            }
+	          }
+	          break
+	        case 4:
+	          secondByte = buf[i + 1]
+	          thirdByte = buf[i + 2]
+	          fourthByte = buf[i + 3]
+	          if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80 && (fourthByte & 0xC0) === 0x80) {
+	            tempCodePoint = (firstByte & 0xF) << 0x12 | (secondByte & 0x3F) << 0xC | (thirdByte & 0x3F) << 0x6 | (fourthByte & 0x3F)
+	            if (tempCodePoint > 0xFFFF && tempCodePoint < 0x110000) {
+	              codePoint = tempCodePoint
+	            }
+	          }
+	      }
+	    }
+	
+	    if (codePoint === null) {
+	      // we did not generate a valid codePoint so insert a
+	      // replacement char (U+FFFD) and advance only 1 byte
+	      codePoint = 0xFFFD
+	      bytesPerSequence = 1
+	    } else if (codePoint > 0xFFFF) {
+	      // encode to utf16 (surrogate pair dance)
+	      codePoint -= 0x10000
+	      res.push(codePoint >>> 10 & 0x3FF | 0xD800)
+	      codePoint = 0xDC00 | codePoint & 0x3FF
+	    }
+	
+	    res.push(codePoint)
+	    i += bytesPerSequence
+	  }
+	
+	  return decodeCodePointsArray(res)
+	}
+	
+	// Based on http://stackoverflow.com/a/22747272/680742, the browser with
+	// the lowest limit is Chrome, with 0x10000 args.
+	// We go 1 magnitude less, for safety
+	var MAX_ARGUMENTS_LENGTH = 0x1000
+	
+	function decodeCodePointsArray (codePoints) {
+	  var len = codePoints.length
+	  if (len <= MAX_ARGUMENTS_LENGTH) {
+	    return String.fromCharCode.apply(String, codePoints) // avoid extra slice()
+	  }
+	
+	  // Decode in chunks to avoid "call stack size exceeded".
+	  var res = ''
+	  var i = 0
+	  while (i < len) {
+	    res += String.fromCharCode.apply(
+	      String,
+	      codePoints.slice(i, i += MAX_ARGUMENTS_LENGTH)
+	    )
+	  }
+	  return res
+	}
+	
+	function asciiSlice (buf, start, end) {
+	  var ret = ''
+	  end = Math.min(buf.length, end)
+	
+	  for (var i = start; i < end; ++i) {
+	    ret += String.fromCharCode(buf[i] & 0x7F)
+	  }
+	  return ret
+	}
+	
+	function latin1Slice (buf, start, end) {
+	  var ret = ''
+	  end = Math.min(buf.length, end)
+	
+	  for (var i = start; i < end; ++i) {
+	    ret += String.fromCharCode(buf[i])
+	  }
+	  return ret
+	}
+	
+	function hexSlice (buf, start, end) {
+	  var len = buf.length
+	
+	  if (!start || start < 0) start = 0
+	  if (!end || end < 0 || end > len) end = len
+	
+	  var out = ''
+	  for (var i = start; i < end; ++i) {
+	    out += toHex(buf[i])
+	  }
+	  return out
+	}
+	
+	function utf16leSlice (buf, start, end) {
+	  var bytes = buf.slice(start, end)
+	  var res = ''
+	  for (var i = 0; i < bytes.length; i += 2) {
+	    res += String.fromCharCode(bytes[i] + bytes[i + 1] * 256)
+	  }
+	  return res
+	}
+	
+	Buffer.prototype.slice = function slice (start, end) {
+	  var len = this.length
+	  start = ~~start
+	  end = end === undefined ? len : ~~end
+	
+	  if (start < 0) {
+	    start += len
+	    if (start < 0) start = 0
+	  } else if (start > len) {
+	    start = len
+	  }
+	
+	  if (end < 0) {
+	    end += len
+	    if (end < 0) end = 0
+	  } else if (end > len) {
+	    end = len
+	  }
+	
+	  if (end < start) end = start
+	
+	  var newBuf
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    newBuf = this.subarray(start, end)
+	    newBuf.__proto__ = Buffer.prototype
+	  } else {
+	    var sliceLen = end - start
+	    newBuf = new Buffer(sliceLen, undefined)
+	    for (var i = 0; i < sliceLen; ++i) {
+	      newBuf[i] = this[i + start]
+	    }
+	  }
+	
+	  return newBuf
+	}
+	
+	/*
+	 * Need to make sure that buffer isn't trying to write out of bounds.
+	 */
+	function checkOffset (offset, ext, length) {
+	  if ((offset % 1) !== 0 || offset < 0) throw new RangeError('offset is not uint')
+	  if (offset + ext > length) throw new RangeError('Trying to access beyond buffer length')
+	}
+	
+	Buffer.prototype.readUIntLE = function readUIntLE (offset, byteLength, noAssert) {
+	  offset = offset | 0
+	  byteLength = byteLength | 0
+	  if (!noAssert) checkOffset(offset, byteLength, this.length)
+	
+	  var val = this[offset]
+	  var mul = 1
+	  var i = 0
+	  while (++i < byteLength && (mul *= 0x100)) {
+	    val += this[offset + i] * mul
+	  }
+	
+	  return val
+	}
+	
+	Buffer.prototype.readUIntBE = function readUIntBE (offset, byteLength, noAssert) {
+	  offset = offset | 0
+	  byteLength = byteLength | 0
+	  if (!noAssert) {
+	    checkOffset(offset, byteLength, this.length)
+	  }
+	
+	  var val = this[offset + --byteLength]
+	  var mul = 1
+	  while (byteLength > 0 && (mul *= 0x100)) {
+	    val += this[offset + --byteLength] * mul
+	  }
+	
+	  return val
+	}
+	
+	Buffer.prototype.readUInt8 = function readUInt8 (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 1, this.length)
+	  return this[offset]
+	}
+	
+	Buffer.prototype.readUInt16LE = function readUInt16LE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 2, this.length)
+	  return this[offset] | (this[offset + 1] << 8)
+	}
+	
+	Buffer.prototype.readUInt16BE = function readUInt16BE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 2, this.length)
+	  return (this[offset] << 8) | this[offset + 1]
+	}
+	
+	Buffer.prototype.readUInt32LE = function readUInt32LE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 4, this.length)
+	
+	  return ((this[offset]) |
+	      (this[offset + 1] << 8) |
+	      (this[offset + 2] << 16)) +
+	      (this[offset + 3] * 0x1000000)
+	}
+	
+	Buffer.prototype.readUInt32BE = function readUInt32BE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 4, this.length)
+	
+	  return (this[offset] * 0x1000000) +
+	    ((this[offset + 1] << 16) |
+	    (this[offset + 2] << 8) |
+	    this[offset + 3])
+	}
+	
+	Buffer.prototype.readIntLE = function readIntLE (offset, byteLength, noAssert) {
+	  offset = offset | 0
+	  byteLength = byteLength | 0
+	  if (!noAssert) checkOffset(offset, byteLength, this.length)
+	
+	  var val = this[offset]
+	  var mul = 1
+	  var i = 0
+	  while (++i < byteLength && (mul *= 0x100)) {
+	    val += this[offset + i] * mul
+	  }
+	  mul *= 0x80
+	
+	  if (val >= mul) val -= Math.pow(2, 8 * byteLength)
+	
+	  return val
+	}
+	
+	Buffer.prototype.readIntBE = function readIntBE (offset, byteLength, noAssert) {
+	  offset = offset | 0
+	  byteLength = byteLength | 0
+	  if (!noAssert) checkOffset(offset, byteLength, this.length)
+	
+	  var i = byteLength
+	  var mul = 1
+	  var val = this[offset + --i]
+	  while (i > 0 && (mul *= 0x100)) {
+	    val += this[offset + --i] * mul
+	  }
+	  mul *= 0x80
+	
+	  if (val >= mul) val -= Math.pow(2, 8 * byteLength)
+	
+	  return val
+	}
+	
+	Buffer.prototype.readInt8 = function readInt8 (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 1, this.length)
+	  if (!(this[offset] & 0x80)) return (this[offset])
+	  return ((0xff - this[offset] + 1) * -1)
+	}
+	
+	Buffer.prototype.readInt16LE = function readInt16LE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 2, this.length)
+	  var val = this[offset] | (this[offset + 1] << 8)
+	  return (val & 0x8000) ? val | 0xFFFF0000 : val
+	}
+	
+	Buffer.prototype.readInt16BE = function readInt16BE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 2, this.length)
+	  var val = this[offset + 1] | (this[offset] << 8)
+	  return (val & 0x8000) ? val | 0xFFFF0000 : val
+	}
+	
+	Buffer.prototype.readInt32LE = function readInt32LE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 4, this.length)
+	
+	  return (this[offset]) |
+	    (this[offset + 1] << 8) |
+	    (this[offset + 2] << 16) |
+	    (this[offset + 3] << 24)
+	}
+	
+	Buffer.prototype.readInt32BE = function readInt32BE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 4, this.length)
+	
+	  return (this[offset] << 24) |
+	    (this[offset + 1] << 16) |
+	    (this[offset + 2] << 8) |
+	    (this[offset + 3])
+	}
+	
+	Buffer.prototype.readFloatLE = function readFloatLE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 4, this.length)
+	  return ieee754.read(this, offset, true, 23, 4)
+	}
+	
+	Buffer.prototype.readFloatBE = function readFloatBE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 4, this.length)
+	  return ieee754.read(this, offset, false, 23, 4)
+	}
+	
+	Buffer.prototype.readDoubleLE = function readDoubleLE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 8, this.length)
+	  return ieee754.read(this, offset, true, 52, 8)
+	}
+	
+	Buffer.prototype.readDoubleBE = function readDoubleBE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 8, this.length)
+	  return ieee754.read(this, offset, false, 52, 8)
+	}
+	
+	function checkInt (buf, value, offset, ext, max, min) {
+	  if (!Buffer.isBuffer(buf)) throw new TypeError('"buffer" argument must be a Buffer instance')
+	  if (value > max || value < min) throw new RangeError('"value" argument is out of bounds')
+	  if (offset + ext > buf.length) throw new RangeError('Index out of range')
+	}
+	
+	Buffer.prototype.writeUIntLE = function writeUIntLE (value, offset, byteLength, noAssert) {
+	  value = +value
+	  offset = offset | 0
+	  byteLength = byteLength | 0
+	  if (!noAssert) {
+	    var maxBytes = Math.pow(2, 8 * byteLength) - 1
+	    checkInt(this, value, offset, byteLength, maxBytes, 0)
+	  }
+	
+	  var mul = 1
+	  var i = 0
+	  this[offset] = value & 0xFF
+	  while (++i < byteLength && (mul *= 0x100)) {
+	    this[offset + i] = (value / mul) & 0xFF
+	  }
+	
+	  return offset + byteLength
+	}
+	
+	Buffer.prototype.writeUIntBE = function writeUIntBE (value, offset, byteLength, noAssert) {
+	  value = +value
+	  offset = offset | 0
+	  byteLength = byteLength | 0
+	  if (!noAssert) {
+	    var maxBytes = Math.pow(2, 8 * byteLength) - 1
+	    checkInt(this, value, offset, byteLength, maxBytes, 0)
+	  }
+	
+	  var i = byteLength - 1
+	  var mul = 1
+	  this[offset + i] = value & 0xFF
+	  while (--i >= 0 && (mul *= 0x100)) {
+	    this[offset + i] = (value / mul) & 0xFF
+	  }
+	
+	  return offset + byteLength
+	}
+	
+	Buffer.prototype.writeUInt8 = function writeUInt8 (value, offset, noAssert) {
+	  value = +value
+	  offset = offset | 0
+	  if (!noAssert) checkInt(this, value, offset, 1, 0xff, 0)
+	  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
+	  this[offset] = (value & 0xff)
+	  return offset + 1
+	}
+	
+	function objectWriteUInt16 (buf, value, offset, littleEndian) {
+	  if (value < 0) value = 0xffff + value + 1
+	  for (var i = 0, j = Math.min(buf.length - offset, 2); i < j; ++i) {
+	    buf[offset + i] = (value & (0xff << (8 * (littleEndian ? i : 1 - i)))) >>>
+	      (littleEndian ? i : 1 - i) * 8
+	  }
+	}
+	
+	Buffer.prototype.writeUInt16LE = function writeUInt16LE (value, offset, noAssert) {
+	  value = +value
+	  offset = offset | 0
+	  if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    this[offset] = (value & 0xff)
+	    this[offset + 1] = (value >>> 8)
+	  } else {
+	    objectWriteUInt16(this, value, offset, true)
+	  }
+	  return offset + 2
+	}
+	
+	Buffer.prototype.writeUInt16BE = function writeUInt16BE (value, offset, noAssert) {
+	  value = +value
+	  offset = offset | 0
+	  if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    this[offset] = (value >>> 8)
+	    this[offset + 1] = (value & 0xff)
+	  } else {
+	    objectWriteUInt16(this, value, offset, false)
+	  }
+	  return offset + 2
+	}
+	
+	function objectWriteUInt32 (buf, value, offset, littleEndian) {
+	  if (value < 0) value = 0xffffffff + value + 1
+	  for (var i = 0, j = Math.min(buf.length - offset, 4); i < j; ++i) {
+	    buf[offset + i] = (value >>> (littleEndian ? i : 3 - i) * 8) & 0xff
+	  }
+	}
+	
+	Buffer.prototype.writeUInt32LE = function writeUInt32LE (value, offset, noAssert) {
+	  value = +value
+	  offset = offset | 0
+	  if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0)
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    this[offset + 3] = (value >>> 24)
+	    this[offset + 2] = (value >>> 16)
+	    this[offset + 1] = (value >>> 8)
+	    this[offset] = (value & 0xff)
+	  } else {
+	    objectWriteUInt32(this, value, offset, true)
+	  }
+	  return offset + 4
+	}
+	
+	Buffer.prototype.writeUInt32BE = function writeUInt32BE (value, offset, noAssert) {
+	  value = +value
+	  offset = offset | 0
+	  if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0)
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    this[offset] = (value >>> 24)
+	    this[offset + 1] = (value >>> 16)
+	    this[offset + 2] = (value >>> 8)
+	    this[offset + 3] = (value & 0xff)
+	  } else {
+	    objectWriteUInt32(this, value, offset, false)
+	  }
+	  return offset + 4
+	}
+	
+	Buffer.prototype.writeIntLE = function writeIntLE (value, offset, byteLength, noAssert) {
+	  value = +value
+	  offset = offset | 0
+	  if (!noAssert) {
+	    var limit = Math.pow(2, 8 * byteLength - 1)
+	
+	    checkInt(this, value, offset, byteLength, limit - 1, -limit)
+	  }
+	
+	  var i = 0
+	  var mul = 1
+	  var sub = 0
+	  this[offset] = value & 0xFF
+	  while (++i < byteLength && (mul *= 0x100)) {
+	    if (value < 0 && sub === 0 && this[offset + i - 1] !== 0) {
+	      sub = 1
+	    }
+	    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
+	  }
+	
+	  return offset + byteLength
+	}
+	
+	Buffer.prototype.writeIntBE = function writeIntBE (value, offset, byteLength, noAssert) {
+	  value = +value
+	  offset = offset | 0
+	  if (!noAssert) {
+	    var limit = Math.pow(2, 8 * byteLength - 1)
+	
+	    checkInt(this, value, offset, byteLength, limit - 1, -limit)
+	  }
+	
+	  var i = byteLength - 1
+	  var mul = 1
+	  var sub = 0
+	  this[offset + i] = value & 0xFF
+	  while (--i >= 0 && (mul *= 0x100)) {
+	    if (value < 0 && sub === 0 && this[offset + i + 1] !== 0) {
+	      sub = 1
+	    }
+	    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
+	  }
+	
+	  return offset + byteLength
+	}
+	
+	Buffer.prototype.writeInt8 = function writeInt8 (value, offset, noAssert) {
+	  value = +value
+	  offset = offset | 0
+	  if (!noAssert) checkInt(this, value, offset, 1, 0x7f, -0x80)
+	  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
+	  if (value < 0) value = 0xff + value + 1
+	  this[offset] = (value & 0xff)
+	  return offset + 1
+	}
+	
+	Buffer.prototype.writeInt16LE = function writeInt16LE (value, offset, noAssert) {
+	  value = +value
+	  offset = offset | 0
+	  if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    this[offset] = (value & 0xff)
+	    this[offset + 1] = (value >>> 8)
+	  } else {
+	    objectWriteUInt16(this, value, offset, true)
+	  }
+	  return offset + 2
+	}
+	
+	Buffer.prototype.writeInt16BE = function writeInt16BE (value, offset, noAssert) {
+	  value = +value
+	  offset = offset | 0
+	  if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    this[offset] = (value >>> 8)
+	    this[offset + 1] = (value & 0xff)
+	  } else {
+	    objectWriteUInt16(this, value, offset, false)
+	  }
+	  return offset + 2
+	}
+	
+	Buffer.prototype.writeInt32LE = function writeInt32LE (value, offset, noAssert) {
+	  value = +value
+	  offset = offset | 0
+	  if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    this[offset] = (value & 0xff)
+	    this[offset + 1] = (value >>> 8)
+	    this[offset + 2] = (value >>> 16)
+	    this[offset + 3] = (value >>> 24)
+	  } else {
+	    objectWriteUInt32(this, value, offset, true)
+	  }
+	  return offset + 4
+	}
+	
+	Buffer.prototype.writeInt32BE = function writeInt32BE (value, offset, noAssert) {
+	  value = +value
+	  offset = offset | 0
+	  if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
+	  if (value < 0) value = 0xffffffff + value + 1
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    this[offset] = (value >>> 24)
+	    this[offset + 1] = (value >>> 16)
+	    this[offset + 2] = (value >>> 8)
+	    this[offset + 3] = (value & 0xff)
+	  } else {
+	    objectWriteUInt32(this, value, offset, false)
+	  }
+	  return offset + 4
+	}
+	
+	function checkIEEE754 (buf, value, offset, ext, max, min) {
+	  if (offset + ext > buf.length) throw new RangeError('Index out of range')
+	  if (offset < 0) throw new RangeError('Index out of range')
+	}
+	
+	function writeFloat (buf, value, offset, littleEndian, noAssert) {
+	  if (!noAssert) {
+	    checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38)
+	  }
+	  ieee754.write(buf, value, offset, littleEndian, 23, 4)
+	  return offset + 4
+	}
+	
+	Buffer.prototype.writeFloatLE = function writeFloatLE (value, offset, noAssert) {
+	  return writeFloat(this, value, offset, true, noAssert)
+	}
+	
+	Buffer.prototype.writeFloatBE = function writeFloatBE (value, offset, noAssert) {
+	  return writeFloat(this, value, offset, false, noAssert)
+	}
+	
+	function writeDouble (buf, value, offset, littleEndian, noAssert) {
+	  if (!noAssert) {
+	    checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308)
+	  }
+	  ieee754.write(buf, value, offset, littleEndian, 52, 8)
+	  return offset + 8
+	}
+	
+	Buffer.prototype.writeDoubleLE = function writeDoubleLE (value, offset, noAssert) {
+	  return writeDouble(this, value, offset, true, noAssert)
+	}
+	
+	Buffer.prototype.writeDoubleBE = function writeDoubleBE (value, offset, noAssert) {
+	  return writeDouble(this, value, offset, false, noAssert)
+	}
+	
+	// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=buffer.length)
+	Buffer.prototype.copy = function copy (target, targetStart, start, end) {
+	  if (!start) start = 0
+	  if (!end && end !== 0) end = this.length
+	  if (targetStart >= target.length) targetStart = target.length
+	  if (!targetStart) targetStart = 0
+	  if (end > 0 && end < start) end = start
+	
+	  // Copy 0 bytes; we're done
+	  if (end === start) return 0
+	  if (target.length === 0 || this.length === 0) return 0
+	
+	  // Fatal error conditions
+	  if (targetStart < 0) {
+	    throw new RangeError('targetStart out of bounds')
+	  }
+	  if (start < 0 || start >= this.length) throw new RangeError('sourceStart out of bounds')
+	  if (end < 0) throw new RangeError('sourceEnd out of bounds')
+	
+	  // Are we oob?
+	  if (end > this.length) end = this.length
+	  if (target.length - targetStart < end - start) {
+	    end = target.length - targetStart + start
+	  }
+	
+	  var len = end - start
+	  var i
+	
+	  if (this === target && start < targetStart && targetStart < end) {
+	    // descending copy from end
+	    for (i = len - 1; i >= 0; --i) {
+	      target[i + targetStart] = this[i + start]
+	    }
+	  } else if (len < 1000 || !Buffer.TYPED_ARRAY_SUPPORT) {
+	    // ascending copy from start
+	    for (i = 0; i < len; ++i) {
+	      target[i + targetStart] = this[i + start]
+	    }
+	  } else {
+	    Uint8Array.prototype.set.call(
+	      target,
+	      this.subarray(start, start + len),
+	      targetStart
+	    )
+	  }
+	
+	  return len
+	}
+	
+	// Usage:
+	//    buffer.fill(number[, offset[, end]])
+	//    buffer.fill(buffer[, offset[, end]])
+	//    buffer.fill(string[, offset[, end]][, encoding])
+	Buffer.prototype.fill = function fill (val, start, end, encoding) {
+	  // Handle string cases:
+	  if (typeof val === 'string') {
+	    if (typeof start === 'string') {
+	      encoding = start
+	      start = 0
+	      end = this.length
+	    } else if (typeof end === 'string') {
+	      encoding = end
+	      end = this.length
+	    }
+	    if (val.length === 1) {
+	      var code = val.charCodeAt(0)
+	      if (code < 256) {
+	        val = code
+	      }
+	    }
+	    if (encoding !== undefined && typeof encoding !== 'string') {
+	      throw new TypeError('encoding must be a string')
+	    }
+	    if (typeof encoding === 'string' && !Buffer.isEncoding(encoding)) {
+	      throw new TypeError('Unknown encoding: ' + encoding)
+	    }
+	  } else if (typeof val === 'number') {
+	    val = val & 255
+	  }
+	
+	  // Invalid ranges are not set to a default, so can range check early.
+	  if (start < 0 || this.length < start || this.length < end) {
+	    throw new RangeError('Out of range index')
+	  }
+	
+	  if (end <= start) {
+	    return this
+	  }
+	
+	  start = start >>> 0
+	  end = end === undefined ? this.length : end >>> 0
+	
+	  if (!val) val = 0
+	
+	  var i
+	  if (typeof val === 'number') {
+	    for (i = start; i < end; ++i) {
+	      this[i] = val
+	    }
+	  } else {
+	    var bytes = Buffer.isBuffer(val)
+	      ? val
+	      : utf8ToBytes(new Buffer(val, encoding).toString())
+	    var len = bytes.length
+	    for (i = 0; i < end - start; ++i) {
+	      this[i + start] = bytes[i % len]
+	    }
+	  }
+	
+	  return this
+	}
+	
+	// HELPER FUNCTIONS
+	// ================
+	
+	var INVALID_BASE64_RE = /[^+\/0-9A-Za-z-_]/g
+	
+	function base64clean (str) {
+	  // Node strips out invalid characters like \n and \t from the string, base64-js does not
+	  str = stringtrim(str).replace(INVALID_BASE64_RE, '')
+	  // Node converts strings with length < 2 to ''
+	  if (str.length < 2) return ''
+	  // Node allows for non-padded base64 strings (missing trailing ===), base64-js does not
+	  while (str.length % 4 !== 0) {
+	    str = str + '='
+	  }
+	  return str
+	}
+	
+	function stringtrim (str) {
+	  if (str.trim) return str.trim()
+	  return str.replace(/^\s+|\s+$/g, '')
+	}
+	
+	function toHex (n) {
+	  if (n < 16) return '0' + n.toString(16)
+	  return n.toString(16)
+	}
+	
+	function utf8ToBytes (string, units) {
+	  units = units || Infinity
+	  var codePoint
+	  var length = string.length
+	  var leadSurrogate = null
+	  var bytes = []
+	
+	  for (var i = 0; i < length; ++i) {
+	    codePoint = string.charCodeAt(i)
+	
+	    // is surrogate component
+	    if (codePoint > 0xD7FF && codePoint < 0xE000) {
+	      // last char was a lead
+	      if (!leadSurrogate) {
+	        // no lead yet
+	        if (codePoint > 0xDBFF) {
+	          // unexpected trail
+	          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+	          continue
+	        } else if (i + 1 === length) {
+	          // unpaired lead
+	          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+	          continue
+	        }
+	
+	        // valid lead
+	        leadSurrogate = codePoint
+	
+	        continue
+	      }
+	
+	      // 2 leads in a row
+	      if (codePoint < 0xDC00) {
+	        if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+	        leadSurrogate = codePoint
+	        continue
+	      }
+	
+	      // valid surrogate pair
+	      codePoint = (leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00) + 0x10000
+	    } else if (leadSurrogate) {
+	      // valid bmp char, but last char was a lead
+	      if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+	    }
+	
+	    leadSurrogate = null
+	
+	    // encode utf8
+	    if (codePoint < 0x80) {
+	      if ((units -= 1) < 0) break
+	      bytes.push(codePoint)
+	    } else if (codePoint < 0x800) {
+	      if ((units -= 2) < 0) break
+	      bytes.push(
+	        codePoint >> 0x6 | 0xC0,
+	        codePoint & 0x3F | 0x80
+	      )
+	    } else if (codePoint < 0x10000) {
+	      if ((units -= 3) < 0) break
+	      bytes.push(
+	        codePoint >> 0xC | 0xE0,
+	        codePoint >> 0x6 & 0x3F | 0x80,
+	        codePoint & 0x3F | 0x80
+	      )
+	    } else if (codePoint < 0x110000) {
+	      if ((units -= 4) < 0) break
+	      bytes.push(
+	        codePoint >> 0x12 | 0xF0,
+	        codePoint >> 0xC & 0x3F | 0x80,
+	        codePoint >> 0x6 & 0x3F | 0x80,
+	        codePoint & 0x3F | 0x80
+	      )
+	    } else {
+	      throw new Error('Invalid code point')
+	    }
+	  }
+	
+	  return bytes
+	}
+	
+	function asciiToBytes (str) {
+	  var byteArray = []
+	  for (var i = 0; i < str.length; ++i) {
+	    // Node's code seems to be doing this and not & 0x7F..
+	    byteArray.push(str.charCodeAt(i) & 0xFF)
+	  }
+	  return byteArray
+	}
+	
+	function utf16leToBytes (str, units) {
+	  var c, hi, lo
+	  var byteArray = []
+	  for (var i = 0; i < str.length; ++i) {
+	    if ((units -= 2) < 0) break
+	
+	    c = str.charCodeAt(i)
+	    hi = c >> 8
+	    lo = c % 256
+	    byteArray.push(lo)
+	    byteArray.push(hi)
+	  }
+	
+	  return byteArray
+	}
+	
+	function base64ToBytes (str) {
+	  return base64.toByteArray(base64clean(str))
+	}
+	
+	function blitBuffer (src, dst, offset, length) {
+	  for (var i = 0; i < length; ++i) {
+	    if ((i + offset >= dst.length) || (i >= src.length)) break
+	    dst[i + offset] = src[i]
+	  }
+	  return i
+	}
+	
+	function isnan (val) {
+	  return val !== val // eslint-disable-line no-self-compare
+	}
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18).Buffer, (function() { return this; }())))
+
+/***/ },
+/* 19 */
+/***/ function(module, exports) {
+
+	module.exports = require("base64-js");
+
+/***/ },
+/* 20 */
+/***/ function(module, exports) {
+
+	module.exports = require("ieee754");
+
+/***/ },
+/* 21 */
+/***/ function(module, exports) {
+
+	module.exports = require("isarray");
+
+/***/ },
+/* 22 */
+/***/ function(module, exports) {
+
+	module.exports = require("ip");
+
+/***/ },
+/* 23 */
+/***/ function(module, exports) {
+
+
+
+/***/ },
+/* 24 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var BALANCE = exports.BALANCE = 'BALANCE';
+	
+	var ORDER_BOOK = exports.ORDER_BOOK = 'OB';
+	var ORDER_BOOK_TRADE_NEW = exports.ORDER_BOOK_TRADE_NEW = 'TRADE_NEW';
+	var ORDER_BOOK_NEW_ORDER = exports.ORDER_BOOK_NEW_ORDER = 'NEW_ORDER';
+	var ORDER_BOOK_UPDATE_ORDER = exports.ORDER_BOOK_UPDATE_ORDER = 'UPDATE_ORDER';
+	var ORDER_BOOK_DELETE_ORDER = exports.ORDER_BOOK_DELETE_ORDER = 'DELETE_ORDER';
+	var ORDER_BOOK_DELETE_ORDERS_THRU = exports.ORDER_BOOK_DELETE_ORDERS_THRU = 'DELETE_ORDERS_THRU';
+	
+	var EXECUTION_REPORT = exports.EXECUTION_REPORT = 'EXECUTION_REPORT';
+	var EXECUTION_REPORT_NEW = exports.EXECUTION_REPORT_NEW = 'NEW';
+	var EXECUTION_REPORT_PARTIAL = exports.EXECUTION_REPORT_PARTIAL = 'PARTIAL';
+	var EXECUTION_REPORT_EXECUTION = exports.EXECUTION_REPORT_EXECUTION = 'EXECUTION';
+	var EXECUTION_REPORT_CANCELED = exports.EXECUTION_REPORT_CANCELED = 'CANCELED';
+	var EXECUTION_REPORT_REJECTED = exports.EXECUTION_REPORT_REJECTED = 'REJECTED';
+	
+	/* eslint-disable quote-props */
+	var EVENTS = exports.EVENTS = {
+	  ORDERBOOK: {
+	    '0': ORDER_BOOK_NEW_ORDER,
+	    '1': ORDER_BOOK_UPDATE_ORDER,
+	    '2': ORDER_BOOK_DELETE_ORDER,
+	    '3': ORDER_BOOK_DELETE_ORDERS_THRU
+	  },
+	  TRADES: {
+	    '0': ORDER_BOOK_TRADE_NEW
+	  },
+	  EXECUTION_REPORT: {
+	    '0': EXECUTION_REPORT_NEW,
+	    '1': EXECUTION_REPORT_PARTIAL,
+	    '2': EXECUTION_REPORT_EXECUTION,
+	    '4': EXECUTION_REPORT_CANCELED,
+	    '8': EXECUTION_REPORT_REJECTED
+	  }
+	};
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+	
+	var _requests = __webpack_require__(3);
+	
+	var _requests2 = _interopRequireDefault(_requests);
+	
+	var _restTransport = __webpack_require__(26);
+	
+	var _restTransport2 = _interopRequireDefault(_restTransport);
+	
+	var _listener = __webpack_require__(10);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * BlinkTradeJS SDK
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * (c) 2016-present BlinkTrade, Inc.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This file is part of BlinkTradeJS
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This program is free software: you can redistribute it and/or modify
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * it under the terms of the GNU General Public License as published by
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * the Free Software Foundation, either version 3 of the License, or
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * (at your option) any later version.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This program is distributed in the hope that it will be useful,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * GNU General Public License for more details.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * You should have received a copy of the GNU General Public License
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+	
+	var BlinkTradeRest = function (_RestTransport) {
+	  _inherits(BlinkTradeRest, _RestTransport);
+	
+	  function BlinkTradeRest() {
+	    _classCallCheck(this, BlinkTradeRest);
+	
+	    return _possibleConstructorReturn(this, (BlinkTradeRest.__proto__ || Object.getPrototypeOf(BlinkTradeRest)).apply(this, arguments));
+	  }
+	
+	  _createClass(BlinkTradeRest, [{
+	    key: 'ticker',
+	    value: function ticker(callback) {
+	      return _get(BlinkTradeRest.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeRest.prototype), 'fetchPublic', this).call(this, 'ticker', callback);
+	    }
+	  }, {
+	    key: 'trades',
+	    value: function trades() {
+	      var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	      var _ref$limit = _ref.limit;
+	      var limit = _ref$limit === undefined ? 1000 : _ref$limit;
+	      var _ref$since = _ref.since;
+	      var since = _ref$since === undefined ? '0' : _ref$since;
+	      var callback = arguments[1];
+	
+	      return _get(BlinkTradeRest.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeRest.prototype), 'fetchPublic', this).call(this, 'trades?limit=' + limit + '&since=' + since, callback);
+	    }
+	  }, {
+	    key: 'orderbook',
+	    value: function orderbook(callback) {
+	      return _get(BlinkTradeRest.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeRest.prototype), 'fetchPublic', this).call(this, 'orderbook', callback);
+	    }
+	  }]);
+	
+	  return BlinkTradeRest;
+	}(_restTransport2.default);
+	
+	exports.default = BlinkTradeRest;
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _base = __webpack_require__(6);
+	
+	var _base2 = _interopRequireDefault(_base);
+	
+	var _baseTransport = __webpack_require__(5);
+	
+	var _baseTransport2 = _interopRequireDefault(_baseTransport);
+	
+	var _sjcl = __webpack_require__(27);
+	
+	var _sjcl2 = _interopRequireDefault(_sjcl);
+	
+	var _nodeify = __webpack_require__(12);
+	
+	var _nodeify2 = _interopRequireDefault(_nodeify);
+	
+	var _url = __webpack_require__(28);
+	
+	var _url2 = _interopRequireDefault(_url);
+	
+	var _path = __webpack_require__(29);
+	
+	var _path2 = _interopRequireDefault(_path);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * BlinkTradeJS SDK
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * (c) 2016-present BlinkTrade, Inc.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This file is part of BlinkTradeJS
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This program is free software: you can redistribute it and/or modify
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * it under the terms of the GNU General Public License as published by
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * the Free Software Foundation, either version 3 of the License, or
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * (at your option) any later version.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This program is distributed in the hope that it will be useful,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * GNU General Public License for more details.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * You should have received a copy of the GNU General Public License
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+	
+	var RestTransport = function (_BaseTransport) {
+	  _inherits(RestTransport, _BaseTransport);
+	
+	  /**
+	   * Exchanges currencies available.
+	   */
+	
+	
+	  /**
+	   * APIKey
+	   */
+	  function RestTransport(params) {
+	    _classCallCheck(this, RestTransport);
+	
+	    var _this = _possibleConstructorReturn(this, (RestTransport.__proto__ || Object.getPrototypeOf(RestTransport)).call(this, params, 'rest'));
+	
+	    _this.key = params.key;
+	    _this.secret = params.secret;
+	    _this.currency = params.currency || 'USD';
+	
+	    _this.fetchRequest = _this.isNode ? __webpack_require__(31) : __webpack_require__(32);
+	    return _this;
+	  }
+	
+	  /**
+	   * Fetch rest API
+	   */
+	
+	
+	  /**
+	   * APISecret
+	   */
+	
+	
+	  _createClass(RestTransport, [{
+	    key: 'headers',
+	    value: function headers(method, body) {
+	      var timeStamp = Date.now().toString();
+	      var hexKey = _sjcl2.default.codec.utf8String.toBits(this.secret);
+	      var hmac = new _sjcl2.default.misc.hmac(hexKey, _sjcl2.default.hash.sha256);
+	      var Signature = _sjcl2.default.codec.hex.fromBits(hmac.encrypt(timeStamp));
+	      return {
+	        method: method,
+	        headers: {
+	          'Content-Type': 'application/json',
+	          Nonce: timeStamp,
+	          APIKey: this.key,
+	          Signature: Signature
+	        },
+	        body: JSON.stringify(body)
+	      };
+	    }
+	  }, {
+	    key: 'fetch',
+	    value: function fetch(msg, api) {
+	      var headers = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	
+	      return this.fetchRequest(_url2.default.resolve(this.endpoint, api), headers).then(function (response) {
+	        return response.json();
+	      });
+	    }
+	  }, {
+	    key: 'fetchPublic',
+	    value: function fetchPublic(api, callback) {
+	      return (0, _nodeify2.default)(this.fetch({}, _path2.default.join('api/v1', this.currency, api)), callback);
+	    }
+	  }, {
+	    key: 'fetchTrade',
+	    value: function fetchTrade(msg, callback) {
+	      var headers = this.headers('POST', msg);
+	      return (0, _nodeify2.default)(this.fetch(msg, 'tapi/v1/message', headers, callback).then(function (response) {
+	        return response.Status === 500 ? Promise.reject(response) : response.Responses;
+	      }).then(function (response) {
+	        return response.length === 1 ? response[0] : response;
+	      }), callback);
+	    }
+	  }]);
+	
+	  return RestTransport;
+	}(_baseTransport2.default);
+	
+	exports.default = RestTransport;
+
+/***/ },
+/* 27 */
+/***/ function(module, exports) {
+
+	module.exports = require("sjcl");
+
+/***/ },
+/* 28 */
+/***/ function(module, exports) {
+
+	module.exports = require("url");
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {// Copyright Joyent, Inc. and other Node contributors.
+	//
+	// Permission is hereby granted, free of charge, to any person obtaining a
+	// copy of this software and associated documentation files (the
+	// "Software"), to deal in the Software without restriction, including
+	// without limitation the rights to use, copy, modify, merge, publish,
+	// distribute, sublicense, and/or sell copies of the Software, and to permit
+	// persons to whom the Software is furnished to do so, subject to the
+	// following conditions:
+	//
+	// The above copyright notice and this permission notice shall be included
+	// in all copies or substantial portions of the Software.
+	//
+	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+	// USE OR OTHER DEALINGS IN THE SOFTWARE.
+	
+	// resolves . and .. elements in a path array with directory names there
+	// must be no slashes, empty elements, or device names (c:\) in the array
+	// (so also no leading and trailing slashes - it does not distinguish
+	// relative and absolute paths)
+	function normalizeArray(parts, allowAboveRoot) {
+	  // if the path tries to go above the root, `up` ends up > 0
+	  var up = 0;
+	  for (var i = parts.length - 1; i >= 0; i--) {
+	    var last = parts[i];
+	    if (last === '.') {
+	      parts.splice(i, 1);
+	    } else if (last === '..') {
+	      parts.splice(i, 1);
+	      up++;
+	    } else if (up) {
+	      parts.splice(i, 1);
+	      up--;
+	    }
+	  }
+	
+	  // if the path is allowed to go above the root, restore leading ..s
+	  if (allowAboveRoot) {
+	    for (; up--; up) {
+	      parts.unshift('..');
+	    }
+	  }
+	
+	  return parts;
+	}
+	
+	// Split a filename into [root, dir, basename, ext], unix version
+	// 'root' is just a slash, or nothing.
+	var splitPathRe =
+	    /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
+	var splitPath = function(filename) {
+	  return splitPathRe.exec(filename).slice(1);
+	};
+	
+	// path.resolve([from ...], to)
+	// posix version
+	exports.resolve = function() {
+	  var resolvedPath = '',
+	      resolvedAbsolute = false;
+	
+	  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+	    var path = (i >= 0) ? arguments[i] : process.cwd();
+	
+	    // Skip empty and invalid entries
+	    if (typeof path !== 'string') {
+	      throw new TypeError('Arguments to path.resolve must be strings');
+	    } else if (!path) {
+	      continue;
+	    }
+	
+	    resolvedPath = path + '/' + resolvedPath;
+	    resolvedAbsolute = path.charAt(0) === '/';
+	  }
+	
+	  // At this point the path should be resolved to a full absolute path, but
+	  // handle relative paths to be safe (might happen when process.cwd() fails)
+	
+	  // Normalize the path
+	  resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(p) {
+	    return !!p;
+	  }), !resolvedAbsolute).join('/');
+	
+	  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
+	};
+	
+	// path.normalize(path)
+	// posix version
+	exports.normalize = function(path) {
+	  var isAbsolute = exports.isAbsolute(path),
+	      trailingSlash = substr(path, -1) === '/';
+	
+	  // Normalize the path
+	  path = normalizeArray(filter(path.split('/'), function(p) {
+	    return !!p;
+	  }), !isAbsolute).join('/');
+	
+	  if (!path && !isAbsolute) {
+	    path = '.';
+	  }
+	  if (path && trailingSlash) {
+	    path += '/';
+	  }
+	
+	  return (isAbsolute ? '/' : '') + path;
+	};
+	
+	// posix version
+	exports.isAbsolute = function(path) {
+	  return path.charAt(0) === '/';
+	};
+	
+	// posix version
+	exports.join = function() {
+	  var paths = Array.prototype.slice.call(arguments, 0);
+	  return exports.normalize(filter(paths, function(p, index) {
+	    if (typeof p !== 'string') {
+	      throw new TypeError('Arguments to path.join must be strings');
+	    }
+	    return p;
+	  }).join('/'));
+	};
+	
+	
+	// path.relative(from, to)
+	// posix version
+	exports.relative = function(from, to) {
+	  from = exports.resolve(from).substr(1);
+	  to = exports.resolve(to).substr(1);
+	
+	  function trim(arr) {
+	    var start = 0;
+	    for (; start < arr.length; start++) {
+	      if (arr[start] !== '') break;
+	    }
+	
+	    var end = arr.length - 1;
+	    for (; end >= 0; end--) {
+	      if (arr[end] !== '') break;
+	    }
+	
+	    if (start > end) return [];
+	    return arr.slice(start, end - start + 1);
+	  }
+	
+	  var fromParts = trim(from.split('/'));
+	  var toParts = trim(to.split('/'));
+	
+	  var length = Math.min(fromParts.length, toParts.length);
+	  var samePartsLength = length;
+	  for (var i = 0; i < length; i++) {
+	    if (fromParts[i] !== toParts[i]) {
+	      samePartsLength = i;
+	      break;
+	    }
+	  }
+	
+	  var outputParts = [];
+	  for (var i = samePartsLength; i < fromParts.length; i++) {
+	    outputParts.push('..');
+	  }
+	
+	  outputParts = outputParts.concat(toParts.slice(samePartsLength));
+	
+	  return outputParts.join('/');
+	};
+	
+	exports.sep = '/';
+	exports.delimiter = ':';
+	
+	exports.dirname = function(path) {
+	  var result = splitPath(path),
+	      root = result[0],
+	      dir = result[1];
+	
+	  if (!root && !dir) {
+	    // No dirname whatsoever
+	    return '.';
+	  }
+	
+	  if (dir) {
+	    // It has a dirname, strip trailing slash
+	    dir = dir.substr(0, dir.length - 1);
+	  }
+	
+	  return root + dir;
+	};
+	
+	
+	exports.basename = function(path, ext) {
+	  var f = splitPath(path)[2];
+	  // TODO: make this comparison case-insensitive on windows?
+	  if (ext && f.substr(-1 * ext.length) === ext) {
+	    f = f.substr(0, f.length - ext.length);
+	  }
+	  return f;
+	};
+	
+	
+	exports.extname = function(path) {
+	  return splitPath(path)[3];
+	};
+	
+	function filter (xs, f) {
+	    if (xs.filter) return xs.filter(f);
+	    var res = [];
+	    for (var i = 0; i < xs.length; i++) {
+	        if (f(xs[i], i, xs)) res.push(xs[i]);
+	    }
+	    return res;
+	}
+	
+	// String.prototype.substr - negative index don't work in IE8
+	var substr = 'ab'.substr(-1) === 'b'
+	    ? function (str, start, len) { return str.substr(start, len) }
+	    : function (str, start, len) {
+	        if (start < 0) start = str.length + start;
+	        return str.substr(start, len);
+	    }
+	;
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(30)))
+
+/***/ },
+/* 30 */
+/***/ function(module, exports) {
+
+	// shim for using process in browser
+	var process = module.exports = {};
+	
+	// cached from whatever global is present so that test runners that stub it
+	// don't break things.  But we need to wrap it in a try catch in case it is
+	// wrapped in strict mode code which doesn't define any globals.  It's inside a
+	// function because try/catches deoptimize in certain engines.
+	
+	var cachedSetTimeout;
+	var cachedClearTimeout;
+	
+	(function () {
+	    try {
+	        cachedSetTimeout = setTimeout;
+	    } catch (e) {
+	        cachedSetTimeout = function () {
+	            throw new Error('setTimeout is not defined');
+	        }
+	    }
+	    try {
+	        cachedClearTimeout = clearTimeout;
+	    } catch (e) {
+	        cachedClearTimeout = function () {
+	            throw new Error('clearTimeout is not defined');
+	        }
+	    }
+	} ())
+	function runTimeout(fun) {
+	    if (cachedSetTimeout === setTimeout) {
+	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedSetTimeout(fun, 0);
+	    } catch(e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+	            return cachedSetTimeout.call(null, fun, 0);
+	        } catch(e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+	            return cachedSetTimeout.call(this, fun, 0);
+	        }
+	    }
+	
+	
+	}
+	function runClearTimeout(marker) {
+	    if (cachedClearTimeout === clearTimeout) {
+	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedClearTimeout(marker);
+	    } catch (e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+	            return cachedClearTimeout.call(null, marker);
+	        } catch (e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+	            return cachedClearTimeout.call(this, marker);
+	        }
+	    }
+	
+	
+	
+	}
+	var queue = [];
+	var draining = false;
+	var currentQueue;
+	var queueIndex = -1;
+	
+	function cleanUpNextTick() {
+	    if (!draining || !currentQueue) {
+	        return;
+	    }
+	    draining = false;
+	    if (currentQueue.length) {
+	        queue = currentQueue.concat(queue);
+	    } else {
+	        queueIndex = -1;
+	    }
+	    if (queue.length) {
+	        drainQueue();
+	    }
+	}
+	
+	function drainQueue() {
+	    if (draining) {
+	        return;
+	    }
+	    var timeout = runTimeout(cleanUpNextTick);
+	    draining = true;
+	
+	    var len = queue.length;
+	    while(len) {
+	        currentQueue = queue;
+	        queue = [];
+	        while (++queueIndex < len) {
+	            if (currentQueue) {
+	                currentQueue[queueIndex].run();
+	            }
+	        }
+	        queueIndex = -1;
+	        len = queue.length;
+	    }
+	    currentQueue = null;
+	    draining = false;
+	    runClearTimeout(timeout);
+	}
+	
+	process.nextTick = function (fun) {
+	    var args = new Array(arguments.length - 1);
+	    if (arguments.length > 1) {
+	        for (var i = 1; i < arguments.length; i++) {
+	            args[i - 1] = arguments[i];
+	        }
+	    }
+	    queue.push(new Item(fun, args));
+	    if (queue.length === 1 && !draining) {
+	        runTimeout(drainQueue);
+	    }
+	};
+	
+	// v8 likes predictible objects
+	function Item(fun, array) {
+	    this.fun = fun;
+	    this.array = array;
+	}
+	Item.prototype.run = function () {
+	    this.fun.apply(null, this.array);
+	};
+	process.title = 'browser';
+	process.browser = true;
+	process.env = {};
+	process.argv = [];
+	process.version = ''; // empty string to avoid regexp issues
+	process.versions = {};
+	
+	function noop() {}
+	
+	process.on = noop;
+	process.addListener = noop;
+	process.once = noop;
+	process.off = noop;
+	process.removeListener = noop;
+	process.removeAllListeners = noop;
+	process.emit = noop;
+	
+	process.binding = function (name) {
+	    throw new Error('process.binding is not supported');
+	};
+	
+	process.cwd = function () { return '/' };
+	process.chdir = function (dir) {
+	    throw new Error('process.chdir is not supported');
+	};
+	process.umask = function() { return 0; };
+
+
+/***/ },
+/* 31 */
+/***/ function(module, exports) {
+
+	module.exports = require("isomorphic-fetch");
+
+/***/ },
+/* 32 */
+/***/ function(module, exports) {
+
+	module.exports = require("fetch-jsonp");
+
+/***/ }
+/******/ ]);
 //# sourceMappingURL=blinktrade.js.map
