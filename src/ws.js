@@ -288,7 +288,9 @@ class BlinkTradeWS extends WebSocketTransport {
     return this.eventEmitter;
   }
 
-  tradeHistory({ page: Page = 0, pageSize: PageSize = 80}: {
+  tradeHistory({ since, filter, page: Page = 0, pageSize: PageSize = 80}: {
+    since?: string;
+    filter?: Array<string>;
     page?: number;
     pageSize?: number;
   } = {}, callback?: Function): Promise<Object> {
@@ -298,6 +300,14 @@ class BlinkTradeWS extends WebSocketTransport {
       Page,
       PageSize,
     };
+
+    if (filter && filter.length > 0) {
+      msg.Filter = filter;
+    }
+
+    if (since && typeof since === 'number') {
+      msg.Since = since;
+    }
 
     return new Promise((resolve, reject) => {
       return super.sendMessageAsPromise(msg, callback).then(data => {
