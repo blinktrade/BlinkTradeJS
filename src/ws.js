@@ -82,6 +82,14 @@ class BlinkTradeWS extends WebSocketTransport {
         UserAgentPlatform: window.navigator.platform,
         UserAgentTimezoneOffset: new Date().getTimezoneOffset(),
       };
+    } else {
+      const os = require('os');
+      userAgent = {
+        UserAgent: `${os.type()} ${os.release()}`,
+        UserAgentLanguage: 'en_US',
+        UserAgentPlatform: `${os.platform()} (${os.arch()})`,
+        UserAgentTimezoneOffset: new Date().getTimezoneOffset(),
+      };
     }
 
     const msg: Object = {
