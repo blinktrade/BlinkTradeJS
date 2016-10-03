@@ -132,10 +132,13 @@ blinktrade.trades().then(function(trades) {
 
 ```
 
-## Trade Rest API
+## Trade Rest / WebSocket
 
-On our Rest-ful API, we provide a trade endpoint that you're allowed to send and cancel orders, request deposits and withdraws,
-you need to generate a API Key through our platform and set their respective permission that gives you access to it.
+On our RESTful API, we provide a trade endpoint that you're allowed to send and cancel orders,
+request deposits and withdrawals. You need to [create an API Key](https://blinktrade.com/docs#create-api-key) through our platform and set their respective permission that gives you access to it.
+
+The Trade endpoint is internaly a bridge to our `WebSocket` API, so you can access it both on `REST` and `WebSocket` API.
+Be aware that our Restful trade endpoint can be changed at any time, we strongly recommend using the `WebSocket` API over the `Restful` API.
 
 > **NOTE** that when generate the API Key and the API Secret, it will be only shown once, you should save it securely, the API Password is only used in the WebSocket api.
 
@@ -407,7 +410,7 @@ blinktrade.trades({ limit: 1000, since: "1472347212" }).then(function(data) {
 
 ### Requesting Deposits
 
-You can generate both bitcoin and FIAT deposits, if any arguments was passed, it will generate a bitcoin deposit along with the address.
+You can generate either bitcoin or FIAT deposits, if any arguments was passed, it will generate a bitcoin deposit along with the address.
 
 #### Generate bitcoin address to deposit
 
@@ -437,7 +440,7 @@ blinktrade.requestDeposit({
 
 > Response
 
-Both response for bitcoin and fiat deposits is similar.
+Both response for bitcoin and fiat deposits is quite similar.
 
 ```json
 
@@ -533,7 +536,7 @@ blinktrade.requestWithdraw({
 
 ## Event Emitters
 
-Using event emitters is easy and expressive way to keep you updated through our websocket api,
+Using event emitters is easy and expressive way to keep you updated through our `WebSocket` api,
 you can listen to individual events to match your needs, you can listen new orders, execution reports, tickers and balance changes,
 event emitters can also be used as promises to keep it chained, event emitters are implemented with [`EventEmitter2`](https://github.com/asyncly/EventEmitter2),
 which gives you more flexibility to match events with multi-level wildcards and extends events such as `.onAny`, `.once`, `.many` and so on.
