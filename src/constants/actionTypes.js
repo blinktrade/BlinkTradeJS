@@ -14,6 +14,9 @@ export const EXECUTION_REPORT_EXECUTION = 'EXECUTION';
 export const EXECUTION_REPORT_CANCELED = 'CANCELED';
 export const EXECUTION_REPORT_REJECTED = 'REJECTED';
 
+export const DEPOSIT_REFRESH = 'DEPOSIT_REFRESH';
+export const WITHDRAW_REFRESH = 'WITHDRAW_REFRESH';
+
 /* eslint-disable quote-props */
 export const EVENTS = {
   ORDERBOOK: {

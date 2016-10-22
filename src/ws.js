@@ -35,6 +35,8 @@ import {
   EVENTS,
   BALANCE,
   ORDER_BOOK,
+  DEPOSIT_REFRESH,
+  WITHDRAW_REFRESH,
   EXECUTION_REPORT,
 } from './constants/actionTypes';
 
@@ -296,13 +298,13 @@ class BlinkTradeWS extends WebSocketTransport {
     return this.eventEmitter;
   }
 
-  tradeHistory({ since, filter, page: Page = 0, pageSize: PageSize = 80}: {
+  tradeHistory({ since, filter, page: Page = 0, pageSize: PageSize = 80 }: {
     since?: string;
     filter?: Array<string>;
     page?: number;
     pageSize?: number;
   } = {}, callback?: Function): Promise<Object> {
-    const msg = {
+    const msg: Object = {
       MsgType: MsgTypes.TRADE_HISTORY,
       TradeHistoryReqID: generateRequestId(),
       Page,
@@ -326,6 +328,59 @@ class BlinkTradeWS extends WebSocketTransport {
           TradeHistoryGrp: TradeHistory,
         });
       }).catch(reject);
+    });
+  }
+
+  requestDeposit({ currency = 'BTC', value, depositMethodId }: {
+    value?: number;
+    currency?: string;
+    depositMethodId?: number;
+  } = {}, callback?: Function): Promise<Object> {
+    registerListener('U23', (deposit) => {
+      callback && callback(null, deposit);
+      return this.eventEmitter.emit(DEPOSIT_REFRESH, deposit);
+    });
+
+    return super.emitterPromise(new Promise((resolve, reject) => {
+      return super.requestDeposit({ currency, value, depositMethodId }, callback)
+        .then(resolve)
+        .catch(reject);
+    }));
+  }
+
+  onDepositRefresh(callback: Function): Promise<Object> {
+    return new Promise((resolve) => {
+      registerListener('U23', (deposit) => {
+        callback && callback(deposit);
+        return resolve(deposit);
+      });
+    });
+  }
+
+  requestWithdraw({ amount, data, currency = 'BTC', method = 'bitcoin' }: {
+    data: Object,
+    amount: number;
+    method?: string;
+    currency?: string;
+  }, callback: Function): Promise<Object> {
+    registerListener('U9', (withdraw) => {
+      callback && callback(null, withdraw);
+      return this.eventEmitter.emit(WITHDRAW_REFRESH, withdraw);
+    });
+
+    return super.emitterPromise(new Promise((resolve, reject) => {
+      return super.requestWithdraw({ amount, data, currency, method }, callback)
+        .then(resolve)
+        .catch(reject);
+    }));
+  }
+
+  onWithdrawRefresh(callback: Function): Promise<Object> {
+    return new Promise((resolve) => {
+      registerListener('U9', (withdraw) => {
+        callback && callback(withdraw);
+        return resolve(withdraw);
+      });
     });
   }
 }
