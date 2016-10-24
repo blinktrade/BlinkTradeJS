@@ -1,8 +1,7 @@
 [ignore]
 ./dist/*
 ./lib/*
-.*/examples/browser/node_modules/*
-.*/examples/node/node_modules/*
+.*/examples/node_modules/*
 .*/node_modules/editions/source/index.js
 
 [include]
