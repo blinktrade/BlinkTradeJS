@@ -59,7 +59,7 @@
 	
 	var _ws2 = _interopRequireDefault(_ws);
 	
-	var _rest = __webpack_require__(25);
+	var _rest = __webpack_require__(26);
 	
 	var _rest2 = _interopRequireDefault(_rest);
 	
@@ -225,6 +225,14 @@
 	          UserAgent: window.navigator.userAgent,
 	          UserAgentLanguage: window.navigator.language,
 	          UserAgentPlatform: window.navigator.platform,
+	          UserAgentTimezoneOffset: new Date().getTimezoneOffset()
+	        };
+	      } else {
+	        var os = __webpack_require__(25);
+	        userAgent = {
+	          UserAgent: os.type() + ' ' + os.release(),
+	          UserAgentLanguage: 'en_US',
+	          UserAgentPlatform: os.platform() + ' (' + os.arch() + ')',
 	          UserAgentTimezoneOffset: new Date().getTimezoneOffset()
 	        };
 	      }
@@ -453,6 +461,8 @@
 	
 	      var _ref2 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	
+	      var since = _ref2.since;
+	      var filter = _ref2.filter;
 	      var _ref2$page = _ref2.page;
 	      var Page = _ref2$page === undefined ? 0 : _ref2$page;
 	      var _ref2$pageSize = _ref2.pageSize;
@@ -465,6 +475,14 @@
 	        Page: Page,
 	        PageSize: PageSize
 	      };
+	
+	      if (filter && filter.length > 0) {
+	        msg.Filter = filter;
+	      }
+	
+	      if (since && typeof since === 'number') {
+	        msg.Since = since;
+	      }
 	
 	      return new Promise(function (resolve, reject) {
 	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this8).call(_this8, msg, callback).then(function (data) {
@@ -481,6 +499,69 @@
 	            TradeHistoryGrp: TradeHistory
 	          }));
 	        }).catch(reject);
+	      });
+	    }
+	  }, {
+	    key: 'requestDeposit',
+	    value: function requestDeposit() {
+	      var _this9 = this;
+	
+	      var _ref3 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	      var _ref3$currency = _ref3.currency;
+	      var currency = _ref3$currency === undefined ? 'BTC' : _ref3$currency;
+	      var value = _ref3.value;
+	      var depositMethodId = _ref3.depositMethodId;
+	      var callback = arguments[1];
+	
+	      (0, _listener.registerListener)('U23', function (deposit) {
+	        callback && callback(null, deposit);
+	        return _this9.eventEmitter.emit(_actionTypes.DEPOSIT_REFRESH, deposit);
+	      });
+	
+	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'emitterPromise', this).call(this, new Promise(function (resolve, reject) {
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'requestDeposit', _this9).call(_this9, { currency: currency, value: value, depositMethodId: depositMethodId }, callback).then(resolve).catch(reject);
+	      }));
+	    }
+	  }, {
+	    key: 'onDepositRefresh',
+	    value: function onDepositRefresh(callback) {
+	      return new Promise(function (resolve) {
+	        (0, _listener.registerListener)('U23', function (deposit) {
+	          callback && callback(deposit);
+	          return resolve(deposit);
+	        });
+	      });
+	    }
+	  }, {
+	    key: 'requestWithdraw',
+	    value: function requestWithdraw(_ref4, callback) {
+	      var _this10 = this;
+	
+	      var amount = _ref4.amount;
+	      var data = _ref4.data;
+	      var _ref4$currency = _ref4.currency;
+	      var currency = _ref4$currency === undefined ? 'BTC' : _ref4$currency;
+	      var _ref4$method = _ref4.method;
+	      var method = _ref4$method === undefined ? 'bitcoin' : _ref4$method;
+	
+	      (0, _listener.registerListener)('U9', function (withdraw) {
+	        callback && callback(null, withdraw);
+	        return _this10.eventEmitter.emit(_actionTypes.WITHDRAW_REFRESH, withdraw);
+	      });
+	
+	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'emitterPromise', this).call(this, new Promise(function (resolve, reject) {
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'requestWithdraw', _this10).call(_this10, { amount: amount, data: data, currency: currency, method: method }, callback).then(resolve).catch(reject);
+	      }));
+	    }
+	  }, {
+	    key: 'onWithdrawRefresh',
+	    value: function onWithdrawRefresh(callback) {
+	      return new Promise(function (resolve) {
+	        (0, _listener.registerListener)('U9', function (withdraw) {
+	          callback && callback(withdraw);
+	          return resolve(withdraw);
+	        });
 	      });
 	    }
 	  }]);
@@ -523,7 +604,10 @@
 	  REQUEST_DEPOSIT_LIST: 'U30',
 	  REQUEST_DEPOSIT_METHODS: 'U20',
 	  REQUEST_WITHDRAW: 'U6',
-	  REQUEST_WITHDRAW_LIST: 'U26'
+	  REQUEST_WITHDRAW_LIST: 'U26',
+	
+	  CONFIRM_WITHDRAW: 'U24',
+	  CANCEL_WITHDRAW: 'U70'
 	};
 
 /***/ },
@@ -1033,18 +1117,66 @@
 	      return this.send(msg, callback);
 	    }
 	  }, {
-	    key: 'requestDepositList',
-	    value: function requestDepositList() {
+	    key: 'confirmWithdraw',
+	    value: function confirmWithdraw(_ref5, callback) {
 	      var _this6 = this;
 	
-	      var _ref5 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	      var WithdrawID = _ref5.withdrawId;
+	      var confirmationToken = _ref5.confirmationToken;
+	      var secondFactor = _ref5.secondFactor;
 	
-	      var _ref5$page = _ref5.page;
-	      var Page = _ref5$page === undefined ? 0 : _ref5$page;
-	      var _ref5$pageSize = _ref5.pageSize;
-	      var PageSize = _ref5$pageSize === undefined ? 20 : _ref5$pageSize;
-	      var _ref5$status = _ref5.status;
-	      var StatusList = _ref5$status === undefined ? ['1', '2', '4', '8'] : _ref5$status;
+	      var msg = {
+	        MsgType: _requests2.default.CONFIRM_WITHDRAW,
+	        WithdrawReqID: (0, _listener.generateRequestId)(),
+	        WithdrawID: WithdrawID
+	      };
+	
+	      if (confirmationToken) {
+	        msg.ConfirmationToken = confirmationToken;
+	      }
+	
+	      if (secondFactor) {
+	        msg.SecondFactor = secondFactor;
+	      }
+	
+	      return new Promise(function (resolve, reject) {
+	        return _this6.send(msg, callback).then(function (data) {
+	          return resolve(_extends({}, data));
+	        }).catch(reject);
+	      });
+	    }
+	  }, {
+	    key: 'cancelWithdraw',
+	    value: function cancelWithdraw(withdrawId, callback) {
+	      var _this7 = this;
+	
+	      var reqId = (0, _listener.generateRequestId)();
+	      var msg = {
+	        MsgType: _requests2.default.CANCEL_WITHDRAW,
+	        WithdrawCancelReqID: reqId,
+	        ClOrdID: reqId,
+	        WithdrawID: withdrawId
+	      };
+	
+	      return new Promise(function (resolve, reject) {
+	        return _this7.send(msg, callback).then(function (data) {
+	          return resolve(_extends({}, data));
+	        }).catch(reject);
+	      });
+	    }
+	  }, {
+	    key: 'requestDepositList',
+	    value: function requestDepositList() {
+	      var _this8 = this;
+	
+	      var _ref6 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	      var _ref6$page = _ref6.page;
+	      var Page = _ref6$page === undefined ? 0 : _ref6$page;
+	      var _ref6$pageSize = _ref6.pageSize;
+	      var PageSize = _ref6$pageSize === undefined ? 20 : _ref6$pageSize;
+	      var _ref6$status = _ref6.status;
+	      var StatusList = _ref6$status === undefined ? ['1', '2', '4', '8'] : _ref6$status;
 	      var callback = arguments[1];
 	
 	      var msg = {
@@ -1056,7 +1188,7 @@
 	      };
 	
 	      return new Promise(function (resolve, reject) {
-	        return _this6.send(msg, callback).then(function (data) {
+	        return _this8.send(msg, callback).then(function (data) {
 	          var Columns = data.Columns;
 	
 	          var depositData = _objectWithoutProperties(data, ['Columns']);
@@ -1073,12 +1205,12 @@
 	  }, {
 	    key: 'requestDeposit',
 	    value: function requestDeposit() {
-	      var _ref6 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	      var _ref7 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	
-	      var _ref6$currency = _ref6.currency;
-	      var currency = _ref6$currency === undefined ? 'BTC' : _ref6$currency;
-	      var value = _ref6.value;
-	      var depositMethodId = _ref6.depositMethodId;
+	      var _ref7$currency = _ref7.currency;
+	      var currency = _ref7$currency === undefined ? 'BTC' : _ref7$currency;
+	      var value = _ref7.value;
+	      var depositMethodId = _ref7.depositMethodId;
 	      var callback = arguments[1];
 	
 	      var reqId = (0, _listener.generateRequestId)();
@@ -1323,7 +1455,7 @@
 	  var result = void 0;
 	  _lodash2.default.mapKeys(RequestTypes, function (key) {
 	    if (_lodash2.default.has(message, key)) {
-	      result = _lodash2.default.find(requests[key], { ReqId: message[key].toString() });
+	      result = _lodash2.default.find(requests[key], { ReqId: String(message[key]) });
 	    }
 	  });
 	
@@ -1334,7 +1466,7 @@
 	  _lodash2.default.mapKeys(RequestTypes, function (key) {
 	    if (_lodash2.default.has(message, key)) {
 	      requests[key] = requests[key] || [];
-	      requests[key].push(_extends({ ReqId: message[key].toString() }, promise));
+	      requests[key].push(_extends({ ReqId: String(message[key]) }, promise));
 	    }
 	  });
 	
@@ -1345,7 +1477,7 @@
 	  _lodash2.default.mapKeys(RequestTypes, function (key) {
 	    if (_lodash2.default.has(message, key)) {
 	      if (requests[key] !== []) {
-	        var index = _lodash2.default.findIndex(requests[key], { ReqId: message[key].toString() });
+	        var index = _lodash2.default.findIndex(requests[key], { ReqId: String(message[key]) });
 	        requests[key][index] = _extends({}, requests[key][index], {
 	          resolve: null,
 	          reject: null,
@@ -3472,6 +3604,9 @@
 	var EXECUTION_REPORT_CANCELED = exports.EXECUTION_REPORT_CANCELED = 'CANCELED';
 	var EXECUTION_REPORT_REJECTED = exports.EXECUTION_REPORT_REJECTED = 'REJECTED';
 	
+	var DEPOSIT_REFRESH = exports.DEPOSIT_REFRESH = 'DEPOSIT_REFRESH';
+	var WITHDRAW_REFRESH = exports.WITHDRAW_REFRESH = 'WITHDRAW_REFRESH';
+	
 	/* eslint-disable quote-props */
 	var EVENTS = exports.EVENTS = {
 	  ORDERBOOK: {
@@ -3494,6 +3629,57 @@
 
 /***/ },
 /* 25 */
+/***/ function(module, exports) {
+
+	exports.endianness = function () { return 'LE' };
+	
+	exports.hostname = function () {
+	    if (typeof location !== 'undefined') {
+	        return location.hostname
+	    }
+	    else return '';
+	};
+	
+	exports.loadavg = function () { return [] };
+	
+	exports.uptime = function () { return 0 };
+	
+	exports.freemem = function () {
+	    return Number.MAX_VALUE;
+	};
+	
+	exports.totalmem = function () {
+	    return Number.MAX_VALUE;
+	};
+	
+	exports.cpus = function () { return [] };
+	
+	exports.type = function () { return 'Browser' };
+	
+	exports.release = function () {
+	    if (typeof navigator !== 'undefined') {
+	        return navigator.appVersion;
+	    }
+	    return '';
+	};
+	
+	exports.networkInterfaces
+	= exports.getNetworkInterfaces
+	= function () { return {} };
+	
+	exports.arch = function () { return 'javascript' };
+	
+	exports.platform = function () { return 'browser' };
+	
+	exports.tmpdir = exports.tmpDir = function () {
+	    return '/tmp';
+	};
+	
+	exports.EOL = '\n';
+
+
+/***/ },
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3510,7 +3696,7 @@
 	
 	var _requests2 = _interopRequireDefault(_requests);
 	
-	var _restTransport = __webpack_require__(26);
+	var _restTransport = __webpack_require__(27);
 	
 	var _restTransport2 = _interopRequireDefault(_restTransport);
 	
@@ -3584,7 +3770,7 @@
 	exports.default = BlinkTradeRest;
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3603,7 +3789,7 @@
 	
 	var _baseTransport2 = _interopRequireDefault(_baseTransport);
 	
-	var _sjcl = __webpack_require__(27);
+	var _sjcl = __webpack_require__(28);
 	
 	var _sjcl2 = _interopRequireDefault(_sjcl);
 	
@@ -3611,11 +3797,11 @@
 	
 	var _nodeify2 = _interopRequireDefault(_nodeify);
 	
-	var _url = __webpack_require__(28);
+	var _url = __webpack_require__(29);
 	
 	var _url2 = _interopRequireDefault(_url);
 	
-	var _path = __webpack_require__(29);
+	var _path = __webpack_require__(30);
 	
 	var _path2 = _interopRequireDefault(_path);
 	
@@ -3667,7 +3853,7 @@
 	    _this.secret = params.secret;
 	    _this.currency = params.currency || 'USD';
 	
-	    _this.fetchRequest = _this.isNode ? __webpack_require__(31) : __webpack_require__(32);
+	    _this.fetchRequest = _this.isNode ? __webpack_require__(32) : __webpack_require__(33);
 	    return _this;
 	  }
 	
@@ -3731,19 +3917,19 @@
 	exports.default = RestTransport;
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports) {
 
 	module.exports = require("sjcl");
 
 /***/ },
-/* 28 */
+/* 29 */
 /***/ function(module, exports) {
 
 	module.exports = require("url");
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -3971,10 +4157,10 @@
 	    }
 	;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(30)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(31)))
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -4140,13 +4326,13 @@
 
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports) {
 
 	module.exports = require("isomorphic-fetch");
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports) {
 
 	module.exports = require("fetch-jsonp");
