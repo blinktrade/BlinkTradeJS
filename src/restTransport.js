@@ -20,12 +20,11 @@
  * @flow
  */
 
-import Base from './base';
-import BaseTransport from './baseTransport'
 import sjcl from 'sjcl';
 import nodeify from 'nodeify';
 import url from 'url';
 import path from 'path';
+import BaseTransport from './baseTransport';
 
 class RestTransport extends BaseTransport {
 
@@ -70,7 +69,7 @@ class RestTransport extends BaseTransport {
         'Content-Type': 'application/json',
         Nonce: timeStamp,
         APIKey: this.key,
-        Signature
+        Signature,
       },
       body: JSON.stringify(body),
     };
@@ -78,7 +77,7 @@ class RestTransport extends BaseTransport {
 
   fetch(msg: Object, api: string, headers?: Object = {}): Promise<Object> {
     return this.fetchRequest(url.resolve(this.endpoint, api), headers)
-      .then(response => response.json())
+      .then(response => response.json());
   }
 
   fetchPublic(api: string, callback?: Function): Promise<Object> {
@@ -88,8 +87,8 @@ class RestTransport extends BaseTransport {
   fetchTrade(msg: Object, callback?: Function): Promise<Object> {
     const headers = this.headers('POST', msg);
     return nodeify(this.fetch(msg, 'tapi/v1/message', headers, callback)
-      .then(response => response.Status === 500 ? Promise.reject(response) : response.Responses)
-      .then(response => response.length === 1 ? response[0] : response)
+      .then(response => (response.Status === 500 ? Promise.reject(response) : response.Responses))
+      .then(response => (response.length === 1 ? response[0] : response))
     , callback);
   }
 }

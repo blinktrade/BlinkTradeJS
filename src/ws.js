@@ -20,9 +20,6 @@
  * @flow
  */
 
-import MsgTypes from './constants/requests';
-
-import WebSocketTransport from './wsTransport';
 import _ from 'lodash';
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import {
@@ -39,6 +36,9 @@ import {
   WITHDRAW_REFRESH,
   EXECUTION_REPORT,
 } from './constants/actionTypes';
+
+import MsgTypes from './constants/requests';
+import WebSocketTransport from './wsTransport';
 
 class BlinkTradeWS extends WebSocketTransport {
 
@@ -221,13 +221,13 @@ class BlinkTradeWS extends WebSocketTransport {
           switch (order.MDEntryType) {
             case '0':
             case '1':
-              const orderbookEvent = ORDER_BOOK + ':' + EVENTS.ORDERBOOK[order.MDUpdateAction];
+              const orderbookEvent = `${ORDER_BOOK}:${EVENTS.ORDERBOOK[order.MDUpdateAction]}`;
               return this.eventEmitter.emit(orderbookEvent, {
                 ...dataOrder,
                 type: orderbookEvent,
               });
             case '2':
-              const tradeEvent = ORDER_BOOK + ':' + EVENTS.TRADES[order.MDUpdateAction];
+              const tradeEvent = `${ORDER_BOOK}:${EVENTS.TRADES[order.MDUpdateAction]}`;
               return this.eventEmitter.emit(tradeEvent, {
                 ...dataOrder,
                 type: tradeEvent,

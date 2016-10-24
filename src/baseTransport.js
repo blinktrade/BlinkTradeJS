@@ -20,16 +20,16 @@
  * @flow
  */
 
+import _ from 'lodash';
 import Base from './base';
 import MsgTypes from './constants/requests';
 import * as RequestTypes from './constants/requestTypes';
-import _ from 'lodash';
 import {
   deleteRequest,
   generateRequestId,
 } from './listener';
 
-type StatusList = '1' | '2' | '4' | '8';
+type StatusListType = '1' | '2' | '4' | '8';
 
 class BaseTransport extends Base {
 
@@ -144,7 +144,7 @@ class BaseTransport extends Base {
   }: {
     page?: number;
     pageSize?: number;
-    statusList?: Array<StatusList>;
+    statusList?: Array<StatusListType>;
   } = {}, callback?: Function): Promise<Object> {
     const msg = {
       MsgType: MsgTypes.REQUEST_WITHDRAW_LIST,
@@ -235,11 +235,11 @@ class BaseTransport extends Base {
   requestDepositList({
     page: Page = 0,
     pageSize: PageSize = 20,
-    status: StatusList = ['1', '2', '4', '8']
+    status: StatusList = ['1', '2', '4', '8'],
   }: {
     page: number;
     pageSize: number;
-    status: Array<StatusList>;
+    status: Array<StatusListType>;
   } = {}, callback?: Function): Promise<Object> {
     const msg = {
       MsgType: MsgTypes.REQUEST_DEPOSIT_LIST,
@@ -257,7 +257,7 @@ class BaseTransport extends Base {
           ...depositData,
           DepositListGrp,
         });
-      });
+      }).catch(reject);
     });
   }
 

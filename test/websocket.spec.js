@@ -75,7 +75,7 @@ describe('WebSocket', () => {
 
   it('Should connect on websocket and callback', (done) => {
     BlinkTrade = new BlinkTradeWS({ prod: false });
-    BlinkTrade.connect((err, data) => {
+    BlinkTrade.connect((err) => {
       expect(err).to.be.null;
       done();
     });

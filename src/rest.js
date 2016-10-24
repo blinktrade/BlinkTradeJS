@@ -20,9 +20,7 @@
  * @flow
  */
 
-import MsgTypes from './constants/requests';
 import RestTransport from './restTransport';
-import { generateRequestId } from './listener';
 
 class BlinkTradeRest extends RestTransport {
   ticker(callback?: Function): Promise<Object> {
