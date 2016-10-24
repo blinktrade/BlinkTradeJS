@@ -186,6 +186,52 @@ class BaseTransport extends Base {
     return this.send(msg, callback);
   }
 
+  confirmWithdraw({ withdrawId: WithdrawID, confirmationToken, secondFactor }: {
+    withdrawId: string;
+    confirmationToken?: string;
+    secondFactor?: string;
+  }, callback: Function): Promise<Object> {
+    const msg: Object = {
+      MsgType: MsgTypes.CONFIRM_WITHDRAW,
+      WithdrawReqID: generateRequestId(),
+      WithdrawID,
+    };
+
+    if (confirmationToken) {
+      msg.ConfirmationToken = confirmationToken;
+    }
+
+    if (secondFactor) {
+      msg.SecondFactor = secondFactor;
+    }
+
+    return new Promise((resolve, reject) => {
+      return this.send(msg, callback).then(data => {
+        return resolve({
+          ...data,
+        });
+      }).catch(reject);
+    });
+  }
+
+  cancelWithdraw(withdrawId: string, callback: Function): Promise<Object> {
+    const reqId = generateRequestId();
+    const msg = {
+      MsgType: MsgTypes.CANCEL_WITHDRAW,
+      WithdrawCancelReqID: reqId,
+      ClOrdID: reqId,
+      WithdrawID: withdrawId,
+    };
+
+    return new Promise((resolve, reject) => {
+      return this.send(msg, callback).then(data => {
+        return resolve({
+          ...data,
+        });
+      }).catch(reject);
+    });
+  }
+
   requestDepositList({
     page: Page = 0,
     pageSize: PageSize = 20,
