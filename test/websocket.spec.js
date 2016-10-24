@@ -31,7 +31,6 @@ let BlinkTrade;
 
 const MOCK_FULL_REFRESH = {
   MsgType: 'W',
-  MDReqID: 1062858,
   Symbol: 'BTCUSD',
   MDFullGrp: [{}],
 };
@@ -99,13 +98,13 @@ describe('WebSocket', () => {
     const mock = {
       SendTime: 1455409766521,
       ServerTimestamp: 1455410567,
-      TestReqID: 1455409766521,
     };
 
     BlinkTrade = new BlinkTradeWS();
 
-    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
-      return promise.resolve(mock);
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      mock.TestReqID = msg.TestReqID;
+      return listener.getRequest(mock).resolve(mock);
     });
 
     BlinkTrade.connect().then(() => {
@@ -133,8 +132,9 @@ describe('WebSocket', () => {
 
     BlinkTrade = new BlinkTradeWS();
 
-    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
-      return promise.resolve(mock);
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      mock.UserReqID = msg.UserReqID;
+      return listener.getRequest(mock).resolve(mock);
     });
 
     BlinkTrade.connect().then(() => {
@@ -160,8 +160,9 @@ describe('WebSocket', () => {
 
     BlinkTrade = new BlinkTradeWS();
 
-    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
-      return promise.resolve(mock);
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      mock.UserReqID = msg.UserReqID;
+      return listener.getRequest(mock).reject(mock);
     });
 
     BlinkTrade.connect().then(() => {
@@ -184,7 +185,6 @@ describe('WebSocket', () => {
         Username: 'rodrigo',
         UserID: 90800003,
         MsgType: 'BF',
-        UserReqID: 8767404,
         UserStatus: 2,
       },
     };
@@ -193,8 +193,10 @@ describe('WebSocket', () => {
 
     BlinkTrade = new BlinkTradeWS();
 
-    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
-      return promise.resolve(msg.UserReqTyp === '1' ? mock.login : mock.logout);
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      const response = msg.UserReqTyp === '1' ? mock.login : mock.logout;
+      response.UserReqID = msg.UserReqID;
+      return listener.getRequest(response).resolve(response);
     });
 
     BlinkTrade.connect().then(() => {
@@ -220,15 +222,15 @@ describe('WebSocket', () => {
       },
       MsgType: 'U3',
       ClientID: 90800003,
-      BalanceReqID: 8525058,
     };
 
     const Available = { USD: 178111288294761, BTC: 1467995872214 };
 
     BlinkTrade = new BlinkTradeWS();
 
-    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
-      return promise.resolve(mock);
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      mock.BalanceReqID = msg.BalanceReqID;
+      return listener.getRequest(mock).resolve(mock);
     });
 
     BlinkTrade.connect().then(() => {
@@ -253,20 +255,21 @@ describe('WebSocket', () => {
       BuyVolume: 925019572651,
       BestBid: 189189000000,
       Symbol: 'BTCBRL',
-      SecurityStatusReqID: 4329626,
       Market: 'BLINK',
     };
 
     BlinkTrade = new BlinkTradeWS();
 
-    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
-      return promise.resolve(mock);
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      mock.SecurityStatusReqID = msg.SecurityStatusReqID;
+      return listener.getRequest(mock).resolve(mock);
     });
 
     BlinkTrade.connect().then(() => {
       return BlinkTrade.subscribeTicker(['BLINK:BTCBRL']);
     }).then(data => {
       expect(data).to.be.eql({
+        ...mock,
         BestAsk: 1910,
         BestBid: 1891.89,
         BuyVolume: 9250.19572651,
@@ -275,7 +278,6 @@ describe('WebSocket', () => {
         LowPx: 1891.89,
         Market: 'BLINK',
         MsgType: 'f',
-        SecurityStatusReqID: 4329626,
         SellVolume: 4.87859418,
         Symbol: 'BTCBRL',
       });
@@ -337,8 +339,9 @@ describe('WebSocket', () => {
 
     BlinkTrade = new BlinkTradeWS();
 
-    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
-      return promise.resolve(mock);
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      mock.MDReqID = msg.MDReqID;
+      return listener.getRequest(mock).resolve(mock);
     });
 
     BlinkTrade.connect().then(() => {
@@ -350,7 +353,7 @@ describe('WebSocket', () => {
           BTCUSD: {
             bids: [[578, 28.63231429, 90800535], [577.79, 5.68, 90800535]],
             asks: [[578.71, 0.1, 90800292], [578.72, 8.87239144, 90800535]],
-          }
+          },
         },
       });
       done();
@@ -360,8 +363,9 @@ describe('WebSocket', () => {
   it('Should get incremental orderbook updates and emit OB:NEW_ORDER', (done) => {
     BlinkTrade = new BlinkTradeWS();
 
-    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
-      return promise.resolve(MOCK_FULL_REFRESH);
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      MOCK_FULL_REFRESH.MDReqID = msg.MDReqID;
+      return listener.getRequest(MOCK_FULL_REFRESH).resolve(MOCK_FULL_REFRESH);
     });
 
     // Mock eventEmitter callback
@@ -387,8 +391,9 @@ describe('WebSocket', () => {
   it('Should get incremental orderbook updates and emit OB:UPDATE_ORDER', (done) => {
     BlinkTrade = new BlinkTradeWS();
 
-    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
-      return promise.resolve(MOCK_FULL_REFRESH);
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      MOCK_FULL_REFRESH.MDReqID = msg.MDReqID;
+      return listener.getRequest(MOCK_FULL_REFRESH).resolve(MOCK_FULL_REFRESH);
     });
 
     // Mock eventEmitter callback
@@ -409,8 +414,9 @@ describe('WebSocket', () => {
   it('Should get incremental orderbook updates and emit OB:DELETE_ORDER', (done) => {
     BlinkTrade = new BlinkTradeWS();
 
-    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
-      return promise.resolve(MOCK_FULL_REFRESH);
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      MOCK_FULL_REFRESH.MDReqID = msg.MDReqID;
+      return listener.getRequest(MOCK_FULL_REFRESH).resolve(MOCK_FULL_REFRESH);
     });
 
     // Mock eventEmitter callback
@@ -431,8 +437,9 @@ describe('WebSocket', () => {
   it('Should get incremental orderbook updates and emit OB:DELETE_ORDERS_THRU', (done) => {
     BlinkTrade = new BlinkTradeWS();
 
-    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
-      return promise.resolve(MOCK_FULL_REFRESH);
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      MOCK_FULL_REFRESH.MDReqID = msg.MDReqID;
+      return listener.getRequest(MOCK_FULL_REFRESH).resolve(MOCK_FULL_REFRESH);
     });
 
     // Mock eventEmitter callback
@@ -453,8 +460,9 @@ describe('WebSocket', () => {
   it('Should get incremental orderbook updates and emit OB:TRADE_NEW', (done) => {
     BlinkTrade = new BlinkTradeWS();
 
-    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
-      return promise.resolve(MOCK_FULL_REFRESH);
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      MOCK_FULL_REFRESH.MDReqID = msg.MDReqID;
+      return listener.getRequest(MOCK_FULL_REFRESH).resolve(MOCK_FULL_REFRESH);
     });
 
     // Mock eventEmitter callback
@@ -480,8 +488,9 @@ describe('WebSocket', () => {
 
     BlinkTrade = new BlinkTradeWS();
 
-    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
-      return promise.resolve(mock);
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      MOCK_NEW_ORDER.ClOrdID = msg.ClOrdID;
+      return listener.getRequest(MOCK_NEW_ORDER).resolve(mock);
     });
 
     const sinon = stub(listener, 'registerListener', (message, callback) => {
@@ -505,8 +514,9 @@ describe('WebSocket', () => {
 
     BlinkTrade = new BlinkTradeWS();
 
-    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
-      return promise.resolve(mock);
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      MOCK_NEW_ORDER.ClOrdID = msg.ClOrdID;
+      return listener.getRequest(MOCK_NEW_ORDER).resolve(mock);
     });
 
     const sinon = stub(listener, 'registerListener', (message, callback) => {
@@ -535,8 +545,9 @@ describe('WebSocket', () => {
 
     BlinkTrade = new BlinkTradeWS();
 
-    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
-      return promise.resolve(mock);
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      MOCK_NEW_ORDER.ClOrdID = msg.ClOrdID;
+      return listener.getRequest(MOCK_NEW_ORDER).resolve(mock);
     });
 
     const callback = spy();
@@ -565,8 +576,9 @@ describe('WebSocket', () => {
 
     BlinkTrade = new BlinkTradeWS();
 
-    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
-      return promise.resolve(mock);
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      mock.ClOrdID = msg.ClOrdID;
+      return listener.getRequest(mock).resolve(mock);
     });
 
     const sinon = stub(listener, 'registerListener', (message, callback) => {
@@ -599,8 +611,9 @@ describe('WebSocket', () => {
 
     const callback = spy();
 
-    stub(BlinkTrade, 'sendMessage', (msg, promise) => {
-      return promise.resolve(mock);
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      mock.ClOrdID = msg.ClOrdID;
+      return listener.getRequest(mock).resolve(mock);
     });
 
     const sinon = stub(listener, 'registerListener', () => {
