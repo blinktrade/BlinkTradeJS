@@ -622,6 +622,37 @@ blinktrade.executionReport()
 
 ```
 
+### Withdraw and Deposit Refresh
+
+To get deposit and withdraw updates, you can listen `DEPOSIT_REFRESH` and `WITHDRAW_REFRESH` respectively.
+
+```js
+
+blinktrade.requestDeposit().on('DEPOSIT_REFRESH', function(deposit) {
+  console.log(deposit);
+});
+
+blinktrade.requestWithdraw().on('WITHDRAW_REFRESH', function(withdraw) {
+  console.log(withdraw);
+});
+
+```
+
+**NOTE** that these events will only be called to the current deposit / withdraw created,
+if you want to listen to any deposit / withdraw updates, you should use `onDepositRefresh(callback)` and `onWithdrawRefresh()` instead.
+
+```js
+
+blinktrade.onDepositRefresh(function(deposit) {
+  console.log(deposit);
+});
+
+blinktrade.onWithdrawRefresh(function(withdraw) {
+  console.log(withdraw);
+});
+
+```
+
 # API
 
 ## Public Rest API
@@ -652,9 +683,11 @@ blinktrade.executionReport()
 * [myOrders](#myorders-websocket-rest)
 * [requestWithdrawList](#requestWithdrawList-websocket-rest)
 * [requestWithdraw](#requestwithdraw-websocket-rest)
+* [onWithdrawRefresh](#on-withdraw-refresh)
 * [requestDepositList](#requestdepositList-websocket-rest)
 * [requestDeposit](#requestdeposit-websocket-rest)
 * [requestDepositMethods](#requestdeposit-websocket-rest)
+* [onDepositRefresh](#on-deposit-refresh)
 
 ## Public Rest
 
@@ -871,6 +904,12 @@ These methods bellow are both availabe under Rest and WebSocket API.
 | method   | Array  | Method name of withdraw, check with your broker, defaults to `bitcoin` |
 | currency | String | Currency pair symbol to withdraw, defaults to `BTC`                    |
 
+#### Events
+
+| Event            | Description                    |
+|------------------|--------------------------------|
+| WITHDRAW_REFRESH | Callback when withdraw refresh |
+
 **FOXBIT**
 
 | Methods               | Required Data fields                                                      |
@@ -888,6 +927,9 @@ These methods bellow are both availabe under Rest and WebSocket API.
 | VPBankinternaltransfer | VPbankbranch, BankCity, AccountName, AccountNumber, BankSwift                                                    |
 | cashtoID               | BankName, BankBranch, BankCity, Clientname, ClientIDNr, Issue Date ID, Place of Issue, Phone Number of Recipient |
 
+### onWithdrawRefresh [websocket]
+
+`onWithdrawRefresh(Function callback)` => Promise
 
 ### requestDepositList [websocket, rest]
 
@@ -909,11 +951,19 @@ These methods bellow are both availabe under Rest and WebSocket API.
 | currency        | String | Currency pair symbol to withdraw, defaults to `BTC`     |
 | depositMethodId | Number | Method ID to deposit, check [`requestDepositMethods`]() |
 
+#### Events
+
+| Event           | Description                   |
+|-----------------|-------------------------------|
+| DEPOSIT_REFRESH | Callback when deposit refresh |
 
 ### requestDepositMethods [websocket, rest]
 
 `requestDepositMethods(Function? callback)` => Promise / callback
 
+### onDepositRefresh [websocket]
+
+`onDepositRefresh(Function callback)` => Promise
 
 # LICENSE
 
