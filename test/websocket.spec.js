@@ -520,8 +520,8 @@ describe('WebSocket', () => {
     });
 
     const sinon = stub(listener, 'registerListener', (message, callback) => {
+      // Simulate server latency
       setTimeout(() => {
-        // Simulate server latency
         callback(mock);
       }, 500);
     });
@@ -582,8 +582,8 @@ describe('WebSocket', () => {
     });
 
     const sinon = stub(listener, 'registerListener', (message, callback) => {
+      // Simulate server latency
       setTimeout(() => {
-        // Simulate server latency
         callback(mock);
       }, 500);
     });
@@ -627,6 +627,101 @@ describe('WebSocket', () => {
       expect(callback.called).to.be.true;
       sinon.restore();
       done();
+    }).catch(err => done(err));
+  });
+
+  it('Should request a deposit and emit DEPOSIT_REFRESH event', (done) => {
+    const mock = {
+      DepositMethodName: 'deposit_btc',
+      State: 'UNCONFIRMED',
+      DepositID: '2a6b5e322fd24574a4d9f988681a542f',
+      Data: {
+        InputAddress: 'mjjVMr8WcYQwVGzYc8HpaRyAZc89ngTdKV',
+        Destination: 'n19ZAH1WGoUkQhubQw71fH11BenifxpBxf',
+      },
+      ClOrdID: '7302188',
+      Status: '0',
+      Value: 0,
+      BrokerID: 5,
+      PaidValue: 0,
+      Currency: 'BTC',
+    };
+
+    BlinkTrade = new BlinkTradeWS();
+
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      mock.ClOrdID = msg.ClOrdID;
+      return listener.getRequest(mock).resolve(mock);
+    });
+
+    const sinon = stub(listener, 'registerListener', (message, callback) => {
+      // Simulate server latency
+      setTimeout(() => {
+        callback({
+          State: 'PROGRESS',
+          DepositID: '2a6b5e322fd24574a4d9f988681a542f',
+        });
+      }, 500);
+    });
+
+    BlinkTrade.connect().then(() => {
+      return BlinkTrade.requestDeposit().on('DEPOSIT_REFRESH', (data) => {
+        expect(data.State).to.be.equal('PROGRESS');
+        expect(data.DepositID).to.be.equal(data.DepositID);
+        sinon.restore();
+        done();
+      });
+    }).catch(err => done(err));
+  });
+
+  it('Should request a withdraw and emit WITHDRAW_REFRESH event', (done) => {
+    const withdraw = {
+      amount: 200 * 1e8,
+      currency: 'USD',
+      method: 'PayPal',
+      data: {
+        Email: 'user@blinktrade.com',
+      },
+    };
+
+    const mock = {
+      Status: '1',
+      ClOrdID: '3332623',
+      WithdrawID: 523,
+      WithdrawReqID: 3332623,
+      Data: {
+        Email: 'user@blinktrade.com',
+      },
+    };
+
+    BlinkTrade = new BlinkTradeWS();
+
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      mock.ClOrdID = msg.ClOrdID;
+      mock.WithdrawReqID = msg.WithdrawReqID;
+      return listener.getRequest(mock).resolve(mock);
+    });
+
+    const sinon = stub(listener, 'registerListener', (message, callback) => {
+      // Simulate server latency
+      setTimeout(() => {
+        // Withdraw cancelled
+        callback({
+          ...mock,
+          Status: '8',
+        });
+      }, 500);
+    });
+
+    BlinkTrade.connect().then(() => {
+      return BlinkTrade.requestWithdraw(withdraw)
+      .on('WITHDRAW_REFRESH', (data) => {
+        expect(data.Status).to.be.equal('8');
+        expect(data.DepositID).to.be.equal(data.DepositID);
+        expect(data.Data).to.be.eql(withdraw.data);
+        sinon.restore();
+        done();
+      });
     }).catch(err => done(err));
   });
 });
