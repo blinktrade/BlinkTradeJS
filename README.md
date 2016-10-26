@@ -1,5 +1,7 @@
 # BlinkTradeJS SDK
 
+[![npm version](https://badge.fury.io/js/blinktrade.svg)](https://badge.fury.io/js/blinktrade)
+
 BlinkTradeJS WebSocket and Rest official JavasScript client for node.js and browser.
 
 # Getting Started
