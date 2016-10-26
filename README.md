@@ -8,8 +8,6 @@ BlinkTrade provides a simple and robust WebSocket API to integrate our platform,
 
 ## Install
 
-> Not Publish yet.
-
 `$ npm install blinktrade`
 
 # Documentation
