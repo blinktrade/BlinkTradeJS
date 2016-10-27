@@ -514,13 +514,20 @@
 	      var depositMethodId = _ref3.depositMethodId;
 	      var callback = arguments[1];
 	
-	      (0, _listener.registerListener)('U23', function (deposit) {
-	        callback && callback(null, deposit);
-	        return _this9.eventEmitter.emit(_actionTypes.DEPOSIT_REFRESH, deposit);
-	      });
+	      var subscribeEvent = function subscribeEvent(depositId) {
+	        return function (deposit) {
+	          if (deposit.DepositID === depositId) {
+	            callback && callback(null, deposit);
+	            return _this9.eventEmitter.emit(_actionTypes.DEPOSIT_REFRESH, deposit);
+	          }
+	        };
+	      };
 	
 	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'emitterPromise', this).call(this, new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'requestDeposit', _this9).call(_this9, { currency: currency, value: value, depositMethodId: depositMethodId }, callback).then(resolve).catch(reject);
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'requestDeposit', _this9).call(_this9, { currency: currency, value: value, depositMethodId: depositMethodId }, callback).then(function (deposit) {
+	          (0, _listener.registerListener)('U23', subscribeEvent(deposit.DepositID));
+	          return resolve(deposit);
+	        }).catch(reject);
 	      }));
 	    }
 	  }, {
@@ -545,13 +552,20 @@
 	      var _ref4$method = _ref4.method;
 	      var method = _ref4$method === undefined ? 'bitcoin' : _ref4$method;
 	
-	      (0, _listener.registerListener)('U9', function (withdraw) {
-	        callback && callback(null, withdraw);
-	        return _this10.eventEmitter.emit(_actionTypes.WITHDRAW_REFRESH, withdraw);
-	      });
+	      var subscribeEvent = function subscribeEvent(withdrawId) {
+	        return function (withdraw) {
+	          if (withdraw.WithdrawID === withdrawId) {
+	            callback && callback(null, withdraw);
+	            return _this10.eventEmitter.emit(_actionTypes.WITHDRAW_REFRESH, withdraw);
+	          }
+	        };
+	      };
 	
 	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'emitterPromise', this).call(this, new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'requestWithdraw', _this10).call(_this10, { amount: amount, data: data, currency: currency, method: method }, callback).then(resolve).catch(reject);
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'requestWithdraw', _this10).call(_this10, { amount: amount, data: data, currency: currency, method: method }, callback).then(function (withdraw) {
+	          (0, _listener.registerListener)('U9', subscribeEvent(withdraw.WithdrawID));
+	          return resolve(withdraw);
+	        }).catch(reject);
 	      }));
 	    }
 	  }, {
