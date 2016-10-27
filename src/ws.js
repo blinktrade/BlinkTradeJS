@@ -352,7 +352,7 @@ class BlinkTradeWS extends WebSocketTransport {
     }));
   }
 
-  onDepositRefresh(callback: Function): Promise<Object> {
+  onDepositRefresh(callback?: Function): Promise<Object> {
     return new Promise((resolve) => {
       registerListener('U23', (deposit) => {
         callback && callback(deposit);
@@ -383,7 +383,7 @@ class BlinkTradeWS extends WebSocketTransport {
     }));
   }
 
-  onWithdrawRefresh(callback: Function): Promise<Object> {
+  onWithdrawRefresh(callback?: Function): Promise<Object> {
     return new Promise((resolve) => {
       registerListener('U9', (withdraw) => {
         callback && callback(withdraw);
