@@ -20,6 +20,10 @@
  * @flow
  */
 
+/* eslint-disable operator-assignment */
+/* eslint-disable no-plusplus */
+/* eslint-disable import/prefer-default-export */
+
 import macaddress from 'macaddress';
 
 export function getMac(callback: Function): void {

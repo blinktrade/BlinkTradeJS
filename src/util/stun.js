@@ -19,6 +19,8 @@
  */
 
 /* eslint-disable no-param-reassign */
+/* eslint-disable no-plusplus */
+/* eslint-disable import/prefer-default-export */
 
 import ip from 'ip';
 import dgram from 'dgram';
@@ -28,10 +30,8 @@ const stunIp = { local: null, public: [] };
 function addIPAddress(ipAddress) {
   if (ipAddress.match(/^(192\.168\.|169\.254\.|10\.|172\.(1[6-9]|2\d|3[01]))/)) {
     stunIp.local = ipAddress;
-  } else {
-    if (stunIp.public.indexOf(ipAddress) === -1) {
-      stunIp.public.push(ipAddress);
-    }
+  } else if (stunIp.public.indexOf(ipAddress) === -1) {
+    stunIp.public.push(ipAddress);
   }
 }
 

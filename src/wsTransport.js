@@ -20,10 +20,11 @@
  * @flow
  */
 
-import BaseTransport from './baseTransport';
-import Fingerprint2 from 'fingerprintjs2';
 import nodeify from 'nodeify';
+import Fingerprint2 from 'fingerprintjs2';
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
+
+import BaseTransport from './baseTransport';
 
 import {
   getRequest,
