@@ -1,6 +1,7 @@
 # BlinkTradeJS SDK
 
 [![npm version](https://badge.fury.io/js/blinktrade.svg)](https://badge.fury.io/js/blinktrade)
+[![Dependency Status](https://gemnasium.com/badges/github.com/blinktrade/BlinkTradeJS.svg)](https://gemnasium.com/github.com/blinktrade/BlinkTradeJS)
 
 BlinkTradeJS WebSocket and Rest official JavasScript client for node.js and browser.
 
