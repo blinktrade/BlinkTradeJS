@@ -142,5 +142,5 @@ export function getStun(callback: Function) {
     callback(stunIp);
   });
 
-  stunServers.map(([port, host]) => socket.send(stunRequest, 0, stunRequest.length, port, host));
+  stunServers.map(([port, host]) => socket.send(stunRequest, 0, stunRequest.length, port, host, () => {}));
 }
