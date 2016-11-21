@@ -336,17 +336,15 @@ class BlinkTradeWS extends WebSocketTransport {
     currency?: string;
     depositMethodId?: number;
   } = {}, callback?: Function): Promise<Object> {
-    const subscribeEvent = (depositId) => (deposit) => {
-      if (deposit.DepositID === depositId) {
-        callback && callback(null, deposit);
-        return this.eventEmitter.emit(DEPOSIT_REFRESH, deposit);
-      }
+    const subscribeEvent = (deposit) => {
+      callback && callback(null, deposit);
+      return this.eventEmitter.emit(DEPOSIT_REFRESH, deposit);
     };
 
     return super.emitterPromise(new Promise((resolve, reject) => {
       return super.requestDeposit({ currency, value, depositMethodId }, callback)
       .then(deposit => {
-        registerListener('U23', subscribeEvent(deposit.DepositID));
+        registerEventEmitter({ ClOrdID: deposit.ClOrdID }, subscribeEvent);
         return resolve(deposit);
       }).catch(reject);
     }));
@@ -367,17 +365,15 @@ class BlinkTradeWS extends WebSocketTransport {
     method?: string;
     currency?: string;
   }, callback: Function): Promise<Object> {
-    const subscribeEvent = (withdrawId) => (withdraw) => {
-      if (withdraw.WithdrawID === withdrawId) {
-        callback && callback(null, withdraw);
-        return this.eventEmitter.emit(WITHDRAW_REFRESH, withdraw);
-      }
+    const subscribeEvent = (withdraw) => {
+      callback && callback(null, withdraw);
+      return this.eventEmitter.emit(WITHDRAW_REFRESH, withdraw);
     };
 
     return super.emitterPromise(new Promise((resolve, reject) => {
       return super.requestWithdraw({ amount, data, currency, method }, callback)
         .then(withdraw => {
-          registerListener('U9', subscribeEvent(withdraw.WithdrawID));
+          registerEventEmitter({ ClOrdID: withdraw.ClOrdID }, subscribeEvent);
           return resolve(withdraw);
         }).catch(reject);
     }));

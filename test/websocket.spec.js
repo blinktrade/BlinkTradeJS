@@ -654,7 +654,7 @@ describe('WebSocket', () => {
       return listener.getRequest(mock).resolve(mock);
     });
 
-    const sinon = stub(listener, 'registerListener', (message, callback) => {
+    const sinon = stub(listener, 'registerEventEmitter', (message, callback) => {
       // Simulate server latency
       setTimeout(() => {
         callback({
@@ -702,7 +702,7 @@ describe('WebSocket', () => {
       return listener.getRequest(mock).resolve(mock);
     });
 
-    const sinon = stub(listener, 'registerListener', (message, callback) => {
+    const sinon = stub(listener, 'registerEventEmitter', (message, callback) => {
       // Simulate server latency
       setTimeout(() => {
         // Withdraw cancelled
@@ -720,6 +720,70 @@ describe('WebSocket', () => {
         expect(data.DepositID).to.be.equal(data.DepositID);
         expect(data.Data).to.be.eql(withdraw.data);
         sinon.restore();
+        done();
+      });
+    }).catch(err => done(err));
+  });
+
+  it('Should request a withdraw and emit WITHDRAW_REFRESH together with onWithdrawRefresh', (done) => {
+    const withdraw = {
+      amount: 200 * 1e8,
+      currency: 'USD',
+      method: 'PayPal',
+      data: {
+        Email: 'user@blinktrade.com',
+      },
+    };
+
+    const mock = {
+      Status: '1',
+      ClOrdID: '3332623',
+      WithdrawID: 523,
+      WithdrawReqID: 3332623,
+      Data: {
+        Email: 'user@blinktrade.com',
+      },
+    };
+
+    const mockResponse = {
+      ...mock,
+      Status: '8',
+    }
+
+    BlinkTrade = new BlinkTradeWS();
+
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      mock.ClOrdID = msg.ClOrdID;
+      mock.WithdrawReqID = msg.WithdrawReqID;
+      return listener.getRequest(mock).resolve(mock);
+    });
+
+    const onWithdrawRefresh = spy()
+
+    const sinonListener = stub(listener, 'registerListener', (message, callback) => {
+      setTimeout(() => {
+        callback(mockResponse);
+      }, 500);
+    });
+
+    const sinonEventEmitter = stub(listener, 'registerEventEmitter', (message, callback) => {
+      // Simulate server latency
+      setTimeout(() => {
+        // Withdraw cancelled
+        callback(mockResponse);
+      }, 500);
+    });
+
+    BlinkTrade.connect().then(() => {
+      BlinkTrade.onWithdrawRefresh(onWithdrawRefresh);
+      return BlinkTrade.requestWithdraw(withdraw)
+      .on('WITHDRAW_REFRESH', (data) => {
+        expect(data.Status).to.be.equal('8');
+        expect(data.DepositID).to.be.equal(data.DepositID);
+        expect(data.Data).to.be.eql(withdraw.data);
+        expect(onWithdrawRefresh.called).to.be.true;
+        sinonListener.restore();
+        sinonEventEmitter.restore();
         done();
       });
     }).catch(err => done(err));
