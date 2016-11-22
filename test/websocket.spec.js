@@ -118,6 +118,30 @@ describe('WebSocket', () => {
     }).catch(done);
   });
 
+  it('Should send heartBeat message with callback', (done) => {
+    const mock = {
+      SendTime: 1455409766521,
+      ServerTimestamp: 1455410567,
+    };
+
+    BlinkTrade = new BlinkTradeWS();
+
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      mock.TestReqID = msg.TestReqID;
+      return listener.getRequest(mock).resolve(mock);
+    });
+
+    BlinkTrade.connect().then(() => {
+      BlinkTrade.heartbeat((err, data) => {
+        expect(data.SendTime).to.be.equal(mock.SendTime);
+        expect(data.TestReqID).to.be.equal(mock.TestReqID);
+        expect(data.ServerTimestamp).to.be.equal(mock.ServerTimestamp);
+        expect(data).to.have.property('Latency');
+        done();
+      });
+    }).catch(done);
+  });
+
   it('Should authenticate successfully ', (done) => {
     const mock = {
       UserID: 90800003,
@@ -283,6 +307,47 @@ describe('WebSocket', () => {
       });
       done();
     }).catch(err => done(err));
+  });
+
+  it('Should subscribe on ticker with callback', (done) => {
+    const mock = {
+      SellVolume: 487859418,
+      LowPx: 189189000000,
+      LastPx: 189189000000,
+      MsgType: 'f',
+      BestAsk: 191000000000,
+      HighPx: 190000000000,
+      BuyVolume: 925019572651,
+      BestBid: 189189000000,
+      Symbol: 'BTCBRL',
+      Market: 'BLINK',
+    };
+
+    BlinkTrade = new BlinkTradeWS();
+
+    stub(BlinkTrade, 'sendMessage', (msg) => {
+      mock.SecurityStatusReqID = msg.SecurityStatusReqID;
+      return listener.getRequest(mock).resolve(mock);
+    });
+
+    BlinkTrade.connect().then(() => {
+      BlinkTrade.subscribeTicker(['BLINK:BTCBRL'], (err, data) => {
+        expect(data).to.be.eql({
+          ...mock,
+          BestAsk: 1910,
+          BestBid: 1891.89,
+          BuyVolume: 9250.19572651,
+          HighPx: 1900,
+          LastPx: 1891.89,
+          LowPx: 1891.89,
+          Market: 'BLINK',
+          MsgType: 'f',
+          SellVolume: 4.87859418,
+          Symbol: 'BTCBRL',
+        });
+        done();
+      });
+    });
   });
 
   it('Should get full orderbook', (done) => {
@@ -567,7 +632,8 @@ describe('WebSocket', () => {
   });
 
   it('Should send order and emit BALANCE updates', (done) => {
-    const mock = {
+    let mock;
+    const balance = {
       // $FlowFixMe
       5: { USD_locked: 8250000000 },
       MsgType: 'U3',
@@ -577,7 +643,15 @@ describe('WebSocket', () => {
     BlinkTrade = new BlinkTradeWS();
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
-      mock.ClOrdID = msg.ClOrdID;
+      if (msg.ClOrdID) {
+        mock = { ClOrdID: msg.ClOrdID };
+      } else {
+        mock = {
+          ...balance,
+          BalanceReqID: msg.BalanceReqID,
+        };
+      }
+
       return listener.getRequest(mock).resolve(mock);
     });
 
@@ -592,7 +666,7 @@ describe('WebSocket', () => {
       return BlinkTrade.sendOrder(MOCK_NEW_ORDER);
     }).then(() => {
       BlinkTrade.balance().on('BALANCE', (data) => {
-        expect(data).to.be.equal(mock);
+        expect(data.BalanceReqID).to.be.equal(mock.BalanceReqID);
         sinon.restore();
         done();
       });
@@ -600,7 +674,8 @@ describe('WebSocket', () => {
   });
 
   it('Should send order and callback balance updates', (done) => {
-    const mock = {
+    let mock;
+    const balance = {
       // $FlowFixMe
       5: { USD_locked: 8250000000 },
       MsgType: 'U3',
@@ -612,7 +687,15 @@ describe('WebSocket', () => {
     const callback = spy();
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
-      mock.ClOrdID = msg.ClOrdID;
+      if (msg.ClOrdID) {
+        mock = { ClOrdID: msg.ClOrdID };
+      } else {
+        mock = {
+          ...balance,
+          BalanceReqID: msg.BalanceReqID,
+        };
+      }
+
       return listener.getRequest(mock).resolve(mock);
     });
 
@@ -748,7 +831,7 @@ describe('WebSocket', () => {
     const mockResponse = {
       ...mock,
       Status: '8',
-    }
+    };
 
     BlinkTrade = new BlinkTradeWS();
 
@@ -758,7 +841,7 @@ describe('WebSocket', () => {
       return listener.getRequest(mock).resolve(mock);
     });
 
-    const onWithdrawRefresh = spy()
+    const onWithdrawRefresh = spy();
 
     const sinonListener = stub(listener, 'registerListener', (message, callback) => {
       setTimeout(() => {

@@ -21,6 +21,7 @@
  */
 
 import _ from 'lodash';
+import nodeify from 'nodeify';
 import Base from './base';
 import MsgTypes from './constants/requests';
 import * as RequestTypes from './constants/requestTypes';
@@ -53,8 +54,8 @@ class BaseTransport extends Base {
       BalanceReqID: generateRequestId(),
     };
 
-    return new Promise((resolve, reject) => {
-      return this.send(msg, callback).then(data => {
+    return nodeify.extend(new Promise((resolve, reject) => {
+      return this.send(msg).then(data => {
         const Available = {};
         const balances = data[this.brokerId];
         Object.keys(balances).map(currency => {
@@ -66,7 +67,7 @@ class BaseTransport extends Base {
 
         return resolve({ ...data, Available });
       }).catch(reject);
-    });
+    })).nodeify(callback);
   }
 
   myOrders({ page: Page = 0, pageSize: PageSize = 40 }: {
@@ -80,8 +81,8 @@ class BaseTransport extends Base {
       PageSize,
     };
 
-    return new Promise((resolve, reject) => {
-      return this.send(msg, callback).then(data => {
+    return nodeify.extend(new Promise((resolve, reject) => {
+      return this.send(msg).then(data => {
         const { Columns, ...orders } = data;
         const OrdListGrp = _.map(data.OrdListGrp, order => _.zipObject(Columns, order));
         return resolve({
@@ -89,7 +90,7 @@ class BaseTransport extends Base {
           OrdListGrp,
         });
       }).catch(reject);
-    });
+    })).nodeify(callback);
   }
 
   sendOrder({ side, amount, price, symbol }: {
@@ -109,12 +110,12 @@ class BaseTransport extends Base {
       BrokerID: this.brokerId,
     };
 
-    return new Promise((resolve, reject) => {
-      return this.send(msg, callback).then(data => {
+    return nodeify.extend(new Promise((resolve, reject) => {
+      return this.send(msg).then(data => {
         deleteRequest(RequestTypes.CLIENT_ORDER_ID);
         resolve(data);
       }).catch(reject);
-    });
+    })).nodeify(callback);
   }
 
   cancelOrder(param: number | {
@@ -131,7 +132,7 @@ class BaseTransport extends Base {
       msg.ClOrdID = param.clientId;
     }
 
-    return this.send(msg, callback);
+    return this.send(msg).nodeify(callback);
   }
 
   /**
@@ -154,8 +155,8 @@ class BaseTransport extends Base {
       StatusList,
     };
 
-    return new Promise((resolve, reject) => {
-      return this.send(msg, callback).then(data => {
+    return nodeify.extend(new Promise((resolve, reject) => {
+      return this.send(msg).then(data => {
         const { Columns, ...withdrawData } = data;
         const WithdrawListGrp = _.map(data.WithdrawListGrp, withdraw => _.zipObject(Columns, withdraw));
         return resolve({
@@ -163,7 +164,7 @@ class BaseTransport extends Base {
           WithdrawListGrp,
         });
       }).catch(reject);
-    });
+    })).nodeify(callback);
   }
 
   requestWithdraw({ amount, data, currency = 'BTC', method = 'bitcoin' }: {
@@ -183,7 +184,7 @@ class BaseTransport extends Base {
       Data: data,
     };
 
-    return this.send(msg, callback);
+    return this.send(msg).nodeify(callback);
   }
 
   confirmWithdraw({ withdrawId: WithdrawID, confirmationToken, secondFactor }: {
@@ -205,13 +206,13 @@ class BaseTransport extends Base {
       msg.SecondFactor = secondFactor;
     }
 
-    return new Promise((resolve, reject) => {
-      return this.send(msg, callback).then(data => {
+    return nodeify.extend(new Promise((resolve, reject) => {
+      return this.send(msg).then(data => {
         return resolve({
           ...data,
         });
       }).catch(reject);
-    });
+    })).nodeify(callback);
   }
 
   cancelWithdraw(withdrawId: string, callback: Function): Promise<Object> {
@@ -223,13 +224,13 @@ class BaseTransport extends Base {
       WithdrawID: withdrawId,
     };
 
-    return new Promise((resolve, reject) => {
-      return this.send(msg, callback).then(data => {
+    return nodeify(new Promise((resolve, reject) => {
+      return this.send(msg).then(data => {
         return resolve({
           ...data,
         });
       }).catch(reject);
-    });
+    })).nodeify(callback);
   }
 
   requestDepositList({
@@ -249,8 +250,8 @@ class BaseTransport extends Base {
       StatusList,
     };
 
-    return new Promise((resolve, reject) => {
-      return this.send(msg, callback).then(data => {
+    return nodeify(new Promise((resolve, reject) => {
+      return this.send(msg).then(data => {
         const { Columns, ...depositData } = data;
         const DepositListGrp = _.map(data.DepositListGrp, deposit => _.zipObject(Columns, deposit));
         return resolve({
@@ -258,7 +259,7 @@ class BaseTransport extends Base {
           DepositListGrp,
         });
       }).catch(reject);
-    });
+    })).nodeify(callback);
   }
 
   requestDeposit({ currency = 'BTC', value, depositMethodId }: {
@@ -280,7 +281,7 @@ class BaseTransport extends Base {
       msg.Value = value;
     }
 
-    return this.send(msg, callback);
+    return this.send(msg).nodeify(callback);
   }
 
   requestDepositMethods(callback?: Function): Promise<Object> {
@@ -289,7 +290,7 @@ class BaseTransport extends Base {
       DepositMethodReqID: generateRequestId(),
     };
 
-    return this.send(msg, callback);
+    return this.send(msg).nodeify(callback);
   }
 }
 

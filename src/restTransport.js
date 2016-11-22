@@ -86,10 +86,10 @@ class RestTransport extends BaseTransport {
 
   fetchTrade(msg: Object, callback?: Function): Promise<Object> {
     const headers = this.headers('POST', msg);
-    return nodeify(this.fetch(msg, 'tapi/v1/message', headers, callback)
+    return nodeify.extend(this.fetch(msg, 'tapi/v1/message', headers, callback)
       .then(response => (response.Status === 500 ? Promise.reject(response) : response.Responses))
       .then(response => (response.length === 1 ? response[0] : response))
-    , callback);
+    );
   }
 }
 

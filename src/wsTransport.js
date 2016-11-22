@@ -112,7 +112,7 @@ class WebSocketTransport extends BaseTransport {
     }
   }
 
-  sendMessageAsPromise(msg: Object, callback?: Function): Promise<Object> {
+  sendMessageAsPromise(msg: Object): Promise<Object> {
     return nodeify.extend(new Promise((resolve, reject) => {
       const promise = { resolve, reject };
 
@@ -124,7 +124,7 @@ class WebSocketTransport extends BaseTransport {
 
       // Send promise to sendMessage to we can mock it.
       this.sendMessage(msg, promise);
-    })).nodeify(callback);
+    }));
   }
 
   onMessage(msg: Object): void {
@@ -182,7 +182,7 @@ class WebSocketTransport extends BaseTransport {
       return promise;
     };
 
-    return promise;
+    return nodeify.extend(promise);
   }
   /* eslint-enable no-param-reassign */
 
