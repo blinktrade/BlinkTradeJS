@@ -1,6 +1,6 @@
 {
   "name": "blinktrade",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "BlinkTrade Client for node.js",
   "main": "lib/index.js",
   "directories": {
