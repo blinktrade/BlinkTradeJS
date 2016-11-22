@@ -127,17 +127,21 @@
 	
 	var _lodash2 = _interopRequireDefault(_lodash);
 	
-	var _eventemitter = __webpack_require__(4);
+	var _nodeify = __webpack_require__(4);
 	
-	var _listener = __webpack_require__(5);
+	var _nodeify2 = _interopRequireDefault(_nodeify);
 	
-	var _actionTypes = __webpack_require__(7);
+	var _eventemitter = __webpack_require__(5);
 	
-	var _requests = __webpack_require__(8);
+	var _listener = __webpack_require__(6);
+	
+	var _actionTypes = __webpack_require__(8);
+	
+	var _requests = __webpack_require__(9);
 	
 	var _requests2 = _interopRequireDefault(_requests);
 	
-	var _wsTransport = __webpack_require__(9);
+	var _wsTransport = __webpack_require__(10);
 	
 	var _wsTransport2 = _interopRequireDefault(_wsTransport);
 	
@@ -202,22 +206,22 @@
 	        SendTime: d.getTime()
 	      };
 	
-	      return new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this2).call(_this2, msg, callback).then(function (data) {
+	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this2).call(_this2, msg).then(function (data) {
 	          return resolve(_extends({}, data, {
 	            Latency: new Date(Date.now()) - data.SendTime
 	          }));
 	        }).catch(reject);
-	      });
+	      })).nodeify(callback);
 	    }
 	  }, {
 	    key: 'login',
 	    value: function login(_ref, callback) {
 	      var _this3 = this;
 	
-	      var username = _ref.username;
-	      var password = _ref.password;
-	      var secondFactor = _ref.secondFactor;
+	      var username = _ref.username,
+	          password = _ref.password,
+	          secondFactor = _ref.secondFactor;
 	
 	      var userAgent = void 0;
 	      if (!this.isNode) {
@@ -250,8 +254,8 @@
 	        msg.SecondFactor = secondFactor;
 	      }
 	
-	      return new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this3).call(_this3, msg, callback).then(function (data) {
+	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this3).call(_this3, msg).then(function (data) {
 	          if (data.UserStatus === 1) {
 	            _this3.session = data;
 	            return resolve(data);
@@ -259,7 +263,7 @@
 	
 	          return reject(data);
 	        }).catch(reject);
-	      });
+	      })).nodeify(callback);
 	    }
 	  }, {
 	    key: 'logout',
@@ -272,30 +276,30 @@
 	        UserReqTyp: '2'
 	      };
 	
-	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', this).call(this, msg, callback);
+	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', this).call(this, msg).nodeify(callback);
 	    }
 	  }, {
 	    key: 'profile',
 	    value: function profile(callback) {
-	      var _session$Profile = this.session.Profile;
-	      var VerificationData = _session$Profile.VerificationData;
+	      var _session$Profile = this.session.Profile,
+	          VerificationData = _session$Profile.VerificationData,
+	          profile = _objectWithoutProperties(_session$Profile, ['VerificationData']);
 	
-	      var profile = _objectWithoutProperties(_session$Profile, ['VerificationData']);
-	
-	      return callback ? callback(profile) : Promise.resolve(profile);
+	      return _nodeify2.default.extend(Promise.resolve(profile)).nodeify(callback);
 	    }
 	  }, {
 	    key: 'balance',
 	    value: function balance(callback) {
 	      var _this4 = this;
 	
-	      (0, _listener.registerListener)('U3', function (balance) {
-	        callback && callback(null, balance);
-	        return _this4.eventEmitter.emit(_actionTypes.BALANCE, balance);
-	      });
-	
 	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'emitterPromise', this).call(this, new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'balance', _this4).call(_this4, callback).then(resolve).catch(reject);
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'balance', _this4).call(_this4, callback).then(function (data) {
+	          (0, _listener.registerListener)('U3', function (balance) {
+	            callback && callback(null, balance);
+	            return _this4.eventEmitter.emit(_actionTypes.BALANCE, balance);
+	          });
+	          return resolve(data);
+	        }).catch(reject);
 	      }));
 	    }
 	  }, {
@@ -323,14 +327,14 @@
 	      };
 	
 	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'emitterPromise', this).call(this, new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this5).call(_this5, msg, callback).then(function (data) {
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this5).call(_this5, msg).then(function (data) {
 	          resolve(formatTicker(data));
 	          (0, _listener.registerEventEmitter)({ SecurityStatusReqID: data.SecurityStatusReqID }, function (ticker) {
 	            callback && callback(null, formatTicker(ticker));
 	            return _this5.eventEmitter.emit('BLINK:' + ticker.Symbol, formatTicker(ticker));
 	          });
 	        }).catch(reject);
-	      }));
+	      })).nodeify(callback);
 	    }
 	  }, {
 	    key: 'unSubscribeTicker',
@@ -373,20 +377,20 @@
 	              time: new Date(order.MDEntryDate + ' ' + order.MDEntryTime).toString()
 	            };
 	
-	            callback && callback(null, dataOrder);
-	
 	            switch (order.MDEntryType) {
 	              case '0':
 	              case '1':
 	                var orderbookEvent = _actionTypes.ORDER_BOOK + ':' + _actionTypes.EVENTS.ORDERBOOK[order.MDUpdateAction];
-	                return _this6.eventEmitter.emit(orderbookEvent, _extends({}, dataOrder, {
-	                  type: orderbookEvent
-	                }));
+	                var bidOfferData = _extends({}, dataOrder, { type: orderbookEvent });
+	
+	                callback && callback(null, bidOfferData);
+	                return _this6.eventEmitter.emit(orderbookEvent, bidOfferData);
 	              case '2':
 	                var tradeEvent = _actionTypes.ORDER_BOOK + ':' + _actionTypes.EVENTS.TRADES[order.MDUpdateAction];
-	                return _this6.eventEmitter.emit(tradeEvent, _extends({}, dataOrder, {
-	                  type: tradeEvent
-	                }));
+	                var tradeData = _extends({}, dataOrder, { type: tradeEvent });
+	
+	                callback && callback(null, tradeData);
+	                return _this6.eventEmitter.emit(tradeEvent, tradeData);
 	              case '4':
 	                break;
 	              default:
@@ -398,7 +402,7 @@
 	      };
 	
 	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'emitterPromise', this).call(this, new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this6).call(_this6, msg, callback).then(function (data) {
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this6).call(_this6, msg).then(function (data) {
 	          if (data.MsgType === 'W') {
 	            // Split orders in bids and asks
 	            /* eslint-disable no-param-reassign */
@@ -408,10 +412,9 @@
 	              var side = order.MDEntryType === '0' ? 'bids' : 'asks';
 	              (prev[side] || (prev[side] = [])).push([order.MDEntryPx / 1e8, order.MDEntrySize / 1e8, order.UserID]);
 	              return prev;
-	            }, []);
-	
-	            var bids = _data$MDFullGrp$filte.bids;
-	            var asks = _data$MDFullGrp$filte.asks;
+	            }, []),
+	                bids = _data$MDFullGrp$filte.bids,
+	                asks = _data$MDFullGrp$filte.asks;
 	            /* eslint-enable no-param-reassign */
 	
 	            (0, _listener.registerEventEmitter)({ MDReqID: data.MDReqID }, subscribeEvent);
@@ -426,7 +429,7 @@
 	        }).catch(function (err) {
 	          return reject(err);
 	        });
-	      }));
+	      })).nodeify(callback);
 	    }
 	  }, {
 	    key: 'unSubscribeOrderbook',
@@ -459,14 +462,14 @@
 	    value: function tradeHistory() {
 	      var _this8 = this;
 	
-	      var _ref2 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	      var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	          since = _ref2.since,
+	          filter = _ref2.filter,
+	          _ref2$page = _ref2.page,
+	          Page = _ref2$page === undefined ? 0 : _ref2$page,
+	          _ref2$pageSize = _ref2.pageSize,
+	          PageSize = _ref2$pageSize === undefined ? 80 : _ref2$pageSize;
 	
-	      var since = _ref2.since;
-	      var filter = _ref2.filter;
-	      var _ref2$page = _ref2.page;
-	      var Page = _ref2$page === undefined ? 0 : _ref2$page;
-	      var _ref2$pageSize = _ref2.pageSize;
-	      var PageSize = _ref2$pageSize === undefined ? 80 : _ref2$pageSize;
 	      var callback = arguments[1];
 	
 	      var msg = {
@@ -484,11 +487,10 @@
 	        msg.Since = since;
 	      }
 	
-	      return new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this8).call(_this8, msg, callback).then(function (data) {
-	          var Columns = data.Columns;
-	
-	          var trades = _objectWithoutProperties(data, ['Columns']);
+	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this8).call(_this8, msg).then(function (data) {
+	          var Columns = data.Columns,
+	              trades = _objectWithoutProperties(data, ['Columns']);
 	
 	          var TradeHistory = _lodash2.default.groupBy(_lodash2.default.map(data.TradeHistoryGrp, function (trade) {
 	            return _lodash2.default.zipObject(Columns, trade);
@@ -499,36 +501,32 @@
 	            TradeHistoryGrp: TradeHistory
 	          }));
 	        }).catch(reject);
-	      });
+	      })).nodeify(callback);
 	    }
 	  }, {
 	    key: 'requestDeposit',
 	    value: function requestDeposit() {
 	      var _this9 = this;
 	
-	      var _ref3 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	      var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	          _ref3$currency = _ref3.currency,
+	          currency = _ref3$currency === undefined ? 'BTC' : _ref3$currency,
+	          value = _ref3.value,
+	          depositMethodId = _ref3.depositMethodId;
 	
-	      var _ref3$currency = _ref3.currency;
-	      var currency = _ref3$currency === undefined ? 'BTC' : _ref3$currency;
-	      var value = _ref3.value;
-	      var depositMethodId = _ref3.depositMethodId;
 	      var callback = arguments[1];
 	
-	      var subscribeEvent = function subscribeEvent(depositId) {
-	        return function (deposit) {
-	          if (deposit.DepositID === depositId) {
-	            callback && callback(null, deposit);
-	            return _this9.eventEmitter.emit(_actionTypes.DEPOSIT_REFRESH, deposit);
-	          }
-	        };
+	      var subscribeEvent = function subscribeEvent(deposit) {
+	        callback && callback(null, deposit);
+	        return _this9.eventEmitter.emit(_actionTypes.DEPOSIT_REFRESH, deposit);
 	      };
 	
 	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'emitterPromise', this).call(this, new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'requestDeposit', _this9).call(_this9, { currency: currency, value: value, depositMethodId: depositMethodId }, callback).then(function (deposit) {
-	          (0, _listener.registerListener)('U23', subscribeEvent(deposit.DepositID));
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'requestDeposit', _this9).call(_this9, { currency: currency, value: value, depositMethodId: depositMethodId }).then(function (deposit) {
+	          (0, _listener.registerEventEmitter)({ ClOrdID: deposit.ClOrdID }, subscribeEvent);
 	          return resolve(deposit);
 	        }).catch(reject);
-	      }));
+	      })).nodeify(callback);
 	    }
 	  }, {
 	    key: 'onDepositRefresh',
@@ -545,28 +543,24 @@
 	    value: function requestWithdraw(_ref4, callback) {
 	      var _this10 = this;
 	
-	      var amount = _ref4.amount;
-	      var data = _ref4.data;
-	      var _ref4$currency = _ref4.currency;
-	      var currency = _ref4$currency === undefined ? 'BTC' : _ref4$currency;
-	      var _ref4$method = _ref4.method;
-	      var method = _ref4$method === undefined ? 'bitcoin' : _ref4$method;
+	      var amount = _ref4.amount,
+	          data = _ref4.data,
+	          _ref4$currency = _ref4.currency,
+	          currency = _ref4$currency === undefined ? 'BTC' : _ref4$currency,
+	          _ref4$method = _ref4.method,
+	          method = _ref4$method === undefined ? 'bitcoin' : _ref4$method;
 	
-	      var subscribeEvent = function subscribeEvent(withdrawId) {
-	        return function (withdraw) {
-	          if (withdraw.WithdrawID === withdrawId) {
-	            callback && callback(null, withdraw);
-	            return _this10.eventEmitter.emit(_actionTypes.WITHDRAW_REFRESH, withdraw);
-	          }
-	        };
+	      var subscribeEvent = function subscribeEvent(withdraw) {
+	        callback && callback(null, withdraw);
+	        return _this10.eventEmitter.emit(_actionTypes.WITHDRAW_REFRESH, withdraw);
 	      };
 	
 	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'emitterPromise', this).call(this, new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'requestWithdraw', _this10).call(_this10, { amount: amount, data: data, currency: currency, method: method }, callback).then(function (withdraw) {
-	          (0, _listener.registerListener)('U9', subscribeEvent(withdraw.WithdrawID));
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'requestWithdraw', _this10).call(_this10, { amount: amount, data: data, currency: currency, method: method }).then(function (withdraw) {
+	          (0, _listener.registerEventEmitter)({ ClOrdID: withdraw.ClOrdID }, subscribeEvent);
 	          return resolve(withdraw);
 	        }).catch(reject);
-	      }));
+	      })).nodeify(callback);
 	    }
 	  }, {
 	    key: 'onWithdrawRefresh',
@@ -595,10 +589,16 @@
 /* 4 */
 /***/ function(module, exports) {
 
-	module.exports = require("eventemitter2");
+	module.exports = require("nodeify");
 
 /***/ },
 /* 5 */
+/***/ function(module, exports) {
+
+	module.exports = require("eventemitter2");
+
+/***/ },
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -642,7 +642,7 @@
 	
 	var _lodash2 = _interopRequireDefault(_lodash);
 	
-	var _requestTypes = __webpack_require__(6);
+	var _requestTypes = __webpack_require__(7);
 	
 	var RequestTypes = _interopRequireWildcard(_requestTypes);
 	
@@ -715,7 +715,7 @@
 	}
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -756,7 +756,7 @@
 	var CLIENT_ORDER_ID = exports.CLIENT_ORDER_ID = 'ClOrdID';
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -804,7 +804,7 @@
 	};
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -843,7 +843,7 @@
 	};
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -854,21 +854,21 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _baseTransport = __webpack_require__(10);
-	
-	var _baseTransport2 = _interopRequireDefault(_baseTransport);
-	
-	var _fingerprintjs = __webpack_require__(13);
-	
-	var _fingerprintjs2 = _interopRequireDefault(_fingerprintjs);
-	
-	var _nodeify = __webpack_require__(14);
+	var _nodeify = __webpack_require__(4);
 	
 	var _nodeify2 = _interopRequireDefault(_nodeify);
 	
-	var _eventemitter = __webpack_require__(4);
+	var _fingerprintjs = __webpack_require__(11);
 	
-	var _listener = __webpack_require__(5);
+	var _fingerprintjs2 = _interopRequireDefault(_fingerprintjs);
+	
+	var _eventemitter = __webpack_require__(5);
+	
+	var _baseTransport = __webpack_require__(12);
+	
+	var _baseTransport2 = _interopRequireDefault(_baseTransport);
+	
+	var _listener = __webpack_require__(6);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -989,7 +989,7 @@
 	    }
 	  }, {
 	    key: 'sendMessageAsPromise',
-	    value: function sendMessageAsPromise(msg, callback) {
+	    value: function sendMessageAsPromise(msg) {
 	      var _this3 = this;
 	
 	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
@@ -1003,7 +1003,7 @@
 	
 	        // Send promise to sendMessage to we can mock it.
 	        _this3.sendMessage(msg, promise);
-	      })).nodeify(callback);
+	      }));
 	    }
 	  }, {
 	    key: 'onMessage',
@@ -1067,7 +1067,7 @@
 	        return promise;
 	      };
 	
-	      return promise;
+	      return _nodeify2.default.extend(promise);
 	    }
 	    /* eslint-enable no-param-reassign */
 	
@@ -1104,7 +1104,13 @@
 	exports.default = WebSocketTransport;
 
 /***/ },
-/* 10 */
+/* 11 */
+/***/ function(module, exports) {
+
+	module.exports = require("fingerprintjs2");
+
+/***/ },
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1121,19 +1127,23 @@
 	
 	var _lodash2 = _interopRequireDefault(_lodash);
 	
-	var _base = __webpack_require__(11);
+	var _nodeify = __webpack_require__(4);
+	
+	var _nodeify2 = _interopRequireDefault(_nodeify);
+	
+	var _base = __webpack_require__(13);
 	
 	var _base2 = _interopRequireDefault(_base);
 	
-	var _requests = __webpack_require__(8);
+	var _requests = __webpack_require__(9);
 	
 	var _requests2 = _interopRequireDefault(_requests);
 	
-	var _requestTypes = __webpack_require__(6);
+	var _requestTypes = __webpack_require__(7);
 	
 	var RequestTypes = _interopRequireWildcard(_requestTypes);
 	
-	var _listener = __webpack_require__(5);
+	var _listener = __webpack_require__(6);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -1189,8 +1199,8 @@
 	        BalanceReqID: (0, _listener.generateRequestId)()
 	      };
 	
-	      return new Promise(function (resolve, reject) {
-	        return _this2.send(msg, callback).then(function (data) {
+	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
+	        return _this2.send(msg).then(function (data) {
 	          var Available = {};
 	          var balances = data[_this2.brokerId];
 	          Object.keys(balances).map(function (currency) {
@@ -1202,19 +1212,19 @@
 	
 	          return resolve(_extends({}, data, { Available: Available }));
 	        }).catch(reject);
-	      });
+	      })).nodeify(callback);
 	    }
 	  }, {
 	    key: 'myOrders',
 	    value: function myOrders() {
 	      var _this3 = this;
 	
-	      var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	      var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	          _ref$page = _ref.page,
+	          Page = _ref$page === undefined ? 0 : _ref$page,
+	          _ref$pageSize = _ref.pageSize,
+	          PageSize = _ref$pageSize === undefined ? 40 : _ref$pageSize;
 	
-	      var _ref$page = _ref.page;
-	      var Page = _ref$page === undefined ? 0 : _ref$page;
-	      var _ref$pageSize = _ref.pageSize;
-	      var PageSize = _ref$pageSize === undefined ? 40 : _ref$pageSize;
 	      var callback = arguments[1];
 	
 	      var msg = {
@@ -1224,11 +1234,10 @@
 	        PageSize: PageSize
 	      };
 	
-	      return new Promise(function (resolve, reject) {
-	        return _this3.send(msg, callback).then(function (data) {
-	          var Columns = data.Columns;
-	
-	          var orders = _objectWithoutProperties(data, ['Columns']);
+	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
+	        return _this3.send(msg).then(function (data) {
+	          var Columns = data.Columns,
+	              orders = _objectWithoutProperties(data, ['Columns']);
 	
 	          var OrdListGrp = _lodash2.default.map(data.OrdListGrp, function (order) {
 	            return _lodash2.default.zipObject(Columns, order);
@@ -1237,17 +1246,17 @@
 	            OrdListGrp: OrdListGrp
 	          }));
 	        }).catch(reject);
-	      });
+	      })).nodeify(callback);
 	    }
 	  }, {
 	    key: 'sendOrder',
 	    value: function sendOrder(_ref2, callback) {
 	      var _this4 = this;
 	
-	      var side = _ref2.side;
-	      var amount = _ref2.amount;
-	      var price = _ref2.price;
-	      var symbol = _ref2.symbol;
+	      var side = _ref2.side,
+	          amount = _ref2.amount,
+	          price = _ref2.price,
+	          symbol = _ref2.symbol;
 	
 	      var msg = {
 	        MsgType: _requests2.default.ORDER_SEND,
@@ -1260,12 +1269,12 @@
 	        BrokerID: this.brokerId
 	      };
 	
-	      return new Promise(function (resolve, reject) {
-	        return _this4.send(msg, callback).then(function (data) {
+	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
+	        return _this4.send(msg).then(function (data) {
 	          (0, _listener.deleteRequest)(RequestTypes.CLIENT_ORDER_ID);
 	          resolve(data);
 	        }).catch(reject);
-	      });
+	      })).nodeify(callback);
 	    }
 	  }, {
 	    key: 'cancelOrder',
@@ -1280,7 +1289,7 @@
 	        msg.ClOrdID = param.clientId;
 	      }
 	
-	      return this.send(msg, callback);
+	      return this.send(msg).nodeify(callback);
 	    }
 	
 	    /**
@@ -1292,14 +1301,14 @@
 	    value: function requestWithdrawList() {
 	      var _this5 = this;
 	
-	      var _ref3 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	      var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	          _ref3$page = _ref3.page,
+	          Page = _ref3$page === undefined ? 0 : _ref3$page,
+	          _ref3$pageSize = _ref3.pageSize,
+	          PageSize = _ref3$pageSize === undefined ? 20 : _ref3$pageSize,
+	          _ref3$statusList = _ref3.statusList,
+	          StatusList = _ref3$statusList === undefined ? ['1', '2', '4', '8'] : _ref3$statusList;
 	
-	      var _ref3$page = _ref3.page;
-	      var Page = _ref3$page === undefined ? 0 : _ref3$page;
-	      var _ref3$pageSize = _ref3.pageSize;
-	      var PageSize = _ref3$pageSize === undefined ? 20 : _ref3$pageSize;
-	      var _ref3$statusList = _ref3.statusList;
-	      var StatusList = _ref3$statusList === undefined ? ['1', '2', '4', '8'] : _ref3$statusList;
 	      var callback = arguments[1];
 	
 	      var msg = {
@@ -1310,11 +1319,10 @@
 	        StatusList: StatusList
 	      };
 	
-	      return new Promise(function (resolve, reject) {
-	        return _this5.send(msg, callback).then(function (data) {
-	          var Columns = data.Columns;
-	
-	          var withdrawData = _objectWithoutProperties(data, ['Columns']);
+	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
+	        return _this5.send(msg).then(function (data) {
+	          var Columns = data.Columns,
+	              withdrawData = _objectWithoutProperties(data, ['Columns']);
 	
 	          var WithdrawListGrp = _lodash2.default.map(data.WithdrawListGrp, function (withdraw) {
 	            return _lodash2.default.zipObject(Columns, withdraw);
@@ -1323,17 +1331,17 @@
 	            WithdrawListGrp: WithdrawListGrp
 	          }));
 	        }).catch(reject);
-	      });
+	      })).nodeify(callback);
 	    }
 	  }, {
 	    key: 'requestWithdraw',
 	    value: function requestWithdraw(_ref4, callback) {
-	      var amount = _ref4.amount;
-	      var data = _ref4.data;
-	      var _ref4$currency = _ref4.currency;
-	      var currency = _ref4$currency === undefined ? 'BTC' : _ref4$currency;
-	      var _ref4$method = _ref4.method;
-	      var method = _ref4$method === undefined ? 'bitcoin' : _ref4$method;
+	      var amount = _ref4.amount,
+	          data = _ref4.data,
+	          _ref4$currency = _ref4.currency,
+	          currency = _ref4$currency === undefined ? 'BTC' : _ref4$currency,
+	          _ref4$method = _ref4.method,
+	          method = _ref4$method === undefined ? 'bitcoin' : _ref4$method;
 	
 	      var reqId = (0, _listener.generateRequestId)();
 	      var msg = {
@@ -1346,16 +1354,16 @@
 	        Data: data
 	      };
 	
-	      return this.send(msg, callback);
+	      return this.send(msg).nodeify(callback);
 	    }
 	  }, {
 	    key: 'confirmWithdraw',
 	    value: function confirmWithdraw(_ref5, callback) {
 	      var _this6 = this;
 	
-	      var WithdrawID = _ref5.withdrawId;
-	      var confirmationToken = _ref5.confirmationToken;
-	      var secondFactor = _ref5.secondFactor;
+	      var WithdrawID = _ref5.withdrawId,
+	          confirmationToken = _ref5.confirmationToken,
+	          secondFactor = _ref5.secondFactor;
 	
 	      var msg = {
 	        MsgType: _requests2.default.CONFIRM_WITHDRAW,
@@ -1371,11 +1379,11 @@
 	        msg.SecondFactor = secondFactor;
 	      }
 	
-	      return new Promise(function (resolve, reject) {
-	        return _this6.send(msg, callback).then(function (data) {
+	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
+	        return _this6.send(msg).then(function (data) {
 	          return resolve(_extends({}, data));
 	        }).catch(reject);
-	      });
+	      })).nodeify(callback);
 	    }
 	  }, {
 	    key: 'cancelWithdraw',
@@ -1390,25 +1398,25 @@
 	        WithdrawID: withdrawId
 	      };
 	
-	      return new Promise(function (resolve, reject) {
-	        return _this7.send(msg, callback).then(function (data) {
+	      return (0, _nodeify2.default)(new Promise(function (resolve, reject) {
+	        return _this7.send(msg).then(function (data) {
 	          return resolve(_extends({}, data));
 	        }).catch(reject);
-	      });
+	      })).nodeify(callback);
 	    }
 	  }, {
 	    key: 'requestDepositList',
 	    value: function requestDepositList() {
 	      var _this8 = this;
 	
-	      var _ref6 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	      var _ref6 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	          _ref6$page = _ref6.page,
+	          Page = _ref6$page === undefined ? 0 : _ref6$page,
+	          _ref6$pageSize = _ref6.pageSize,
+	          PageSize = _ref6$pageSize === undefined ? 20 : _ref6$pageSize,
+	          _ref6$status = _ref6.status,
+	          StatusList = _ref6$status === undefined ? ['1', '2', '4', '8'] : _ref6$status;
 	
-	      var _ref6$page = _ref6.page;
-	      var Page = _ref6$page === undefined ? 0 : _ref6$page;
-	      var _ref6$pageSize = _ref6.pageSize;
-	      var PageSize = _ref6$pageSize === undefined ? 20 : _ref6$pageSize;
-	      var _ref6$status = _ref6.status;
-	      var StatusList = _ref6$status === undefined ? ['1', '2', '4', '8'] : _ref6$status;
 	      var callback = arguments[1];
 	
 	      var msg = {
@@ -1419,11 +1427,10 @@
 	        StatusList: StatusList
 	      };
 	
-	      return new Promise(function (resolve, reject) {
-	        return _this8.send(msg, callback).then(function (data) {
-	          var Columns = data.Columns;
-	
-	          var depositData = _objectWithoutProperties(data, ['Columns']);
+	      return (0, _nodeify2.default)(new Promise(function (resolve, reject) {
+	        return _this8.send(msg).then(function (data) {
+	          var Columns = data.Columns,
+	              depositData = _objectWithoutProperties(data, ['Columns']);
 	
 	          var DepositListGrp = _lodash2.default.map(data.DepositListGrp, function (deposit) {
 	            return _lodash2.default.zipObject(Columns, deposit);
@@ -1432,17 +1439,17 @@
 	            DepositListGrp: DepositListGrp
 	          }));
 	        }).catch(reject);
-	      });
+	      })).nodeify(callback);
 	    }
 	  }, {
 	    key: 'requestDeposit',
 	    value: function requestDeposit() {
-	      var _ref7 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	      var _ref7 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	          _ref7$currency = _ref7.currency,
+	          currency = _ref7$currency === undefined ? 'BTC' : _ref7$currency,
+	          value = _ref7.value,
+	          depositMethodId = _ref7.depositMethodId;
 	
-	      var _ref7$currency = _ref7.currency;
-	      var currency = _ref7$currency === undefined ? 'BTC' : _ref7$currency;
-	      var value = _ref7.value;
-	      var depositMethodId = _ref7.depositMethodId;
 	      var callback = arguments[1];
 	
 	      var reqId = (0, _listener.generateRequestId)();
@@ -1459,7 +1466,7 @@
 	        msg.Value = value;
 	      }
 	
-	      return this.send(msg, callback);
+	      return this.send(msg).nodeify(callback);
 	    }
 	  }, {
 	    key: 'requestDepositMethods',
@@ -1469,7 +1476,7 @@
 	        DepositMethodReqID: (0, _listener.generateRequestId)()
 	      };
 	
-	      return this.send(msg, callback);
+	      return this.send(msg).nodeify(callback);
 	    }
 	  }]);
 	
@@ -1479,7 +1486,7 @@
 	exports.default = BaseTransport;
 
 /***/ },
-/* 11 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1488,7 +1495,7 @@
 	  value: true
 	});
 	
-	var _common = __webpack_require__(12);
+	var _common = __webpack_require__(14);
 	
 	var _common2 = _interopRequireDefault(_common);
 	
@@ -1522,7 +1529,7 @@
 	 * Broker id
 	 */
 	function Base() {
-	  var params = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	  var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 	  var env = arguments[1];
 	
 	  _classCallCheck(this, Base);
@@ -1549,7 +1556,7 @@
 	exports.default = Base;
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1567,18 +1574,6 @@
 	    rest: 'https://api.testnet.blinktrade.com/'
 	  }
 	};
-
-/***/ },
-/* 13 */
-/***/ function(module, exports) {
-
-	module.exports = require("fingerprintjs2");
-
-/***/ },
-/* 14 */
-/***/ function(module, exports) {
-
-	module.exports = require("nodeify");
 
 /***/ },
 /* 15 */
@@ -1648,6 +1643,10 @@
 	   *
 	   * 
 	   */
+	
+	/* eslint-disable operator-assignment */
+	/* eslint-disable no-plusplus */
+	/* eslint-disable import/prefer-default-export */
 
 /***/ },
 /* 17 */
@@ -1686,6 +1685,8 @@
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          */
 	
 	/* eslint-disable no-param-reassign */
+	/* eslint-disable no-plusplus */
+	/* eslint-disable import/prefer-default-export */
 	
 	exports.getStun = getStun;
 	
@@ -1704,10 +1705,8 @@
 	function addIPAddress(ipAddress) {
 	  if (ipAddress.match(/^(192\.168\.|169\.254\.|10\.|172\.(1[6-9]|2\d|3[01]))/)) {
 	    stunIp.local = ipAddress;
-	  } else {
-	    if (stunIp.public.indexOf(ipAddress) === -1) {
-	      stunIp.public.push(ipAddress);
-	    }
+	  } else if (stunIp.public.indexOf(ipAddress) === -1) {
+	    stunIp.public.push(ipAddress);
 	  }
 	}
 	
@@ -1806,11 +1805,11 @@
 	  });
 	
 	  stunServers.map(function (_ref) {
-	    var _ref2 = _slicedToArray(_ref, 2);
+	    var _ref2 = _slicedToArray(_ref, 2),
+	        port = _ref2[0],
+	        host = _ref2[1];
 	
-	    var port = _ref2[0];
-	    var host = _ref2[1];
-	    return socket.send(stunRequest, 0, stunRequest.length, port, host);
+	    return socket.send(stunRequest, 0, stunRequest.length, port, host, function () {});
 	  });
 	}
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19).Buffer))
@@ -3755,12 +3754,12 @@
 	  }, {
 	    key: 'trades',
 	    value: function trades() {
-	      var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	      var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	          _ref$limit = _ref.limit,
+	          limit = _ref$limit === undefined ? 1000 : _ref$limit,
+	          _ref$since = _ref.since,
+	          since = _ref$since === undefined ? '0' : _ref$since;
 	
-	      var _ref$limit = _ref.limit;
-	      var limit = _ref$limit === undefined ? 1000 : _ref$limit;
-	      var _ref$since = _ref.since;
-	      var since = _ref$since === undefined ? '0' : _ref$since;
 	      var callback = arguments[1];
 	
 	      return _get(BlinkTradeRest.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeRest.prototype), 'fetchPublic', this).call(this, 'trades?limit=' + limit + '&since=' + since, callback);
@@ -3793,7 +3792,7 @@
 	
 	var _sjcl2 = _interopRequireDefault(_sjcl);
 	
-	var _nodeify = __webpack_require__(14);
+	var _nodeify = __webpack_require__(4);
 	
 	var _nodeify2 = _interopRequireDefault(_nodeify);
 	
@@ -3805,7 +3804,7 @@
 	
 	var _path2 = _interopRequireDefault(_path);
 	
-	var _baseTransport = __webpack_require__(10);
+	var _baseTransport = __webpack_require__(12);
 	
 	var _baseTransport2 = _interopRequireDefault(_baseTransport);
 	
@@ -3892,7 +3891,7 @@
 	  }, {
 	    key: 'fetch',
 	    value: function fetch(msg, api) {
-	      var headers = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	      var headers = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 	
 	      return this.fetchRequest(_url2.default.resolve(this.endpoint, api), headers).then(function (response) {
 	        return response.json();
@@ -3907,11 +3906,11 @@
 	    key: 'fetchTrade',
 	    value: function fetchTrade(msg, callback) {
 	      var headers = this.headers('POST', msg);
-	      return (0, _nodeify2.default)(this.fetch(msg, 'tapi/v1/message', headers, callback).then(function (response) {
+	      return _nodeify2.default.extend(this.fetch(msg, 'tapi/v1/message', headers, callback).then(function (response) {
 	        return response.Status === 500 ? Promise.reject(response) : response.Responses;
 	      }).then(function (response) {
 	        return response.length === 1 ? response[0] : response;
-	      }), callback);
+	      }));
 	    }
 	  }]);
 	
@@ -4178,25 +4177,40 @@
 	var cachedSetTimeout;
 	var cachedClearTimeout;
 	
+	function defaultSetTimout() {
+	    throw new Error('setTimeout has not been defined');
+	}
+	function defaultClearTimeout () {
+	    throw new Error('clearTimeout has not been defined');
+	}
 	(function () {
 	    try {
-	        cachedSetTimeout = setTimeout;
-	    } catch (e) {
-	        cachedSetTimeout = function () {
-	            throw new Error('setTimeout is not defined');
+	        if (typeof setTimeout === 'function') {
+	            cachedSetTimeout = setTimeout;
+	        } else {
+	            cachedSetTimeout = defaultSetTimout;
 	        }
+	    } catch (e) {
+	        cachedSetTimeout = defaultSetTimout;
 	    }
 	    try {
-	        cachedClearTimeout = clearTimeout;
-	    } catch (e) {
-	        cachedClearTimeout = function () {
-	            throw new Error('clearTimeout is not defined');
+	        if (typeof clearTimeout === 'function') {
+	            cachedClearTimeout = clearTimeout;
+	        } else {
+	            cachedClearTimeout = defaultClearTimeout;
 	        }
+	    } catch (e) {
+	        cachedClearTimeout = defaultClearTimeout;
 	    }
 	} ())
 	function runTimeout(fun) {
 	    if (cachedSetTimeout === setTimeout) {
 	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    // if setTimeout wasn't available but was latter defined
+	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+	        cachedSetTimeout = setTimeout;
 	        return setTimeout(fun, 0);
 	    }
 	    try {
@@ -4217,6 +4231,11 @@
 	function runClearTimeout(marker) {
 	    if (cachedClearTimeout === clearTimeout) {
 	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    // if clearTimeout wasn't available but was latter defined
+	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+	        cachedClearTimeout = clearTimeout;
 	        return clearTimeout(marker);
 	    }
 	    try {
