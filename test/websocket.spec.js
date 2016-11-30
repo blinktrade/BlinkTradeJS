@@ -22,6 +22,7 @@
 
 /* eslint-disable new-cap */
 
+import nodeify from 'nodeify';
 import { spy, stub } from 'sinon';
 import { expect } from 'chai';
 import { BlinkTradeWS } from '../src';
@@ -63,9 +64,11 @@ const MOCK_NEW_ORDER = {
 };
 
 describe('WebSocket', () => {
-  afterEach(() => {
-    // Close WebSocket connection on each unit test.
-    BlinkTrade.disconnect();
+  beforeEach(() => {
+    const stubConnect = stub(BlinkTradeWS.prototype, 'connect', (callback) => {
+      stubConnect.restore();
+      return nodeify.extend(Promise.resolve({ connected: true })).nodeify(callback);
+    });
   });
 
   it('Should connect on websocket and resolve a promise', (done) => {
@@ -79,19 +82,6 @@ describe('WebSocket', () => {
       expect(err).to.be.null;
       done();
     });
-  });
-
-  it('Should connect on a wrong websocket url and reject promise', (done) => {
-    BlinkTrade = new BlinkTradeWS({ url: 'wss://api.wrong.url' });
-    BlinkTrade.connect().catch(done);
-  });
-
-  it('Should connect on a wrong websocket url and callback with error', (done) => {
-    BlinkTrade = new BlinkTradeWS({ url: 'wss://api.wrong.url' });
-    BlinkTrade.connect((err, data) => {
-      expect(data).to.be.undefined;
-      done();
-    }).catch(done);
   });
 
   it('Should send heartBeat message and mock ws response', (done) => {
