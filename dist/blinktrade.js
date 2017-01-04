@@ -838,6 +838,8 @@
 	  REQUEST_WITHDRAW: 'U6',
 	  REQUEST_WITHDRAW_LIST: 'U26',
 	
+	  REQUEST_LEDGER: 'U34',
+	
 	  CONFIRM_WITHDRAW: 'U24',
 	  CANCEL_WITHDRAW: 'U70'
 	};
@@ -1398,7 +1400,7 @@
 	        WithdrawID: withdrawId
 	      };
 	
-	      return (0, _nodeify2.default)(new Promise(function (resolve, reject) {
+	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
 	        return _this7.send(msg).then(function (data) {
 	          return resolve(_extends({}, data));
 	        }).catch(reject);
@@ -1427,7 +1429,7 @@
 	        StatusList: StatusList
 	      };
 	
-	      return (0, _nodeify2.default)(new Promise(function (resolve, reject) {
+	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
 	        return _this8.send(msg).then(function (data) {
 	          var Columns = data.Columns,
 	              depositData = _objectWithoutProperties(data, ['Columns']);
@@ -1477,6 +1479,49 @@
 	      };
 	
 	      return this.send(msg).nodeify(callback);
+	    }
+	  }, {
+	    key: 'requestLedger',
+	    value: function requestLedger() {
+	      var _this9 = this;
+	
+	      var _ref8 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	          _ref8$page = _ref8.page,
+	          Page = _ref8$page === undefined ? 0 : _ref8$page,
+	          _ref8$pageSize = _ref8.pageSize,
+	          PageSize = _ref8$pageSize === undefined ? 20 : _ref8$pageSize,
+	          currency = _ref8.currency,
+	          filter = _ref8.filter;
+	
+	      var callback = arguments[1];
+	
+	      var msg = {
+	        MsgType: _requests2.default.REQUEST_LEDGER,
+	        LedgerListReqID: (0, _listener.generateRequestId)(),
+	        Page: Page,
+	        PageSize: PageSize
+	      };
+	
+	      if (currency) {
+	        msg.Currency = currency;
+	      }
+	      if (filter) {
+	        msg.Filter = filter;
+	      }
+	
+	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
+	        return _this9.send(msg).then(function (data) {
+	          var Columns = data.Columns,
+	              ledgerData = _objectWithoutProperties(data, ['Columns']);
+	
+	          var LedgerListGrp = _lodash2.default.map(data.LedgerListGrp, function (ledger) {
+	            return _lodash2.default.zipObject(Columns, ledger);
+	          });
+	          resolve(_extends({}, ledgerData, {
+	            LedgerListGrp: LedgerListGrp
+	          }));
+	        }).catch(reject);
+	      })).nodeify(callback);
 	    }
 	  }]);
 	
@@ -1818,7 +1863,7 @@
 /* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(Buffer, global) {/*!
+	/* WEBPACK VAR INJECTION */(function(global) {/*!
 	 * The buffer module from node.js, for the browser.
 	 *
 	 * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
@@ -3608,7 +3653,7 @@
 	  return val !== val // eslint-disable-line no-self-compare
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19).Buffer, (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 20 */
