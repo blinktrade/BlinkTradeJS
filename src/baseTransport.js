@@ -224,7 +224,7 @@ class BaseTransport extends Base {
       WithdrawID: withdrawId,
     };
 
-    return nodeify(new Promise((resolve, reject) => {
+    return nodeify.extend(new Promise((resolve, reject) => {
       return this.send(msg).then(data => {
         return resolve({
           ...data,
@@ -250,7 +250,7 @@ class BaseTransport extends Base {
       StatusList,
     };
 
-    return nodeify(new Promise((resolve, reject) => {
+    return nodeify.extend(new Promise((resolve, reject) => {
       return this.send(msg).then(data => {
         const { Columns, ...depositData } = data;
         const DepositListGrp = _.map(data.DepositListGrp, deposit => _.zipObject(Columns, deposit));
@@ -291,6 +291,43 @@ class BaseTransport extends Base {
     };
 
     return this.send(msg).nodeify(callback);
+  }
+
+  requestLedger({
+    page: Page = 0,
+    pageSize: PageSize = 20,
+    currency,
+    filter,
+  }: {
+    page: number;
+    pageSize: number;
+    currency: string;
+    filter: Array<string>;
+  } = {}, callback?: Function) {
+    const msg = {
+      MsgType: MsgTypes.REQUEST_LEDGER,
+      LedgerListReqID: generateRequestId(),
+      Page,
+      PageSize,
+    };
+
+    if (currency) {
+      msg.Currency = currency;
+    }
+    if (filter) {
+      msg.Filter = filter;
+    }
+
+    return nodeify.extend(new Promise((resolve, reject) => {
+      return this.send(msg).then(data => {
+        const { Columns, ...ledgerData } = data;
+        const LedgerListGrp = _.map(data.LedgerListGrp, ledger => _.zipObject(Columns, ledger));
+        resolve({
+          ...ledgerData,
+          LedgerListGrp,
+        });
+      }).catch(reject);
+    })).nodeify(callback);
   }
 }
 
