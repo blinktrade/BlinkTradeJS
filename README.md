@@ -698,6 +698,7 @@ blinktrade.onWithdrawRefresh(function(withdraw) {
 * [sendOrder](#sendorder-websocket-rest)
 * [cancelOrder](#cancelorder-websocket-rest)
 * [myOrders](#myorders-websocket-rest)
+* [requestLedger](#request-ledger)
 * [requestWithdrawList](#requestWithdrawList-websocket-rest)
 * [requestWithdraw](#requestwithdraw-websocket-rest)
 * [confirmWithdraw](#confirmwithdraw-websocket-rest)
@@ -900,6 +901,19 @@ These methods bellow are both availabe under Rest and WebSocket API.
 |----------|--------|-------------------------------------------------|
 | page     | Number | Current page to fetch, defaults to 0            |
 | pageSize | Number | Number of orders, limits to 40 |
+
+### requestLedger [websocket, rest]
+
+`requestLedger(Object params, Function? callback)` => Promise / callback
+
+#### Arguments
+
+| Name     | Type   | Description/Value
+|----------|--------|------------------
+| page     | number | **Optional**; defaults to 0
+| pageSize | number | **Optional**; defaults to 20
+| brokerID | number | **Optional**; [\<BROKER_ID\>](#brokers)
+| currency | string | **Optional**; Currency code. (.e.g: BTC)
 
 
 ### requestWithdrawList [websocket, rest]
