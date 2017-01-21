@@ -388,7 +388,7 @@ To cancel orders, you need to pass the OrderID, you'll also need to pass the ClO
 
 ```js
 
-blinktrade.cancelOrder({ orderID: order.OrderID, clientId: order.ClOrdID }).then(function(order) {
+blinktrade.cancelOrder({ orderId: order.OrderID, clientId: order.ClOrdID }).then(function(order) {
   console.log("Order Cancelled");
 });
 
