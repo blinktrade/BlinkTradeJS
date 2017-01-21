@@ -384,7 +384,9 @@ The response is the same as the [Execution Report](#executionreport-websocket), 
 
 ```
 
-To cancel orders, you need to pass the OrderID, you'll also need to pass the ClOrdId as `clientId` in order to get a response.
+To cancel a order, you need to pass the `orderId`, you'll also need to pass the `clientId` in order to get a response,
+if you didn't provide `orderId`, all open orders will be cancelled.
+
 
 ```js
 
