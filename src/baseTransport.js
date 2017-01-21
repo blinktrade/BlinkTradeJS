@@ -125,11 +125,14 @@ class BaseTransport extends Base {
     const orderId = param.orderId ? param.orderId : param;
     const msg: Object = {
       MsgType: MsgTypes.ORDER_CANCEL,
-      OrderID: orderId,
     };
 
     if (param.clientId) {
       msg.ClOrdID = param.clientId;
+    }
+
+    if (param.orderId) {
+      msg.OrderID = orderId;
     }
 
     return this.send(msg).nodeify(callback);
