@@ -118,10 +118,10 @@ class BaseTransport extends Base {
     })).nodeify(callback);
   }
 
-  cancelOrder(param: number | {
-    orderId: number;
+  cancelOrder(param?: number | {
+    orderId?: number;
     clientId?: number;
-  }, callback?: Function): Promise<Object> {
+  } = {}, callback?: Function): Promise<Object> {
     const orderId = param.orderId ? param.orderId : param;
     const msg: Object = {
       MsgType: MsgTypes.ORDER_CANCEL,

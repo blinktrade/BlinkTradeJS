@@ -108,7 +108,7 @@ declare module blinktrade {
         /**
          * Required Order ID to be canceled
          */
-        orderId: number;
+        orderId?: number;
 
         /**
          * You need to pass the clientId (ClOrdID) in order to get a response
@@ -126,6 +126,16 @@ declare module blinktrade {
          * 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled
          */
         statusList: Array<WithdrawStatus>;
+    }
+
+    /**
+     * Returns ledger
+     */
+    interface LedgerList extends Pagination {
+        /**
+         * Currency Symbol, e.g.: 'USD' | 'BRL' | 'VEF' | 'CLP' | 'VND' | 'PKR';
+         */
+        currency: string;
     }
 
     /**
@@ -229,7 +239,7 @@ declare module blinktrade {
         /**
          * Cancel an order
          */
-        cancelOrder(param: number | OrderClient, callback?: Function): Promise<Object>;
+        cancelOrder(param?: number | OrderClient, callback?: Function): Promise<Object>;
 
         /**
          * Returns a list of your withdraws
@@ -265,6 +275,11 @@ declare module blinktrade {
          * Used to check the deposit methods codes to FIAT deposit
          */
         requestDepositMethods(callback?: Function): Promise<Object>;
+
+        /**
+         * Request Ledger
+         */
+        requestLedger(params?: Ledger, callback?: Function): Promise<Object>;
     }
 
     /**
