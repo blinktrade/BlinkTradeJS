@@ -4,11 +4,11 @@
 [![Dependency Status](https://gemnasium.com/badges/github.com/blinktrade/BlinkTradeJS.svg)](https://gemnasium.com/github.com/blinktrade/BlinkTradeJS)
 [![Known Vulnerabilities](https://snyk.io/test/github/blinktrade/blinktradejs/badge.svg)](https://snyk.io/test/github/blinktrade/blinktradejs)
 
-BlinkTradeJS WebSocket and Rest official JavasScript client for node.js and browser.
+BlinkTradeJS WebSocket and REST Official JavasScript client for node.js and browser.
 
 # Getting Started
 
-BlinkTrade provides a simple and robust WebSocket API to integrate our platform, we strongly recommend you to use it over the Rest-ful API.
+BlinkTrade provides a simple and robust WebSocket API to integrate our platform, we strongly recommend you to use it over the RESTful API.
 
 ## Install
 
@@ -16,22 +16,22 @@ BlinkTrade provides a simple and robust WebSocket API to integrate our platform,
 
 # Documentation
 
-You can also check our [Full API Documentation](https://blinktrade.com/docs)
+You can also check our [Full API Documentation](https://blinktrade.com/docs).
 
 # Examples
 
-More examples can be found in the examples [directory.](./examples)
+More examples can be found in the [examples directory.](./examples)
 
 # Usage
 
 All SDK supports either promises and callbacks, if a callback is provided as the last argument, it will be called as `callback(error, result)`,
-otherwise it will just return the original promise, we also provide event emitters that you can use to get realtime updates through our websocket api,
+otherwise it will just return the original promise, we also provide event emitters that you can use to get realtime updates through our WebSocket API,
 you can check the [Event Emitters section.](#event-emitters)
 
 
-## Public Rest API
+## Public REST API
 
-The most simple way to get the ticker, orderbook and trades, is through our public rest-ful api, which doesn't require authentication.
+The most simple way to get the ticker, orderbook and trades, is through our public RESTful API, which doesn't require authentication.
 
 ### Ticker
 
@@ -134,15 +134,15 @@ blinktrade.trades().then(function(trades) {
 
 ```
 
-## Trade Rest / WebSocket
+## Trade REST / WebSocket
 
 On our RESTful API, we provide a trade endpoint that you're allowed to send and cancel orders,
 request deposits and withdrawals. You need to [create an API Key](https://blinktrade.com/docs#create-api-key) through our platform and set their respective permission that gives you access to it.
 
 The Trade endpoint is internaly a bridge to our `WebSocket` API, so you can access it both on `REST` and `WebSocket` API.
-Be aware that our Restful trade endpoint can be changed at any time, we strongly recommend using the `WebSocket` API over the `Restful` API.
+Be aware that our RESTful trade endpoint can be changed at any time, we strongly recommend using the `WebSocket` API over the `RESTful` API.
 
-> **NOTE** that when generate the API Key and the API Secret, it will be only shown once, you should save it securely, the API Password is only used in the WebSocket api.
+> **NOTE** that when generate the API Key and the API Secret, it will be only shown once, you should save it securely. The API Password is only used in the WebSocket API.
 
 ```js
 var BlinkTradeRest = require("blinktrade").BlinkTradeRest;
@@ -155,11 +155,11 @@ var blinktrade = new BlinkTradeRest({
 
 blinktrade.sendOrder({
   side: "1",
-  price: parseInt(1800 * 1e8),
-  amount: parseInt(0.5 * 1e8),
+  price: parseInt(1800 * 1e8).toFixed(0),
+  amount: parseInt(0.5 * 1e8).toFixed(0),
   symbol: "BTCBRL",
 }).then(function(order) {
-	console.log(order);
+    console.log(order);
 });
 
 ```
@@ -198,7 +198,7 @@ blinktrade.sendOrder({
 
 ### Authenticating
 
-Make sure that you're connected to send messages through websocket, most of the message also require that you're authenticated.
+Make sure that you're connected to send messages through WebSocket, most of the message also require that you're authenticated.
 
 ```js
 
@@ -326,8 +326,8 @@ blinktrade.subscribeTicker(["BLINK:BTCUSD"]).then(function(ticker) {
 
 #####[Floats are Evil!](http://floating-point-gui.de/basic/)
 
-Converting Floats to Integers can be dangerous, different programming languages can get weird rounding errors and imprecisions,
-so all API returns prices and bitcoin values as Integers and in "satoshis" format, we also expect Integers as input,
+Converting Floats to Integers can be dangerous. Different programming languages can get weird rounding errors and imprecisions,
+so all API returns prices and bitcoin values as Integers and in "satoshis" format. We also expect Integers as input,
 make sure that you're formatting the values properly to avoid precision issues.
 
 e.g.:
@@ -444,7 +444,7 @@ blinktrade.requestDeposit({
 
 > Response
 
-Both response for bitcoin and fiat deposits is quite similar.
+Both responses for bitcoin and fiat deposits are quite similar.
 
 ```json
 
@@ -480,12 +480,12 @@ Both response for bitcoin and fiat deposits is quite similar.
 
 ```
 
-**NOTE** The `Data.InputAddress` is the address that you have to deposit, **DO NOT DEPOSIT** on `Data.Destination` address.
+**NOTE** The `Data.InputAddress` is the address that you have to deposit. **DO NOT DEPOSIT** on `Data.Destination` address.
 
 ### Requesting Withdraws
 
-To request withdraws, you need to pass a "data" information, whichs represents the information to your withdraw,
-it's related to bank accounts, numbers, or a bitcoin address, these informations are dynamically and different by each broker.
+To request withdraws, you need to pass a "data" information, which represents the information to your withdraw,
+it's related to bank accounts, numbers, or a bitcoin address. This information is dynamically and different for every broker.
 
 ```js
 
@@ -505,7 +505,7 @@ blinktrade.requestWithdraw({
 
 ### Confirm Withdraws (two-factor)
 
-After request a withdraw, you might get a error asking for two factor authentication,
+After requesting a withdraw, you might get an error asking for two factor authentication,
 you should call `confirmWithdraw` passing the `confirmationToken` that was sent to your email,
 or `secondFactor` if needed.
 
@@ -555,9 +555,9 @@ blinktrade.confirmWithdraw({
 
 ## Event Emitters
 
-Using event emitters is easy and expressive way to keep you updated through our `WebSocket` api,
-you can listen to individual events to match your needs, you can listen new orders, execution reports, tickers and balance changes,
-event emitters can also be used as promises to keep it chained, event emitters are implemented with [`EventEmitter2`](https://github.com/asyncly/EventEmitter2),
+Using event emitters is easy and expressive way to keep you updated through our `WebSocket` API,
+you can listen to individual events to match your needs, you can listen to new orders, execution reports, tickers and balance changes.
+Event emitters can also be used as promises to keep it chained, event emitters are implemented with [`EventEmitter2`](https://github.com/asyncly/EventEmitter2),
 which gives you more flexibility to match events with multi-level wildcards and extends events such as `.onAny`, `.once`, `.many` and so on.
 
 ### Event Ticker
@@ -615,7 +615,7 @@ blinktrade.subscribeOrderbook(["BTCUSD"])
 
 ### Event Balance
 
-You listen the `BALANCE` event to receive balance updates
+You listen to the `BALANCE` event to receive balance updates.
 
 ```js
 
@@ -627,7 +627,7 @@ blinktrade.balance().on("BALANCE", function(balance) {
 
 ### Execution Reports
 
-In order the get when a order is executed, you can listen the execution report.
+In order the get when a order is executed, you can listen to the execution report.
 
 ```js
 
@@ -643,7 +643,7 @@ blinktrade.executionReport()
 
 ### Withdraw and Deposit Refresh
 
-To get deposit and withdraw updates, you can listen `DEPOSIT_REFRESH` and `WITHDRAW_REFRESH` respectively.
+To get deposit and withdraw updates, you can listen to `DEPOSIT_REFRESH` and `WITHDRAW_REFRESH` respectively.
 
 ```js
 
@@ -657,8 +657,8 @@ blinktrade.requestWithdraw().on('WITHDRAW_REFRESH', function(withdraw) {
 
 ```
 
-**NOTE** that these events will only be called to the current deposit / withdraw created,
-if you want to listen to any deposit / withdraw updates, you should use `onDepositRefresh(callback)` and `onWithdrawRefresh()` instead.
+**NOTE** that these events will only be called to the current deposit / withdraw created.
+If you want to listen to any deposit / withdraw updates, you should use `onDepositRefresh(callback)` and `onWithdrawRefresh()` instead.
 
 ```js
 
@@ -674,7 +674,7 @@ blinktrade.onWithdrawRefresh(function(withdraw) {
 
 # API
 
-## Public Rest API
+## Public REST API
 
 * [Ticker](#ticker-rest)
 * [Trades](#trades-rest)
@@ -711,7 +711,7 @@ blinktrade.onWithdrawRefresh(function(withdraw) {
 * [requestDepositMethods](#requestdeposit-websocket-rest)
 * [onDepositRefresh](#ondepositrefresh-websocket)
 
-## Public Rest
+## Public REST
 
 ### Constructor [rest]
 
@@ -762,7 +762,7 @@ blinktrade.onWithdrawRefresh(function(withdraw) {
 
 ### connect [websocket]
 
-Connect to our websocket.
+Connect to our WebSocket.
 
 `connect(Function? callback)` => Promise / callback
 
@@ -790,7 +790,7 @@ Used as test request to check the latency connection.
 
 ### profile [websocket]
 
-Available only on `websocket`.
+Available only on `WebSocket`.
 
 `profile(Function? callback)` => Promise / callback
 
@@ -837,8 +837,8 @@ An event emitter to get execution reports.
 | Event                      |  Description                                         |
 |----------------------------|------------------------------------------------------|
 | EXECUTION_REPORT:NEW       | Callback when you send a new order                   |
-| EXECUTION_REPORT:PARTIAL   | Callback when your order has been partialy executed |
-| EXECUTION_REPORT:EXECUTION | Callback when an order has been sussefully executed |
+| EXECUTION_REPORT:PARTIAL   | Callback when your order has been partially executed |
+| EXECUTION_REPORT:EXECUTION | Callback when an order has been successfully executed |
 | EXECUTION_REPORT:CANCELED  | Callback when your order has been canceled          |
 | EXECUTION_REPORT:REJECTED  | Callback when order has been rejected          |
 
@@ -855,9 +855,9 @@ An event emitter to get execution reports.
 | pageSize | Number | Number of trades, limits to 80 |
 
 
-## Trade Rest / Websocket
+## Trade REST / Websocket
 
-These methods bellow are both availabe under Rest and WebSocket API.
+These methods bellow are both availabe under REST and WebSocket API.
 
 ### balance [websocket, rest]
 
