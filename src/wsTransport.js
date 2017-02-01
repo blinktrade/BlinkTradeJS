@@ -193,7 +193,7 @@ class WebSocketTransport extends BaseTransport {
       });
     }
     return new Fingerprint2().get(fingerPrint => {
-      this.fingerPrint = fingerPrint;
+      this.fingerPrint = Math.abs(require('./util/hash32').encodeByteArray(fingerPrint));
     });
   }
 
