@@ -59,7 +59,7 @@
 	
 	var _ws2 = _interopRequireDefault(_ws);
 	
-	var _rest = __webpack_require__(26);
+	var _rest = __webpack_require__(27);
 	
 	var _rest2 = _interopRequireDefault(_rest);
 	
@@ -232,7 +232,7 @@
 	          UserAgentTimezoneOffset: new Date().getTimezoneOffset()
 	        };
 	      } else {
-	        var os = __webpack_require__(25);
+	        var os = __webpack_require__(26);
 	        userAgent = {
 	          UserAgent: os.type() + ' ' + os.release(),
 	          UserAgentLanguage: 'en_US',
@@ -1084,7 +1084,7 @@
 	        });
 	      }
 	      return new _fingerprintjs2.default().get(function (fingerPrint) {
-	        _this5.fingerPrint = fingerPrint;
+	        _this5.fingerPrint = Math.abs(__webpack_require__(18).encodeByteArray(fingerPrint));
 	      });
 	    }
 	  }, {
@@ -1093,7 +1093,7 @@
 	      var _this6 = this;
 	
 	      if (this.isNode) {
-	        __webpack_require__(18).getStun(function (data) {
+	        __webpack_require__(19).getStun(function (data) {
 	          _this6.stun = data;
 	        });
 	      }
@@ -1280,15 +1280,21 @@
 	    }
 	  }, {
 	    key: 'cancelOrder',
-	    value: function cancelOrder(param, callback) {
+	    value: function cancelOrder() {
+	      var param = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	      var callback = arguments[1];
+	
 	      var orderId = param.orderId ? param.orderId : param;
 	      var msg = {
-	        MsgType: _requests2.default.ORDER_CANCEL,
-	        OrderID: orderId
+	        MsgType: _requests2.default.ORDER_CANCEL
 	      };
 	
 	      if (param.clientId) {
 	        msg.ClOrdID = param.clientId;
+	      }
+	
+	      if (param.orderId) {
+	        msg.OrderID = orderId;
 	      }
 	
 	      return this.send(msg).nodeify(callback);
@@ -1701,6 +1707,147 @@
 
 /***/ },
 /* 18 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.encodeByteArray = encodeByteArray;
+	/* eslint-disable no-var */
+	/* eslint-disable no-bitwise */
+	/* eslint-disable no-param-reassign */
+	/* eslint-disable no-fallthrough */
+	/* eslint-disable no-underscore-dangle */
+	/* eslint-disable default-case */
+	/*
+	 * ByteArray enconding from google-closure-library
+	 */
+	
+	var SEED32 = 314159265;
+	var CONSTANT32 = -1640531527;
+	
+	/**
+	 * Performs an inplace mix of an object with the integer properties (a, b, c)
+	 * and returns the final value of c.
+	 * @param {Object} mix Object with properties, a, b, and c.
+	 * @return {number} The end c-value for the mixing.
+	 * @private
+	 */
+	var mix32_ = function mix32_(mix) {
+	  var a = mix.a;
+	  var b = mix.b;
+	  var c = mix.c;
+	  a -= b;
+	  a -= c;
+	  a ^= c >>> 13;
+	  b -= c;
+	  b -= a;
+	  b ^= a << 8;
+	  c -= a;
+	  c -= b;
+	  c ^= b >>> 13;
+	  a -= b;
+	  a -= c;
+	  a ^= c >>> 12;
+	  b -= c;
+	  b -= a;
+	  b ^= a << 16;
+	  c -= a;
+	  c -= b;
+	  c ^= b >>> 5;
+	  a -= b;
+	  a -= c;
+	  a ^= c >>> 3;
+	  b -= c;
+	  b -= a;
+	  b ^= a << 10;
+	  c -= a;
+	  c -= b;
+	  c ^= b >>> 15;
+	  mix.a = a;
+	  mix.b = b;
+	  mix.c = c;
+	  return c;
+	};
+	
+	/**
+	 * Converts an unsigned "byte" to signed, that is, convert a value in the range
+	 * (0, 2^8-1) to (-2^7, 2^7-1) in order to be compatible with Java's byte type.
+	 * @param {number} n Unsigned "byte" value.
+	 * @return {number} Signed "byte" value.
+	 * @private
+	 */
+	var toSigned_ = function toSigned_(n) {
+	  return n > 127 ? n - 256 : n;
+	};
+	
+	var wordAt_ = function wordAt_(bytes, offset) {
+	  var a = toSigned_(bytes[offset + 0]);
+	  var b = toSigned_(bytes[offset + 1]);
+	  var c = toSigned_(bytes[offset + 2]);
+	  var d = toSigned_(bytes[offset + 3]);
+	  return a + (b << 8) + (c << 16) + (d << 24);
+	};
+	
+	/**
+	 * Hashes a "byte" array to a 32-bit value using the supplied seed.
+	 */
+	function encodeByteArray(bytes) {
+	  var offset = 0;
+	  var length = bytes.length;
+	  var seed = SEED32;
+	
+	  var mix = {
+	    a: CONSTANT32,
+	    b: CONSTANT32,
+	    c: seed
+	  };
+	
+	  var keylen;
+	  for (keylen = length; keylen >= 12; keylen -= 12, offset += 12) {
+	    mix.a += wordAt_(bytes, offset);
+	    mix.b += wordAt_(bytes, offset + 4);
+	    mix.c += wordAt_(bytes, offset + 8);
+	    mix32_(mix);
+	  }
+	  // Hash any remaining bytes
+	  mix.c += length;
+	  switch (keylen) {// deal with rest.  Some cases fall through
+	    case 11:
+	      mix.c += bytes[offset + 10] << 24;
+	    case 10:
+	      mix.c += (bytes[offset + 9] & 0xff) << 16;
+	    case 9:
+	      mix.c += (bytes[offset + 8] & 0xff) << 8;
+	    // the first byte of c is reserved for the length
+	    case 8:
+	      mix.b += wordAt_(bytes, offset + 4);
+	      mix.a += wordAt_(bytes, offset);
+	      break;
+	    case 7:
+	      mix.b += (bytes[offset + 6] & 0xff) << 16;
+	    case 6:
+	      mix.b += (bytes[offset + 5] & 0xff) << 8;
+	    case 5:
+	      mix.b += bytes[offset + 4] & 0xff;
+	    case 4:
+	      mix.a += wordAt_(bytes, offset);
+	      break;
+	    case 3:
+	      mix.a += (bytes[offset + 2] & 0xff) << 16;
+	    case 2:
+	      mix.a += (bytes[offset + 1] & 0xff) << 8;
+	    case 1:
+	      mix.a += bytes[offset + 0] & 0xff;
+	    // case 0 : nothing left to add
+	  }
+	  return mix32_(mix);
+	}
+
+/***/ },
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
@@ -1735,11 +1882,11 @@
 	
 	exports.getStun = getStun;
 	
-	var _ip = __webpack_require__(23);
+	var _ip = __webpack_require__(24);
 	
 	var _ip2 = _interopRequireDefault(_ip);
 	
-	var _dgram = __webpack_require__(24);
+	var _dgram = __webpack_require__(25);
 	
 	var _dgram2 = _interopRequireDefault(_dgram);
 	
@@ -1857,10 +2004,10 @@
 	    return socket.send(stunRequest, 0, stunRequest.length, port, host, function () {});
 	  });
 	}
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(20).Buffer))
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -1873,9 +2020,9 @@
 	
 	'use strict'
 	
-	var base64 = __webpack_require__(20)
-	var ieee754 = __webpack_require__(21)
-	var isArray = __webpack_require__(22)
+	var base64 = __webpack_require__(21)
+	var ieee754 = __webpack_require__(22)
+	var isArray = __webpack_require__(23)
 	
 	exports.Buffer = Buffer
 	exports.SlowBuffer = SlowBuffer
@@ -3656,37 +3803,37 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports) {
 
 	module.exports = require("base64-js");
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports) {
 
 	module.exports = require("ieee754");
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports) {
 
 	module.exports = require("isarray");
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports) {
 
 	module.exports = require("ip");
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports) {
 
 
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports) {
 
 	exports.endianness = function () { return 'LE' };
@@ -3737,7 +3884,7 @@
 
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3750,7 +3897,7 @@
 	
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 	
-	var _restTransport = __webpack_require__(27);
+	var _restTransport = __webpack_require__(28);
 	
 	var _restTransport2 = _interopRequireDefault(_restTransport);
 	
@@ -3822,7 +3969,7 @@
 	exports.default = BlinkTradeRest;
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3833,7 +3980,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _sjcl = __webpack_require__(28);
+	var _sjcl = __webpack_require__(29);
 	
 	var _sjcl2 = _interopRequireDefault(_sjcl);
 	
@@ -3841,11 +3988,11 @@
 	
 	var _nodeify2 = _interopRequireDefault(_nodeify);
 	
-	var _url = __webpack_require__(29);
+	var _url = __webpack_require__(30);
 	
 	var _url2 = _interopRequireDefault(_url);
 	
-	var _path = __webpack_require__(30);
+	var _path = __webpack_require__(31);
 	
 	var _path2 = _interopRequireDefault(_path);
 	
@@ -3901,7 +4048,7 @@
 	    _this.secret = params.secret;
 	    _this.currency = params.currency || 'USD';
 	
-	    _this.fetchRequest = _this.isNode ? __webpack_require__(32) : __webpack_require__(33);
+	    _this.fetchRequest = _this.isNode ? __webpack_require__(33) : __webpack_require__(34);
 	    return _this;
 	  }
 	
@@ -3965,19 +4112,19 @@
 	exports.default = RestTransport;
 
 /***/ },
-/* 28 */
+/* 29 */
 /***/ function(module, exports) {
 
 	module.exports = require("sjcl");
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports) {
 
 	module.exports = require("url");
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -4205,10 +4352,10 @@
 	    }
 	;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(31)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(32)))
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -4394,13 +4541,13 @@
 
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports) {
 
 	module.exports = require("isomorphic-fetch");
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports) {
 
 	module.exports = require("fetch-jsonp");
