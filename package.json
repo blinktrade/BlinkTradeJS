@@ -39,7 +39,7 @@
     "macaddress": "^0.2.8",
     "nodeify": "^1.0.0",
     "sjcl": "^1.0.3",
-    "ws": "^1.1.1"
+    "ws": "^2.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.14.0",
