@@ -55,7 +55,10 @@ class RestTransport extends BaseTransport {
     this.secret = params.secret;
     this.currency = params.currency || 'USD';
 
-    this.fetchRequest = this.isNode ? require('isomorphic-fetch') : require('fetch-jsonp');
+    this.fetchRequest =
+        this.isNode    ? require('isomorphic-fetch')
+      : this.isBrowser ? require('fetch-jsonp')
+      :                  window.fetch;
   }
 
   headers(method: string, body: Object): Object {

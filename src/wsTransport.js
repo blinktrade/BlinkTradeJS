@@ -61,13 +61,13 @@ class WebSocketTransport extends BaseTransport {
    */
   eventEmitter: EventEmitter;
 
-  constructor(params?: BlinkTradeBase) {
+  constructor(params?: BlinkTradeBase = {}) {
     super(params, 'ws');
 
     this.stun = { local: null, public: [] };
 
     this.getStun();
-    this.getFingerPrint();
+    this.getFingerPrint(params.fingerPrint);
 
     this.eventEmitter = new EventEmitter({ wildcard: true, delimiter: ':' });
   }
@@ -186,15 +186,20 @@ class WebSocketTransport extends BaseTransport {
   }
   /* eslint-enable no-param-reassign */
 
-  getFingerPrint(): void {
+  getFingerPrint(customFingerprint: string): void {
     if (this.isNode) {
       return require('./util/macaddress').getMac(macAddress => {
         this.fingerPrint = macAddress;
       });
+    } else if (this.isBrowser) {
+      return new Fingerprint2().get(fingerPrint => {
+        this.fingerPrint = Math.abs(require('./util/hash32').encodeByteArray(fingerPrint));
+      });
+    } else if (customFingerprint) {
+      this.fingerPrint = customFingerprint;
+    } else {
+      throw new Error('FingerPrint not provided');
     }
-    return new Fingerprint2().get(fingerPrint => {
-      this.fingerPrint = Math.abs(require('./util/hash32').encodeByteArray(fingerPrint));
-    });
   }
 
   getStun(): void {
