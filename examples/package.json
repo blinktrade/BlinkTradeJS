@@ -5,7 +5,7 @@
   "description": "BlinkTradeJS example",
   "main": "bundle-node.js",
   "scripts": {
-    "webpack": "webpack",
+    "webpack": "../node_modules/.bin/webpack",
     "build": "rm -rf node_modules/blinktrade && npm install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,5 +15,6 @@
   "author": "Cesar Augusto",
   "license": "GPL-3.0",
   "devDependencies": {
+    "babel-loader": "^6.2.10"
   }
 }
