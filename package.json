@@ -10,17 +10,17 @@
     "clean": "",
     "lint": "eslint src test",
     "flow": "flow check",
-    "check": "npm run lint && npm run test ",
+    "check": "yarn run lint && yarn run test ",
     "build:src": "babel src --out-dir lib",
     "build:commonjs": "webpack",
     "build:commonjs:min": "cross-env NODE_ENV=production webpack",
     "build:browser": "webpack --config webpack.config.browser.js",
     "build:browser:min": "cross-env NODE_ENV=production webpack --config webpack.config.browser.js",
-    "build:prod": "npm run build:commonjs:min && npm run build:browser:min",
-    "build:dev": "npm run build:commonjs && npm run build:browser",
-    "build": "npm run build:src && npm run build:dev && npm run build:prod",
+    "build:prod": "yarn run build:commonjs:min && yarn run build:browser:min",
+    "build:dev": "yarn run build:commonjs && yarn run build:browser",
+    "build": "yarn run build:src && yarn run build:dev && yarn run build:prod",
     "test": "NODE_ENV=test mocha --compilers js:babel-register --recursive",
-    "prepublish": "npm run build"
+    "prepublish": "yarn run build"
   },
   "keywords": [
     "blinktrade",
