@@ -32,8 +32,6 @@ import {
   registerRequest,
 } from './listener';
 
-/* eslint-disable global-require */
-
 class WebSocketTransport extends BaseTransport {
 
   /*
@@ -61,7 +59,7 @@ class WebSocketTransport extends BaseTransport {
    */
   eventEmitter: EventEmitter;
 
-  constructor(params?: BlinkTradeBase = {}) {
+  constructor(params?: BlinkTradeWS = {}) {
     super(params, 'ws');
 
     this.stun = { local: null, public: [] };
@@ -113,7 +111,7 @@ class WebSocketTransport extends BaseTransport {
   }
 
   sendMessageAsPromise(msg: Object): Promise<Object> {
-    return nodeify.extend(new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const promise = { resolve, reject };
 
       if (!msg) {
@@ -124,7 +122,7 @@ class WebSocketTransport extends BaseTransport {
 
       // Send promise to sendMessage to we can mock it.
       this.sendMessage(msg, promise);
-    }));
+    });
   }
 
   onMessage(msg: Object): void {
@@ -151,8 +149,32 @@ class WebSocketTransport extends BaseTransport {
     return listener && listener(data);
   }
 
+  getFingerPrint(customFingerprint?: string): void {
+    if (this.isNode) {
+      return require('./util/macaddress').getMac(macAddress => {
+        this.fingerPrint = macAddress;
+      });
+    } else if (this.isBrowser) {
+      return new Fingerprint2().get(fingerPrint => {
+        this.fingerPrint = Math.abs(require('./util/hash32').encodeByteArray(fingerPrint)).toString();
+      });
+    } else if (customFingerprint) {
+      this.fingerPrint = customFingerprint;
+    } else {
+      throw new Error('FingerPrint not provided');
+    }
+  }
+
+  getStun(): void {
+    if (this.isNode) {
+      require('./util/stun').getStun(data => {
+        this.stun = data;
+      });
+    }
+  }
+
   /* eslint-disable no-param-reassign */
-  emitterPromise<T>(promise: Promise<T>): Promise<T> {
+  emitterPromise<T>(promise: Object, callback?: Function): PromiseEmitter<T> {
     promise.on = (event: string, listener: Function) => {
       this.eventEmitter.on(event, listener);
       return promise;
@@ -182,33 +204,9 @@ class WebSocketTransport extends BaseTransport {
       return promise;
     };
 
-    return nodeify.extend(promise);
+    return nodeify.extend(promise).nodeify(callback);
   }
   /* eslint-enable no-param-reassign */
-
-  getFingerPrint(customFingerprint: string): void {
-    if (this.isNode) {
-      return require('./util/macaddress').getMac(macAddress => {
-        this.fingerPrint = macAddress;
-      });
-    } else if (this.isBrowser) {
-      return new Fingerprint2().get(fingerPrint => {
-        this.fingerPrint = Math.abs(require('./util/hash32').encodeByteArray(fingerPrint));
-      });
-    } else if (customFingerprint) {
-      this.fingerPrint = customFingerprint;
-    } else {
-      throw new Error('FingerPrint not provided');
-    }
-  }
-
-  getStun(): void {
-    if (this.isNode) {
-      require('./util/stun').getStun(data => {
-        this.stun = data;
-      });
-    }
-  }
 }
 
 export default WebSocketTransport;

@@ -73,9 +73,9 @@ class BlinkTradeWS extends WebSocketTransport {
   }
 
   login({ username, password, secondFactor }: {
-    username: string;
-    password: string;
-    secondFactor?: string;
+    username: string,
+    password: string,
+    secondFactor?: string,
   }, callback?: Function): Promise<Object> {
     let userAgent;
     if (!this.isNode) {
@@ -130,7 +130,7 @@ class BlinkTradeWS extends WebSocketTransport {
       UserReqTyp: '2',
     };
 
-    return super.sendMessageAsPromise(msg).nodeify(callback);
+    return nodeify.extend(super.sendMessageAsPromise(msg)).nodeify(callback);
   }
 
   profile(callback?: Function): Promise<Object> {
@@ -138,7 +138,7 @@ class BlinkTradeWS extends WebSocketTransport {
     return nodeify.extend(Promise.resolve(profile)).nodeify(callback);
   }
 
-  balance(callback?: Function): Promise<Object> {
+  balance(callback?: Function): PromiseEmitter<Object> {
     return super.emitterPromise(new Promise((resolve, reject) => {
       return super.balance(callback).then((data) => {
         registerListener('U3', (balance) => {
@@ -150,7 +150,7 @@ class BlinkTradeWS extends WebSocketTransport {
     }));
   }
 
-  subscribeTicker(symbols: Array<string>, callback?: Function): Promise<Object> {
+  subscribeTicker(symbols: Array<string>, callback?: Function): PromiseEmitter<Object> {
     const msg = {
       MsgType: MsgTypes.SECURITY_STATUS,
       SecurityStatusReqID: generateRequestId(),
@@ -179,7 +179,7 @@ class BlinkTradeWS extends WebSocketTransport {
           return this.eventEmitter.emit(`BLINK:${ticker.Symbol}`, formatTicker(ticker));
         });
       }).catch(reject);
-    })).nodeify(callback);
+    }), callback);
   }
 
   unSubscribeTicker(SecurityStatusReqID: number): number {
@@ -193,7 +193,7 @@ class BlinkTradeWS extends WebSocketTransport {
     return SecurityStatusReqID;
   }
 
-  subscribeOrderbook(symbols: Array<string>, callback?: Function): Promise<Object> {
+  subscribeOrderbook(symbols: Array<string>, callback?: Function): PromiseEmitter<Object> {
     const msg = {
       MsgType: MsgTypes.MARKET_DATA_FULL_REFRESH,
       MDReqID: generateRequestId(),
@@ -273,7 +273,7 @@ class BlinkTradeWS extends WebSocketTransport {
           });
         }
       }).catch(err => reject(err));
-    })).nodeify(callback);
+    }), callback);
   }
 
   unSubscribeOrderbook(MDReqID: number): number {
@@ -299,10 +299,10 @@ class BlinkTradeWS extends WebSocketTransport {
   }
 
   tradeHistory({ since, filter, page: Page = 0, pageSize: PageSize = 80 }: {
-    since?: string;
-    filter?: Array<string>;
-    page?: number;
-    pageSize?: number;
+    since?: string,
+    filter?: Array<string>,
+    page?: number,
+    pageSize?: number,
   } = {}, callback?: Function): Promise<Object> {
     const msg: Object = {
       MsgType: MsgTypes.TRADE_HISTORY,
@@ -332,10 +332,10 @@ class BlinkTradeWS extends WebSocketTransport {
   }
 
   requestDeposit({ currency = 'BTC', value, depositMethodId }: {
-    value?: number;
-    currency?: string;
-    depositMethodId?: number;
-  } = {}, callback?: Function): Promise<Object> {
+    value?: number,
+    currency?: string,
+    depositMethodId?: number,
+  } = {}, callback?: Function): PromiseEmitter<Object> {
     const subscribeEvent = (deposit) => {
       callback && callback(null, deposit);
       return this.eventEmitter.emit(DEPOSIT_REFRESH, deposit);
@@ -347,7 +347,7 @@ class BlinkTradeWS extends WebSocketTransport {
         registerEventEmitter({ ClOrdID: deposit.ClOrdID }, subscribeEvent);
         return resolve(deposit);
       }).catch(reject);
-    })).nodeify(callback);
+    }), callback);
   }
 
   onDepositRefresh(callback?: Function): Promise<Object> {
@@ -361,10 +361,10 @@ class BlinkTradeWS extends WebSocketTransport {
 
   requestWithdraw({ amount, data, currency = 'BTC', method = 'bitcoin' }: {
     data: Object,
-    amount: number;
-    method?: string;
-    currency?: string;
-  }, callback: Function): Promise<Object> {
+    amount: number,
+    method?: string,
+    currency?: string,
+  }, callback?: Function): PromiseEmitter<Object> {
     const subscribeEvent = (withdraw) => {
       callback && callback(null, withdraw);
       return this.eventEmitter.emit(WITHDRAW_REFRESH, withdraw);
@@ -376,7 +376,7 @@ class BlinkTradeWS extends WebSocketTransport {
           registerEventEmitter({ ClOrdID: withdraw.ClOrdID }, subscribeEvent);
           return resolve(withdraw);
         }).catch(reject);
-    })).nodeify(callback);
+    }), callback);
   }
 
   onWithdrawRefresh(callback?: Function): Promise<Object> {
