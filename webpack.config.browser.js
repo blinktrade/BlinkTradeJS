@@ -1,24 +1,36 @@
 const path = require('path');
 const webpack = require('webpack');
-const nodeExternals = require('webpack-node-externals');
 
 const env = process.env.NODE_ENV;
 const config = {
   devtool: 'source-map',
   plugins: [],
   entry: './src/index.js',
-  target: 'node',
+  target: 'web',
   output: {
     filename: 'blinktrade.js',
-    path: path.join(__dirname, './dist'),
-    libraryTarget: 'commonjs2',
+    path: path.join(__dirname, './browser'),
+    library: 'blinktrade',
+    libraryTarget: 'umd',
+    umdNamedDefine: true,
   },
-  externals: [nodeExternals()],
+  node: {
+    ws: 'empty',
+    fs: 'empty',
+    os: 'empty',
+    tls: 'empty',
+    dgram: 'empty',
+    encoding: 'empty',
+    child_process: 'empty',
+  },
   module: {
     loaders: [{
       test: /\.js$/,
       exclude: /node_modules/,
       loader: 'babel',
+      query: {
+        plugins: ['lodash'],
+      },
     }],
   },
 };

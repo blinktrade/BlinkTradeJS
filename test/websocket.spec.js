@@ -30,7 +30,7 @@ import * as listener from '../src/listener';
 
 let BlinkTrade;
 
-const MOCK_FULL_REFRESH = {
+const MOCK_FULL_REFRESH: Object = {
   MsgType: 'W',
   Symbol: 'BTCUSD',
   MDFullGrp: [{}],
@@ -56,7 +56,7 @@ const MOCK_INCREMENT = (action, type) => {
   };
 };
 
-const MOCK_NEW_ORDER = {
+const MOCK_NEW_ORDER: Object = {
   side: '1',
   price: parseInt(550 * 1e8, 10),
   amount: parseInt(0.05 * 1e8, 10),
@@ -85,7 +85,7 @@ describe('WebSocket', () => {
   });
 
   it('Should send heartBeat message and mock ws response', (done) => {
-    const mock = {
+    const mock: Object = {
       SendTime: 1455409766521,
       ServerTimestamp: 1455410567,
     };
@@ -94,7 +94,8 @@ describe('WebSocket', () => {
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
       mock.TestReqID = msg.TestReqID;
-      return listener.getRequest(mock).resolve(mock);
+      const request = listener.getRequest(mock);
+      return request && request.resolve(mock);
     });
 
     BlinkTrade.connect().then(() => {
@@ -109,7 +110,7 @@ describe('WebSocket', () => {
   });
 
   it('Should send heartBeat message with callback', (done) => {
-    const mock = {
+    const mock: Object = {
       SendTime: 1455409766521,
       ServerTimestamp: 1455410567,
     };
@@ -118,7 +119,8 @@ describe('WebSocket', () => {
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
       mock.TestReqID = msg.TestReqID;
-      return listener.getRequest(mock).resolve(mock);
+      const request = listener.getRequest(mock);
+      return request && request.resolve(mock);
     });
 
     BlinkTrade.connect().then(() => {
@@ -133,7 +135,7 @@ describe('WebSocket', () => {
   });
 
   it('Should authenticate successfully ', (done) => {
-    const mock = {
+    const mock: Object = {
       UserID: 90800003,
       UserStatus: 1,
       BrokerID: 5,
@@ -148,7 +150,8 @@ describe('WebSocket', () => {
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
       mock.UserReqID = msg.UserReqID;
-      return listener.getRequest(mock).resolve(mock);
+      const request = listener.getRequest(mock);
+      return request && request.resolve(mock);
     });
 
     BlinkTrade.connect().then(() => {
@@ -161,7 +164,7 @@ describe('WebSocket', () => {
   });
 
   it('Should reject authentication', (done) => {
-    const mock = {
+    const mock: Object = {
       UserID: 90800003,
       UserStatus: 3,
       BrokerID: 5,
@@ -176,7 +179,8 @@ describe('WebSocket', () => {
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
       mock.UserReqID = msg.UserReqID;
-      return listener.getRequest(mock).reject(mock);
+      const request = listener.getRequest(mock);
+      return request && request.resolve(mock);
     });
 
     BlinkTrade.connect().then(() => {
@@ -188,7 +192,7 @@ describe('WebSocket', () => {
   });
 
   it('Should login and logout successfully', (done) => {
-    const mock = {
+    const mock: Object = {
       login: {
         UserID: 90800003,
         UserStatus: 1,
@@ -210,7 +214,8 @@ describe('WebSocket', () => {
     stub(BlinkTrade, 'sendMessage', (msg) => {
       const response = msg.UserReqTyp === '1' ? mock.login : mock.logout;
       response.UserReqID = msg.UserReqID;
-      return listener.getRequest(response).resolve(response);
+      const request = listener.getRequest(response);
+      return request && request.resolve(response);
     });
 
     BlinkTrade.connect().then(() => {
@@ -226,7 +231,7 @@ describe('WebSocket', () => {
   });
 
   it('Should request balance and match available balance', (done) => {
-    const mock = {
+    const mock: Object = {
       // $FlowFixMe
       5: {
         BTC_locked: 0,
@@ -244,7 +249,8 @@ describe('WebSocket', () => {
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
       mock.BalanceReqID = msg.BalanceReqID;
-      return listener.getRequest(mock).resolve(mock);
+      const request = listener.getRequest(mock);
+      return request && request.resolve(mock);
     });
 
     BlinkTrade.connect().then(() => {
@@ -259,7 +265,7 @@ describe('WebSocket', () => {
   });
 
   it('Should subscribe on ticker', (done) => {
-    const mock = {
+    const mock: Object = {
       SellVolume: 487859418,
       LowPx: 189189000000,
       LastPx: 189189000000,
@@ -276,7 +282,8 @@ describe('WebSocket', () => {
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
       mock.SecurityStatusReqID = msg.SecurityStatusReqID;
-      return listener.getRequest(mock).resolve(mock);
+      const request = listener.getRequest(mock);
+      return request && request.resolve(mock);
     });
 
     BlinkTrade.connect().then(() => {
@@ -300,7 +307,7 @@ describe('WebSocket', () => {
   });
 
   it('Should subscribe on ticker with callback', (done) => {
-    const mock = {
+    const mock: Object = {
       SellVolume: 487859418,
       LowPx: 189189000000,
       LastPx: 189189000000,
@@ -317,7 +324,8 @@ describe('WebSocket', () => {
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
       mock.SecurityStatusReqID = msg.SecurityStatusReqID;
-      return listener.getRequest(mock).resolve(mock);
+      const request = listener.getRequest(mock);
+      return request && request.resolve(mock);
     });
 
     BlinkTrade.connect().then(() => {
@@ -396,7 +404,8 @@ describe('WebSocket', () => {
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
       mock.MDReqID = msg.MDReqID;
-      return listener.getRequest(mock).resolve(mock);
+      const request = listener.getRequest(mock);
+      return request && request.resolve(mock);
     });
 
     BlinkTrade.connect().then(() => {
@@ -420,7 +429,8 @@ describe('WebSocket', () => {
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
       MOCK_FULL_REFRESH.MDReqID = msg.MDReqID;
-      return listener.getRequest(MOCK_FULL_REFRESH).resolve(MOCK_FULL_REFRESH);
+      const request = listener.getRequest(MOCK_FULL_REFRESH);
+      return request && request.resolve(MOCK_FULL_REFRESH);
     });
 
     // Mock eventEmitter callback
@@ -448,7 +458,8 @@ describe('WebSocket', () => {
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
       MOCK_FULL_REFRESH.MDReqID = msg.MDReqID;
-      return listener.getRequest(MOCK_FULL_REFRESH).resolve(MOCK_FULL_REFRESH);
+      const request = listener.getRequest(MOCK_FULL_REFRESH);
+      return request && request.resolve(MOCK_FULL_REFRESH);
     });
 
     // Mock eventEmitter callback
@@ -471,7 +482,8 @@ describe('WebSocket', () => {
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
       MOCK_FULL_REFRESH.MDReqID = msg.MDReqID;
-      return listener.getRequest(MOCK_FULL_REFRESH).resolve(MOCK_FULL_REFRESH);
+      const request = listener.getRequest(MOCK_FULL_REFRESH);
+      return request && request.resolve(MOCK_FULL_REFRESH);
     });
 
     // Mock eventEmitter callback
@@ -494,7 +506,8 @@ describe('WebSocket', () => {
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
       MOCK_FULL_REFRESH.MDReqID = msg.MDReqID;
-      return listener.getRequest(MOCK_FULL_REFRESH).resolve(MOCK_FULL_REFRESH);
+      const request = listener.getRequest(MOCK_FULL_REFRESH);
+      return request && request.resolve(MOCK_FULL_REFRESH);
     });
 
     // Mock eventEmitter callback
@@ -517,7 +530,8 @@ describe('WebSocket', () => {
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
       MOCK_FULL_REFRESH.MDReqID = msg.MDReqID;
-      return listener.getRequest(MOCK_FULL_REFRESH).resolve(MOCK_FULL_REFRESH);
+      const request = listener.getRequest(MOCK_FULL_REFRESH);
+      return request && request.resolve(MOCK_FULL_REFRESH);
     });
 
     // Mock eventEmitter callback
@@ -545,7 +559,8 @@ describe('WebSocket', () => {
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
       MOCK_NEW_ORDER.ClOrdID = msg.ClOrdID;
-      return listener.getRequest(MOCK_NEW_ORDER).resolve(mock);
+      const request = listener.getRequest(MOCK_NEW_ORDER);
+      return request && request.resolve(mock);
     });
 
     const sinon = stub(listener, 'registerListener', (message, callback) => {
@@ -571,7 +586,8 @@ describe('WebSocket', () => {
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
       MOCK_NEW_ORDER.ClOrdID = msg.ClOrdID;
-      return listener.getRequest(MOCK_NEW_ORDER).resolve(mock);
+      const request = listener.getRequest(MOCK_NEW_ORDER);
+      return request && request.resolve(mock);
     });
 
     const sinon = stub(listener, 'registerListener', (message, callback) => {
@@ -602,7 +618,8 @@ describe('WebSocket', () => {
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
       MOCK_NEW_ORDER.ClOrdID = msg.ClOrdID;
-      return listener.getRequest(MOCK_NEW_ORDER).resolve(mock);
+      const request = listener.getRequest(MOCK_NEW_ORDER);
+      return request && request.resolve(mock);
     });
 
     const callback = spy();
@@ -622,7 +639,7 @@ describe('WebSocket', () => {
   });
 
   it('Should send order and emit BALANCE updates', (done) => {
-    let mock;
+    let mock: Object;
     const balance = {
       // $FlowFixMe
       5: { USD_locked: 8250000000 },
@@ -642,7 +659,8 @@ describe('WebSocket', () => {
         };
       }
 
-      return listener.getRequest(mock).resolve(mock);
+      const request = listener.getRequest(mock);
+      return request && request.resolve(mock);
     });
 
     const sinon = stub(listener, 'registerListener', (message, callback) => {
@@ -664,7 +682,7 @@ describe('WebSocket', () => {
   });
 
   it('Should send order and callback balance updates', (done) => {
-    let mock;
+    let mock: Object;
     const balance = {
       // $FlowFixMe
       5: { USD_locked: 8250000000 },
@@ -686,7 +704,8 @@ describe('WebSocket', () => {
         };
       }
 
-      return listener.getRequest(mock).resolve(mock);
+      const request = listener.getRequest(mock);
+      return request && request.resolve(mock);
     });
 
     const sinon = stub(listener, 'registerListener', () => {
@@ -724,7 +743,8 @@ describe('WebSocket', () => {
 
     stub(BlinkTrade, 'sendMessage', (msg) => {
       mock.ClOrdID = msg.ClOrdID;
-      return listener.getRequest(mock).resolve(mock);
+      const request = listener.getRequest(mock);
+      return request && request.resolve(mock);
     });
 
     const sinon = stub(listener, 'registerEventEmitter', (message, callback) => {
@@ -772,7 +792,8 @@ describe('WebSocket', () => {
     stub(BlinkTrade, 'sendMessage', (msg) => {
       mock.ClOrdID = msg.ClOrdID;
       mock.WithdrawReqID = msg.WithdrawReqID;
-      return listener.getRequest(mock).resolve(mock);
+      const request = listener.getRequest(mock);
+      return request && request.resolve(mock);
     });
 
     const sinon = stub(listener, 'registerEventEmitter', (message, callback) => {
@@ -828,7 +849,8 @@ describe('WebSocket', () => {
     stub(BlinkTrade, 'sendMessage', (msg) => {
       mock.ClOrdID = msg.ClOrdID;
       mock.WithdrawReqID = msg.WithdrawReqID;
-      return listener.getRequest(mock).resolve(mock);
+      const request = listener.getRequest(mock);
+      return request && request.resolve(mock);
     });
 
     const onWithdrawRefresh = spy();

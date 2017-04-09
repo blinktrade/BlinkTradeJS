@@ -36,15 +36,14 @@ class BaseTransport extends Base {
 
   env: BlinkTradeEnv;
 
-  send: Function;
+  send: (msg: Object) => Promise<Object>;
 
-  fetchTrade: Function;
+  +fetchTrade: (msg: Object) => Promise<Object>;
 
-  sendMessageAsPromise: Function;
+  +sendMessageAsPromise: (msg: Object) => Promise<Object>;
 
   constructor(params?: BlinkTradeBase, env: BlinkTradeEnv) {
     super(params, env);
-
     this.send = env === 'ws' ? this.sendMessageAsPromise : this.fetchTrade;
   }
 
@@ -71,8 +70,8 @@ class BaseTransport extends Base {
   }
 
   myOrders({ page: Page = 0, pageSize: PageSize = 40 }: {
-    page?: number;
-    pageSize?: number;
+    page?: number,
+    pageSize?: number,
   } = {}, callback?: Function): Promise<Object> {
     const msg = {
       MsgType: MsgTypes.ORDER_LIST,
@@ -94,10 +93,10 @@ class BaseTransport extends Base {
   }
 
   sendOrder({ side, amount, price, symbol }: {
-    side: '1' | '2';
-    price: number;
-    amount: number;
-    symbol: string;
+    side: '1' | '2',
+    price: number,
+    amount: number,
+    symbol: string,
   }, callback?: Function): Promise<Object> {
     const msg = {
       MsgType: MsgTypes.ORDER_SEND,
@@ -119,8 +118,8 @@ class BaseTransport extends Base {
   }
 
   cancelOrder(param?: number | {
-    orderId?: number;
-    clientId?: number;
+    orderId?: number,
+    clientId?: number,
   } = {}, callback?: Function): Promise<Object> {
     const orderId = param.orderId ? param.orderId : param;
     const msg: Object = {
@@ -135,7 +134,7 @@ class BaseTransport extends Base {
       msg.OrderID = orderId;
     }
 
-    return this.send(msg).nodeify(callback);
+    return nodeify.extend(this.send(msg)).nodeify(callback);
   }
 
   /**
@@ -146,9 +145,9 @@ class BaseTransport extends Base {
     pageSize: PageSize = 20,
     statusList: StatusList = ['1', '2', '4', '8'],
   }: {
-    page?: number;
-    pageSize?: number;
-    statusList?: Array<StatusListType>;
+    page?: number,
+    pageSize?: number,
+    statusList?: Array<StatusListType>,
   } = {}, callback?: Function): Promise<Object> {
     const msg = {
       MsgType: MsgTypes.REQUEST_WITHDRAW_LIST,
@@ -172,10 +171,10 @@ class BaseTransport extends Base {
 
   requestWithdraw({ amount, data, currency = 'BTC', method = 'bitcoin' }: {
     data: Object,
-    amount: number;
-    method?: string;
-    currency?: string;
-  }, callback: Function): Promise<Object> {
+    amount: number,
+    method?: string,
+    currency?: string,
+  }, callback?: Function): Promise<Object> {
     const reqId = generateRequestId();
     const msg = {
       MsgType: MsgTypes.REQUEST_WITHDRAW,
@@ -187,13 +186,13 @@ class BaseTransport extends Base {
       Data: data,
     };
 
-    return this.send(msg).nodeify(callback);
+    return nodeify.extend(this.send(msg)).nodeify(callback);
   }
 
   confirmWithdraw({ withdrawId: WithdrawID, confirmationToken, secondFactor }: {
-    withdrawId: string;
-    confirmationToken?: string;
-    secondFactor?: string;
+    withdrawId: string,
+    confirmationToken?: string,
+    secondFactor?: string,
   }, callback: Function): Promise<Object> {
     const msg: Object = {
       MsgType: MsgTypes.CONFIRM_WITHDRAW,
@@ -241,9 +240,9 @@ class BaseTransport extends Base {
     pageSize: PageSize = 20,
     status: StatusList = ['1', '2', '4', '8'],
   }: {
-    page: number;
-    pageSize: number;
-    status: Array<StatusListType>;
+    page: number,
+    pageSize: number,
+    status: Array<StatusListType>,
   } = {}, callback?: Function): Promise<Object> {
     const msg = {
       MsgType: MsgTypes.REQUEST_DEPOSIT_LIST,
@@ -266,9 +265,9 @@ class BaseTransport extends Base {
   }
 
   requestDeposit({ currency = 'BTC', value, depositMethodId }: {
-    value?: number;
-    currency?: string;
-    depositMethodId?: number;
+    value?: number,
+    currency?: string,
+    depositMethodId?: number,
   } = {}, callback?: Function): Promise<Object> {
     const reqId = generateRequestId();
     const msg: Object = {
@@ -284,7 +283,7 @@ class BaseTransport extends Base {
       msg.Value = value;
     }
 
-    return this.send(msg).nodeify(callback);
+    return nodeify.extend(this.send(msg)).nodeify(callback);
   }
 
   requestDepositMethods(callback?: Function): Promise<Object> {
@@ -293,7 +292,7 @@ class BaseTransport extends Base {
       DepositMethodReqID: generateRequestId(),
     };
 
-    return this.send(msg).nodeify(callback);
+    return nodeify.extend(this.send(msg)).nodeify(callback);
   }
 
   requestLedger({
@@ -302,12 +301,12 @@ class BaseTransport extends Base {
     currency,
     filter,
   }: {
-    page: number;
-    pageSize: number;
-    currency: string;
-    filter: Array<string>;
+    page: number,
+    pageSize: number,
+    currency: string,
+    filter: Array<string>,
   } = {}, callback?: Function) {
-    const msg = {
+    const msg: Object = {
       MsgType: MsgTypes.REQUEST_LEDGER,
       LedgerListReqID: generateRequestId(),
       Page,

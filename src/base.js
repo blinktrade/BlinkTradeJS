@@ -39,6 +39,11 @@ class Base {
    */
   isNode: boolean;
 
+  /*
+   * Is browser environment.
+   */
+  isBrowser: boolean;
+
   constructor(params: BlinkTradeBase = {}, env: BlinkTradeEnv) {
     const endpoint =
         params.url  ? params.url
@@ -49,7 +54,8 @@ class Base {
 
     this.endpoint = endpoint;
 
-    this.isNode = typeof window === 'undefined';
+    this.isNode    = typeof window === 'undefined';
+    this.isBrowser = typeof document !== 'undefined';
   }
 }
 

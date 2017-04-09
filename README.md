@@ -12,6 +12,10 @@ BlinkTrade provides a simple and robust WebSocket API to integrate our platform,
 
 ## Install
 
+`$ yarn add blinktrade`
+
+using npm.
+
 `$ npm install blinktrade`
 
 # Documentation
