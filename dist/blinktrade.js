@@ -277,7 +277,7 @@ module.exports =
 	        UserReqTyp: '2'
 	      };
 	
-	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', this).call(this, msg).nodeify(callback);
+	      return _nodeify2.default.extend(_get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', this).call(this, msg)).nodeify(callback);
 	    }
 	  }, {
 	    key: 'profile',
@@ -335,7 +335,7 @@ module.exports =
 	            return _this5.eventEmitter.emit('BLINK:' + ticker.Symbol, formatTicker(ticker));
 	          });
 	        }).catch(reject);
-	      })).nodeify(callback);
+	      }), callback);
 	    }
 	  }, {
 	    key: 'unSubscribeTicker',
@@ -430,7 +430,7 @@ module.exports =
 	        }).catch(function (err) {
 	          return reject(err);
 	        });
-	      })).nodeify(callback);
+	      }), callback);
 	    }
 	  }, {
 	    key: 'unSubscribeOrderbook',
@@ -527,7 +527,7 @@ module.exports =
 	          (0, _listener.registerEventEmitter)({ ClOrdID: deposit.ClOrdID }, subscribeEvent);
 	          return resolve(deposit);
 	        }).catch(reject);
-	      })).nodeify(callback);
+	      }), callback);
 	    }
 	  }, {
 	    key: 'onDepositRefresh',
@@ -561,7 +561,7 @@ module.exports =
 	          (0, _listener.registerEventEmitter)({ ClOrdID: withdraw.ClOrdID }, subscribeEvent);
 	          return resolve(withdraw);
 	        }).catch(reject);
-	      })).nodeify(callback);
+	      }), callback);
 	    }
 	  }, {
 	    key: 'onWithdrawRefresh',
@@ -901,8 +901,6 @@ module.exports =
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
 	
-	/* eslint-disable global-require */
-	
 	var WebSocketTransport = function (_BaseTransport) {
 	  _inherits(WebSocketTransport, _BaseTransport);
 	
@@ -997,7 +995,7 @@ module.exports =
 	    value: function sendMessageAsPromise(msg) {
 	      var _this3 = this;
 	
-	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
+	      return new Promise(function (resolve, reject) {
 	        var promise = { resolve: resolve, reject: reject };
 	
 	        if (!msg) {
@@ -1008,7 +1006,7 @@ module.exports =
 	
 	        // Send promise to sendMessage to we can mock it.
 	        _this3.sendMessage(msg, promise);
-	      }));
+	      });
 	    }
 	  }, {
 	    key: 'onMessage',
@@ -1035,59 +1033,18 @@ module.exports =
 	    value: function dispatchListeners(listener, data) {
 	      return listener && listener(data);
 	    }
-	
-	    /* eslint-disable no-param-reassign */
-	
-	  }, {
-	    key: 'emitterPromise',
-	    value: function emitterPromise(promise) {
-	      var _this4 = this;
-	
-	      promise.on = function (event, listener) {
-	        _this4.eventEmitter.on(event, listener);
-	        return promise;
-	      };
-	      promise.onAny = function (listener) {
-	        _this4.eventEmitter.onAny(listener);
-	        return promise;
-	      };
-	      promise.offAny = function (listener) {
-	        _this4.eventEmitter.offAny(listener);
-	        return promise;
-	      };
-	      promise.once = function (event, listener) {
-	        _this4.eventEmitter.once(event, listener);
-	        return promise;
-	      };
-	      promise.many = function (event, times, listener) {
-	        _this4.eventEmitter.many(event, times, listener);
-	        return promise;
-	      };
-	      promise.removeListener = function (event, listener) {
-	        _this4.eventEmitter.removeListener(event, listener);
-	        return promise;
-	      };
-	      promise.removeAllListeners = function (events) {
-	        _this4.eventEmitter.removeAllListeners(events);
-	        return promise;
-	      };
-	
-	      return _nodeify2.default.extend(promise);
-	    }
-	    /* eslint-enable no-param-reassign */
-	
 	  }, {
 	    key: 'getFingerPrint',
 	    value: function getFingerPrint(customFingerprint) {
-	      var _this5 = this;
+	      var _this4 = this;
 	
 	      if (this.isNode) {
 	        return __webpack_require__(16).getMac(function (macAddress) {
-	          _this5.fingerPrint = macAddress;
+	          _this4.fingerPrint = macAddress;
 	        });
 	      } else if (this.isBrowser) {
 	        return new _fingerprintjs2.default().get(function (fingerPrint) {
-	          _this5.fingerPrint = Math.abs(__webpack_require__(18).encodeByteArray(fingerPrint));
+	          _this4.fingerPrint = Math.abs(__webpack_require__(18).encodeByteArray(fingerPrint)).toString();
 	        });
 	      } else if (customFingerprint) {
 	        this.fingerPrint = customFingerprint;
@@ -1098,14 +1055,55 @@ module.exports =
 	  }, {
 	    key: 'getStun',
 	    value: function getStun() {
-	      var _this6 = this;
+	      var _this5 = this;
 	
 	      if (this.isNode) {
 	        __webpack_require__(19).getStun(function (data) {
-	          _this6.stun = data;
+	          _this5.stun = data;
 	        });
 	      }
 	    }
+	
+	    /* eslint-disable no-param-reassign */
+	
+	  }, {
+	    key: 'emitterPromise',
+	    value: function emitterPromise(promise, callback) {
+	      var _this6 = this;
+	
+	      promise.on = function (event, listener) {
+	        _this6.eventEmitter.on(event, listener);
+	        return promise;
+	      };
+	      promise.onAny = function (listener) {
+	        _this6.eventEmitter.onAny(listener);
+	        return promise;
+	      };
+	      promise.offAny = function (listener) {
+	        _this6.eventEmitter.offAny(listener);
+	        return promise;
+	      };
+	      promise.once = function (event, listener) {
+	        _this6.eventEmitter.once(event, listener);
+	        return promise;
+	      };
+	      promise.many = function (event, times, listener) {
+	        _this6.eventEmitter.many(event, times, listener);
+	        return promise;
+	      };
+	      promise.removeListener = function (event, listener) {
+	        _this6.eventEmitter.removeListener(event, listener);
+	        return promise;
+	      };
+	      promise.removeAllListeners = function (events) {
+	        _this6.eventEmitter.removeAllListeners(events);
+	        return promise;
+	      };
+	
+	      return _nodeify2.default.extend(promise).nodeify(callback);
+	    }
+	    /* eslint-enable no-param-reassign */
+	
 	  }]);
 	
 	  return WebSocketTransport;
@@ -1305,7 +1303,7 @@ module.exports =
 	        msg.OrderID = orderId;
 	      }
 	
-	      return this.send(msg).nodeify(callback);
+	      return _nodeify2.default.extend(this.send(msg)).nodeify(callback);
 	    }
 	
 	    /**
@@ -1370,7 +1368,7 @@ module.exports =
 	        Data: data
 	      };
 	
-	      return this.send(msg).nodeify(callback);
+	      return _nodeify2.default.extend(this.send(msg)).nodeify(callback);
 	    }
 	  }, {
 	    key: 'confirmWithdraw',
@@ -1482,7 +1480,7 @@ module.exports =
 	        msg.Value = value;
 	      }
 	
-	      return this.send(msg).nodeify(callback);
+	      return _nodeify2.default.extend(this.send(msg)).nodeify(callback);
 	    }
 	  }, {
 	    key: 'requestDepositMethods',
@@ -1492,7 +1490,7 @@ module.exports =
 	        DepositMethodReqID: (0, _listener.generateRequestId)()
 	      };
 	
-	      return this.send(msg).nodeify(callback);
+	      return _nodeify2.default.extend(this.send(msg)).nodeify(callback);
 	    }
 	  }, {
 	    key: 'requestLedger',
