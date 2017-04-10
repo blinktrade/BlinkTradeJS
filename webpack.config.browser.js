@@ -26,7 +26,7 @@ const config = {
   module: {
     loaders: [{
       test: /\.js$/,
-      exclude: /node_modules/,
+      exclude: /node_modules\/(?!(ws)\/).*/,
       loader: 'babel',
       query: {
         plugins: ['lodash'],
