@@ -95,8 +95,8 @@ class WebSocketTransport extends BaseTransport {
   onClose(): void {
   }
 
-  onError(): void {
-    this.request.reject();
+  onError(error): void {
+    this.request.reject(error);
   }
 
   sendMessage(msg: Object): void {
