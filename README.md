@@ -328,7 +328,7 @@ blinktrade.subscribeTicker(["BLINK:BTCUSD"]).then(function(ticker) {
 ### Send and cancelling orders
 
 
-#####[Floats are Evil!](http://floating-point-gui.de/basic/)
+##### [Floats are Evil!](http://floating-point-gui.de/basic/)
 
 Converting Floats to Integers can be dangerous. Different programming languages can get weird rounding errors and imprecisions,
 so all API returns prices and bitcoin values as Integers and in "satoshis" format. We also expect Integers as input,
