@@ -8518,8 +8518,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function onClose() {}
 	  }, {
 	    key: 'onError',
-	    value: function onError() {
-	      this.request.reject();
+	    value: function onError(error) {
+	      this.request.reject(error);
 	    }
 	  }, {
 	    key: 'sendMessage',
@@ -9177,7 +9177,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.default = {
 	  prod: {
-	    ws: 'wss://api.blinktrade.com/trade/',
+	    ws: 'wss://ws.blinktrade.com/trade/',
 	    rest: 'https://api.blinktrade.com/'
 	  },
 	  testnet: {
