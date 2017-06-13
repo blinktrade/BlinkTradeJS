@@ -1,6 +1,6 @@
 export default {
   prod: {
-    ws: 'wss://api.blinktrade.com/trade/',
+    ws: 'wss://ws.blinktrade.com/trade/',
     rest: 'https://api.blinktrade.com/',
   },
   testnet: {
