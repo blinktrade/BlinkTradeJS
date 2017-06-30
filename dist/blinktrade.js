@@ -975,8 +975,8 @@ module.exports =
 	    value: function onClose() {}
 	  }, {
 	    key: 'onError',
-	    value: function onError() {
-	      this.request.reject();
+	    value: function onError(error) {
+	      this.request.reject(error);
 	    }
 	  }, {
 	    key: 'sendMessage',
@@ -1629,7 +1629,7 @@ module.exports =
 	});
 	exports.default = {
 	  prod: {
-	    ws: 'wss://api.blinktrade.com/trade/',
+	    ws: 'wss://ws.blinktrade.com/trade/',
 	    rest: 'https://api.blinktrade.com/'
 	  },
 	  testnet: {
