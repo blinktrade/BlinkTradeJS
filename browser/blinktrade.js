@@ -239,7 +239,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var username = _ref.username,
 	          password = _ref.password,
-	          secondFactor = _ref.secondFactor;
+	          secondFactor = _ref.secondFactor,
+	          brokerId = _ref.brokerId;
 	
 	      var userAgent = void 0;
 	      if (!this.isNode) {
@@ -262,7 +263,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var msg = _extends({
 	        MsgType: _requests2.default.LOGIN,
 	        UserReqID: (0, _listener.generateRequestId)(),
-	        BrokerID: this.brokerId,
+	        BrokerID: brokerId || this.brokerId,
 	        Username: username,
 	        Password: password,
 	        UserReqTyp: '1'
