@@ -446,7 +446,6 @@ describe('WebSocket', () => {
         expect(data.price).to.be.equal(580);
         expect(data.side).to.be.equal('buy');
         expect(data.type).to.be.equal('OB:NEW_ORDER');
-        expect(data.time).to.be.equal('Wed Aug 24 2016 03:50:48 GMT-0300 (BRT)');
         sinon.restore();
         done();
       }).catch(err => done(err));
