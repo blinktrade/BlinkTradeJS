@@ -72,10 +72,11 @@ class BlinkTradeWS extends WebSocketTransport {
     })).nodeify(callback);
   }
 
-  login({ username, password, secondFactor }: {
+  login({ username, password, secondFactor, brokerId }: {
     username: string,
     password: string,
     secondFactor?: string,
+    brokerId?: number,
   }, callback?: Function): Promise<Object> {
     let userAgent;
     if (!this.isNode) {
@@ -98,7 +99,7 @@ class BlinkTradeWS extends WebSocketTransport {
     const msg: Object = {
       MsgType: MsgTypes.LOGIN,
       UserReqID: generateRequestId(),
-      BrokerID: this.brokerId,
+      BrokerID: brokerId || this.brokerId,
       Username: username,
       Password: password,
       UserReqTyp: '1',
