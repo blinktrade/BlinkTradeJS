@@ -1,5 +1,6 @@
 # BlinkTradeJS SDK
 
+[![travis](https://travis-ci.org/blinktrade/BlinkTradeJS.svg?branch=master)](https://travis-ci.org/blinktrade/BlinkTradeJS)
 [![npm version](https://badge.fury.io/js/blinktrade.svg)](https://badge.fury.io/js/blinktrade)
 [![Dependency Status](https://gemnasium.com/badges/github.com/blinktrade/BlinkTradeJS.svg)](https://gemnasium.com/github.com/blinktrade/BlinkTradeJS)
 [![Known Vulnerabilities](https://snyk.io/test/github/blinktrade/blinktradejs/badge.svg)](https://snyk.io/test/github/blinktrade/blinktradejs)
