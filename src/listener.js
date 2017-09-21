@@ -41,8 +41,8 @@ export function getListener(msgType: string): Function {
 export function getRequest(message: Object): ?Request {
   let result;
   lodash.mapKeys(RequestTypes, (key) => {
-    if (lodash.has(message, key)) {
-      result = lodash.find(requests[key], { ReqId: String(message[key]) });
+    if (lodash.has(message, key) && message[key]) {
+      result = lodash.find(requests[key], { ReqId: String(message[key]) }) || result;
     }
   });
 
