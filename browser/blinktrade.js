@@ -6216,8 +6216,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	function getRequest(message) {
 	  var result = void 0;
 	  (0, _mapKeys3.default)(RequestTypes, function (key) {
-	    if ((0, _has3.default)(message, key)) {
-	      result = (0, _find3.default)(requests[key], { ReqId: String(message[key]) });
+	    if ((0, _has3.default)(message, key) && message[key]) {
+	      result = (0, _find3.default)(requests[key], { ReqId: String(message[key]) }) || result;
 	    }
 	  });
 	

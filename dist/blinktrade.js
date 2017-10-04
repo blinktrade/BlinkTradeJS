@@ -670,8 +670,8 @@ module.exports =
 	function getRequest(message) {
 	  var result = void 0;
 	  _lodash2.default.mapKeys(RequestTypes, function (key) {
-	    if (_lodash2.default.has(message, key)) {
-	      result = _lodash2.default.find(requests[key], { ReqId: String(message[key]) });
+	    if (_lodash2.default.has(message, key) && message[key]) {
+	      result = _lodash2.default.find(requests[key], { ReqId: String(message[key]) }) || result;
 	    }
 	  });
 	
