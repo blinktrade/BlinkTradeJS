@@ -95,11 +95,12 @@ class WebSocketTransport extends BaseTransport {
   onClose(): void {
   }
 
-  onError(error): void {
+  onError(error: any): void {
     this.request.reject(error);
   }
 
-  sendMessage(msg: Object): void {
+  /* eslint-disable no-unused-vars */
+  sendMessage(msg: Object, promise: any): void {
     if (this.socket.readyState === 1) {
       const data = msg;
 
@@ -109,6 +110,7 @@ class WebSocketTransport extends BaseTransport {
       this.socket.send(JSON.stringify(data));
     }
   }
+  /* eslint-enable no-unused-vars */
 
   sendMessageAsPromise(msg: Object): Promise<Object> {
     return new Promise((resolve, reject) => {
@@ -120,7 +122,7 @@ class WebSocketTransport extends BaseTransport {
 
       registerRequest(msg, promise);
 
-      // Send promise to sendMessage to we can mock it.
+      // We are passing the promise as a parameter to spy it in our tests
       this.sendMessage(msg, promise);
     });
   }
