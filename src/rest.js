@@ -20,22 +20,23 @@
  * @flow
  */
 
+import nodeify from 'nodeify';
 import RestTransport from './restTransport';
 
 class BlinkTradeRest extends RestTransport {
   ticker(callback?: Function): Promise<Object> {
-    return super.fetchPublic('ticker', callback);
+    return nodeify.extend(super.fetchPublic('ticker')).nodeify(callback);
   }
 
   trades({ limit = 1000, since = '0' }: {
     limit: number,
     since: string,
   } = {}, callback?: Function): Promise<Object> {
-    return super.fetchPublic(`trades?limit=${limit}&since=${since}`, callback);
+    return nodeify.extend(super.fetchPublic(`trades?limit=${limit}&since=${since}`)).nodeify(callback);
   }
 
   orderbook(callback?: Function): Promise<Object> {
-    return super.fetchPublic('orderbook', callback);
+    return nodeify.extend(super.fetchPublic('orderbook')).nodeify(callback);
   }
 }
 

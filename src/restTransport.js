@@ -21,7 +21,6 @@
  */
 
 import sjcl from 'sjcl';
-import nodeify from 'nodeify';
 import url from 'url';
 import path from 'path';
 import BaseTransport from './baseTransport';
@@ -83,16 +82,15 @@ class RestTransport extends BaseTransport {
       .then(response => response.json());
   }
 
-  fetchPublic(api: string, callback?: Function): Promise<Object> {
-    return nodeify(this.fetch({}, path.join('api/v1', this.currency, api)), callback);
+  fetchPublic(api: string): Promise<Object> {
+    return this.fetch({}, path.join('api/v1', this.currency, api));
   }
 
-  fetchTrade(msg: Object, callback?: Function): Promise<Object> {
+  fetchTrade(msg: Object): Promise<Object> {
     const headers = this.headers('POST', msg);
-    return nodeify.extend(this.fetch(msg, 'tapi/v1/message', headers, callback)
+    return this.fetch(msg, 'tapi/v1/message', headers)
       .then(response => (response.Status === 500 ? Promise.reject(response) : response.Responses))
-      .then(response => (response.length === 1 ? response[0] : response))
-    );
+      .then(response => (response.length === 1 ? response[0] : response));
   }
 }
 
