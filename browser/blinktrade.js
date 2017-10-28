@@ -8522,9 +8522,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function onError(error) {
 	      this.request.reject(error);
 	    }
+	
+	    /* eslint-disable no-unused-vars */
+	
 	  }, {
 	    key: 'sendMessage',
-	    value: function sendMessage(msg) {
+	    value: function sendMessage(msg, promise) {
 	      if (this.socket.readyState === 1) {
 	        var data = msg;
 	
@@ -8534,6 +8537,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.socket.send(JSON.stringify(data));
 	      }
 	    }
+	    /* eslint-enable no-unused-vars */
+	
 	  }, {
 	    key: 'sendMessageAsPromise',
 	    value: function sendMessageAsPromise(msg) {
@@ -8548,7 +8553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        (0, _listener.registerRequest)(msg, promise);
 	
-	        // Send promise to sendMessage to we can mock it.
+	        // We are passing the promise as a parameter to spy it in our tests
 	        _this3.sendMessage(msg, promise);
 	      });
 	    }
@@ -9182,8 +9187,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    rest: 'https://api.blinktrade.com/'
 	  },
 	  testnet: {
-	    ws: 'wss://api.testnet.blinktrade.com/trade/',
-	    rest: 'https://api.testnet.blinktrade.com/'
+	    ws: 'wss://api_testnet.blinktrade.com/trade/',
+	    rest: 'https://api_testnet.blinktrade.com/'
 	  }
 	};
 
@@ -30493,6 +30498,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 	
+	var _nodeify = __webpack_require__(134);
+	
+	var _nodeify2 = _interopRequireDefault(_nodeify);
+	
 	var _restTransport = __webpack_require__(315);
 	
 	var _restTransport2 = _interopRequireDefault(_restTransport);
@@ -30537,7 +30546,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(BlinkTradeRest, [{
 	    key: 'ticker',
 	    value: function ticker(callback) {
-	      return _get(BlinkTradeRest.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeRest.prototype), 'fetchPublic', this).call(this, 'ticker', callback);
+	      return _nodeify2.default.extend(_get(BlinkTradeRest.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeRest.prototype), 'fetchPublic', this).call(this, 'ticker')).nodeify(callback);
 	    }
 	  }, {
 	    key: 'trades',
@@ -30550,12 +30559,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var callback = arguments[1];
 	
-	      return _get(BlinkTradeRest.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeRest.prototype), 'fetchPublic', this).call(this, 'trades?limit=' + limit + '&since=' + since, callback);
+	      return _nodeify2.default.extend(_get(BlinkTradeRest.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeRest.prototype), 'fetchPublic', this).call(this, 'trades?limit=' + limit + '&since=' + since)).nodeify(callback);
 	    }
 	  }, {
 	    key: 'orderbook',
 	    value: function orderbook(callback) {
-	      return _get(BlinkTradeRest.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeRest.prototype), 'fetchPublic', this).call(this, 'orderbook', callback);
+	      return _nodeify2.default.extend(_get(BlinkTradeRest.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeRest.prototype), 'fetchPublic', this).call(this, 'orderbook')).nodeify(callback);
 	    }
 	  }]);
 	
@@ -30579,10 +30588,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _sjcl = __webpack_require__(316);
 	
 	var _sjcl2 = _interopRequireDefault(_sjcl);
-	
-	var _nodeify = __webpack_require__(134);
-	
-	var _nodeify2 = _interopRequireDefault(_nodeify);
 	
 	var _url = __webpack_require__(274);
 	
@@ -30687,18 +30692,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: 'fetchPublic',
-	    value: function fetchPublic(api, callback) {
-	      return (0, _nodeify2.default)(this.fetch({}, _path2.default.join('api/v1', this.currency, api)), callback);
+	    value: function fetchPublic(api) {
+	      return this.fetch({}, _path2.default.join('api/v1', this.currency, api));
 	    }
 	  }, {
 	    key: 'fetchTrade',
-	    value: function fetchTrade(msg, callback) {
+	    value: function fetchTrade(msg) {
 	      var headers = this.headers('POST', msg);
-	      return _nodeify2.default.extend(this.fetch(msg, 'tapi/v1/message', headers, callback).then(function (response) {
+	      return this.fetch(msg, 'tapi/v1/message', headers).then(function (response) {
 	        return response.Status === 500 ? Promise.reject(response) : response.Responses;
 	      }).then(function (response) {
 	        return response.length === 1 ? response[0] : response;
-	      }));
+	      });
 	    }
 	  }]);
 	
