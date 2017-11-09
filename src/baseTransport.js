@@ -57,12 +57,14 @@ class BaseTransport extends Base {
       return this.send(msg).then(data => {
         const Available = {};
         const balances = data[this.brokerId];
-        Object.keys(balances).map(currency => {
-          if (!currency.includes('locked')) {
-            Available[currency] = balances[currency] - balances[`${currency}_locked`];
-          }
-          return Available;
-        });
+        if (balances) {
+          Object.keys(balances).map(currency => {
+            if (!currency.includes('locked')) {
+              Available[currency] = balances[currency] - balances[`${currency}_locked`];
+            }
+            return Available;
+          });
+        }
 
         return resolve({ ...data, Available });
       }).catch(reject);
