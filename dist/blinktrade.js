@@ -1217,12 +1217,14 @@ module.exports =
 	        return _this2.send(msg).then(function (data) {
 	          var Available = {};
 	          var balances = data[_this2.brokerId];
-	          Object.keys(balances).map(function (currency) {
-	            if (!currency.includes('locked')) {
-	              Available[currency] = balances[currency] - balances[currency + '_locked'];
-	            }
-	            return Available;
-	          });
+	          if (balances) {
+	            Object.keys(balances).map(function (currency) {
+	              if (!currency.includes('locked')) {
+	                Available[currency] = balances[currency] - balances[currency + '_locked'];
+	              }
+	              return Available;
+	            });
+	          }
 	
 	          return resolve(_extends({}, data, { Available: Available }));
 	        }).catch(reject);
