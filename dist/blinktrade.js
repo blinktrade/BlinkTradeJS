@@ -189,7 +189,6 @@ module.exports =
 	    _this.session = {};
 	    return _this;
 	  }
-	
 	  /**
 	   * Session to store login information
 	   */
@@ -938,7 +937,6 @@ module.exports =
 	   * Stun object
 	   */
 	
-	
 	  /*
 	   * WebSocket Instance
 	   */
@@ -1003,13 +1001,7 @@ module.exports =
 	
 	      return new Promise(function (resolve, reject) {
 	        var promise = { resolve: resolve, reject: reject };
-	
-	        if (!msg) {
-	          return reject('Missing Message');
-	        }
-	
 	        (0, _listener.registerRequest)(msg, promise);
-	
 	        // We are passing the promise as a parameter to spy it in our tests
 	        _this3.sendMessage(msg, promise);
 	      });
@@ -1027,6 +1019,9 @@ module.exports =
 	      this.dispatchPromise(request, data);
 	      this.dispatchListeners(listener, data);
 	    }
+	
+	    /* eslint-disable indent */
+	
 	  }, {
 	    key: 'dispatchPromise',
 	    value: function dispatchPromise(request, data) {
@@ -1034,6 +1029,8 @@ module.exports =
 	        return request.resolve ? request.resolve(data) : request.callback ? request.callback(data) : null;
 	      }
 	    }
+	    /* eslint-enable indent */
+	
 	  }, {
 	    key: 'dispatchListeners',
 	    value: function dispatchListeners(listener, data) {
@@ -1594,7 +1591,6 @@ module.exports =
 	 * Is node.js environment.
 	 */
 	
-	
 	/*
 	 * url endpoint.
 	 */
@@ -1604,7 +1600,9 @@ module.exports =
 	
 	  _classCallCheck(this, Base);
 	
+	  /* eslint-disable indent */
 	  var endpoint = params.url ? params.url : params.prod ? _common2.default.prod[env] : _common2.default.testnet[env];
+	  /* eslint-enable indent */
 	
 	  this.brokerId = params.brokerId || 5;
 	
@@ -1741,6 +1739,7 @@ module.exports =
 	/* eslint-disable no-fallthrough */
 	/* eslint-disable no-underscore-dangle */
 	/* eslint-disable default-case */
+	/* eslint-disable prefer-destructuring */
 	/*
 	 * ByteArray enconding from google-closure-library
 	 */
@@ -1899,6 +1898,8 @@ module.exports =
 	/* eslint-disable no-param-reassign */
 	/* eslint-disable no-plusplus */
 	/* eslint-disable import/prefer-default-export */
+	/* eslint-disable no-restricted-properties */
+	/* eslint-disable no-buffer-constructor */
 	
 	exports.getStun = getStun;
 	
@@ -2195,7 +2196,6 @@ module.exports =
 	   * Exchanges currencies available.
 	   */
 	
-	
 	  /**
 	   * APIKey
 	   */
@@ -2208,7 +2208,9 @@ module.exports =
 	    _this.secret = params.secret;
 	    _this.currency = params.currency || 'USD';
 	
+	    /* eslint-disable indent */
 	    _this.fetchRequest = _this.isNode ? __webpack_require__(28) : _this.isBrowser ? __webpack_require__(29) : window.fetch;
+	    /* eslint-enable indent */
 	    return _this;
 	  }
 	
