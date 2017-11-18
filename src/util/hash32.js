@@ -4,6 +4,7 @@
 /* eslint-disable no-fallthrough */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable default-case */
+/* eslint-disable prefer-destructuring */
 /*
  * ByteArray enconding from google-closure-library
  */

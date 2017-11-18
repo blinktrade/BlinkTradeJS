@@ -440,15 +440,15 @@ describe('WebSocket', () => {
 
     BlinkTrade.connect().then(() => {
       BlinkTrade.subscribeOrderbook(['BTCUSD'])
-      .on('OB:NEW_ORDER', (data) => {
-        expect(data.index).to.be.equal(1);
-        expect(data.size).to.be.equal(1);
-        expect(data.price).to.be.equal(580);
-        expect(data.side).to.be.equal('buy');
-        expect(data.type).to.be.equal('OB:NEW_ORDER');
-        sinon.restore();
-        done();
-      }).catch(err => done(err));
+        .on('OB:NEW_ORDER', (data) => {
+          expect(data.index).to.be.equal(1);
+          expect(data.size).to.be.equal(1);
+          expect(data.price).to.be.equal(580);
+          expect(data.side).to.be.equal('buy');
+          expect(data.type).to.be.equal('OB:NEW_ORDER');
+          sinon.restore();
+          done();
+        }).catch(err => done(err));
     }).catch(err => done(err));
   });
 
@@ -468,11 +468,11 @@ describe('WebSocket', () => {
 
     BlinkTrade.connect().then(() => {
       BlinkTrade.subscribeOrderbook(['BTCUSD'])
-      .on('OB:UPDATE_ORDER', (data) => {
-        expect(data.type).to.be.equal('OB:UPDATE_ORDER');
-        sinon.restore();
-        done();
-      });
+        .on('OB:UPDATE_ORDER', (data) => {
+          expect(data.type).to.be.equal('OB:UPDATE_ORDER');
+          sinon.restore();
+          done();
+        });
     }).catch(err => done(err));
   });
 
@@ -492,11 +492,11 @@ describe('WebSocket', () => {
 
     BlinkTrade.connect().then(() => {
       BlinkTrade.subscribeOrderbook(['BTCUSD'])
-      .on('OB:DELETE_ORDER', (data) => {
-        expect(data.type).to.be.equal('OB:DELETE_ORDER');
-        sinon.restore();
-        done();
-      });
+        .on('OB:DELETE_ORDER', (data) => {
+          expect(data.type).to.be.equal('OB:DELETE_ORDER');
+          sinon.restore();
+          done();
+        });
     }).catch(err => done(err));
   });
 
@@ -516,11 +516,11 @@ describe('WebSocket', () => {
 
     BlinkTrade.connect().then(() => {
       BlinkTrade.subscribeOrderbook(['BTCUSD'])
-      .on('OB:DELETE_ORDERS_THRU', (data) => {
-        expect(data.type).to.be.equal('OB:DELETE_ORDERS_THRU');
-        sinon.restore();
-        done();
-      });
+        .on('OB:DELETE_ORDERS_THRU', (data) => {
+          expect(data.type).to.be.equal('OB:DELETE_ORDERS_THRU');
+          sinon.restore();
+          done();
+        });
     }).catch(err => done(err));
   });
 
@@ -540,11 +540,11 @@ describe('WebSocket', () => {
 
     BlinkTrade.connect().then(() => {
       return BlinkTrade.subscribeOrderbook(['BTCUSD'])
-      .on('OB:TRADE_NEW', (data) => {
-        expect(data.type).to.be.equal('OB:TRADE_NEW');
-        sinon.restore();
-        done();
-      });
+        .on('OB:TRADE_NEW', (data) => {
+          expect(data.type).to.be.equal('OB:TRADE_NEW');
+          sinon.restore();
+          done();
+        });
     }).catch(err => done(err));
   });
 
@@ -808,13 +808,13 @@ describe('WebSocket', () => {
 
     BlinkTrade.connect().then(() => {
       return BlinkTrade.requestWithdraw(withdraw)
-      .on('WITHDRAW_REFRESH', (data) => {
-        expect(data.Status).to.be.equal('8');
-        expect(data.DepositID).to.be.equal(data.DepositID);
-        expect(data.Data).to.be.eql(withdraw.data);
-        sinon.restore();
-        done();
-      });
+        .on('WITHDRAW_REFRESH', (data) => {
+          expect(data.Status).to.be.equal('8');
+          expect(data.DepositID).to.be.equal(data.DepositID);
+          expect(data.Data).to.be.eql(withdraw.data);
+          sinon.restore();
+          done();
+        });
     }).catch(err => done(err));
   });
 
@@ -871,15 +871,15 @@ describe('WebSocket', () => {
     BlinkTrade.connect().then(() => {
       BlinkTrade.onWithdrawRefresh(onWithdrawRefresh);
       return BlinkTrade.requestWithdraw(withdraw)
-      .on('WITHDRAW_REFRESH', (data) => {
-        expect(data.Status).to.be.equal('8');
-        expect(data.DepositID).to.be.equal(data.DepositID);
-        expect(data.Data).to.be.eql(withdraw.data);
-        expect(onWithdrawRefresh.called).to.be.true;
-        sinonListener.restore();
-        sinonEventEmitter.restore();
-        done();
-      });
+        .on('WITHDRAW_REFRESH', (data) => {
+          expect(data.Status).to.be.equal('8');
+          expect(data.DepositID).to.be.equal(data.DepositID);
+          expect(data.Data).to.be.eql(withdraw.data);
+          expect(onWithdrawRefresh.called).to.be.true;
+          sinonListener.restore();
+          sinonEventEmitter.restore();
+          done();
+        });
     }).catch(err => done(err));
   });
 });

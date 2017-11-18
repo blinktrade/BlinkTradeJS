@@ -42,7 +42,6 @@ import MsgTypes from './constants/requests';
 import WebSocketTransport from './wsTransport';
 
 class BlinkTradeWS extends WebSocketTransport {
-
   /**
    * Session to store login information
    */
@@ -249,16 +248,16 @@ class BlinkTradeWS extends WebSocketTransport {
           // Split orders in bids and asks
           /* eslint-disable no-param-reassign */
           const { bids, asks } = data.MDFullGrp
-          .filter(order => order.MDEntryType === '0' || order.MDEntryType === '1')
-          .reduce((prev, order) => {
-            const side = order.MDEntryType === '0' ? 'bids' : 'asks';
-            (prev[side] || (prev[side] = [])).push([
-              order.MDEntryPx / 1e8,
-              order.MDEntrySize / 1e8,
-              order.UserID,
-            ]);
-            return prev;
-          }, []);
+            .filter(order => order.MDEntryType === '0' || order.MDEntryType === '1')
+            .reduce((prev, order) => {
+              const side = order.MDEntryType === '0' ? 'bids' : 'asks';
+              (prev[side] || (prev[side] = [])).push([
+                order.MDEntryPx / 1e8,
+                order.MDEntrySize / 1e8,
+                order.UserID,
+              ]);
+              return prev;
+            }, []);
           /* eslint-enable no-param-reassign */
 
           registerEventEmitter({ MDReqID: data.MDReqID }, subscribeEvent);
@@ -344,10 +343,10 @@ class BlinkTradeWS extends WebSocketTransport {
 
     return super.emitterPromise(new Promise((resolve, reject) => {
       return super.requestDeposit({ currency, value, depositMethodId })
-      .then(deposit => {
-        registerEventEmitter({ ClOrdID: deposit.ClOrdID }, subscribeEvent);
-        return resolve(deposit);
-      }).catch(reject);
+        .then(deposit => {
+          registerEventEmitter({ ClOrdID: deposit.ClOrdID }, subscribeEvent);
+          return resolve(deposit);
+        }).catch(reject);
     }), callback);
   }
 

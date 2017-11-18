@@ -33,7 +33,6 @@ import {
 type StatusListType = '1' | '2' | '4' | '8';
 
 class BaseTransport extends Base {
-
   env: BlinkTradeEnv;
 
   send: (msg: Object) => Promise<Object>;

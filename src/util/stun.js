@@ -21,6 +21,8 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-plusplus */
 /* eslint-disable import/prefer-default-export */
+/* eslint-disable no-restricted-properties */
+/* eslint-disable no-buffer-constructor */
 
 import ip from 'ip';
 import dgram from 'dgram';
@@ -35,7 +37,7 @@ function addIPAddress(ipAddress) {
   }
 }
 
-export function getStun(callback: Function) {
+export function getStun(callback) {
   const socket = dgram.createSocket('udp4');
 
   const STUN_HEADER_LENGTH = 20;

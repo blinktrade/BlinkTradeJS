@@ -23,7 +23,6 @@
 import common from './constants/common';
 
 class Base {
-
   /*
    * url endpoint.
    */
@@ -45,10 +44,12 @@ class Base {
   isBrowser: boolean;
 
   constructor(params: BlinkTradeBase = {}, env: BlinkTradeEnv) {
+    /* eslint-disable indent */
     const endpoint =
         params.url  ? params.url
       : params.prod ? common.prod[env]
       :               common.testnet[env];
+    /* eslint-enable indent */
 
     this.brokerId = params.brokerId || 5;
 

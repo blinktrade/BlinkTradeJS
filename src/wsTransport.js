@@ -33,7 +33,6 @@ import {
 } from './listener';
 
 class WebSocketTransport extends BaseTransport {
-
   /*
    * WebSocket Instance
    */
@@ -115,13 +114,7 @@ class WebSocketTransport extends BaseTransport {
   sendMessageAsPromise(msg: Object): Promise<Object> {
     return new Promise((resolve, reject) => {
       const promise = { resolve, reject };
-
-      if (!msg) {
-        return reject('Missing Message');
-      }
-
       registerRequest(msg, promise);
-
       // We are passing the promise as a parameter to spy it in our tests
       this.sendMessage(msg, promise);
     });
@@ -139,6 +132,7 @@ class WebSocketTransport extends BaseTransport {
     this.dispatchListeners(listener, data);
   }
 
+  /* eslint-disable indent */
   dispatchPromise(request: ?Request, data: Object): any {
     if (request) {
       return request.resolve  ? request.resolve(data)
@@ -146,6 +140,7 @@ class WebSocketTransport extends BaseTransport {
            : null;
     }
   }
+  /* eslint-enable indent */
 
   dispatchListeners(listener: Function, data: Object): void {
     return listener && listener(data);

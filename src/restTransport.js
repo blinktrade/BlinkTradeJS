@@ -26,7 +26,6 @@ import path from 'path';
 import BaseTransport from './baseTransport';
 
 class RestTransport extends BaseTransport {
-
   /**
    * APIKey
    */
@@ -54,10 +53,12 @@ class RestTransport extends BaseTransport {
     this.secret = params.secret;
     this.currency = params.currency || 'USD';
 
+    /* eslint-disable indent */
     this.fetchRequest =
         this.isNode    ? require('isomorphic-fetch')
       : this.isBrowser ? require('fetch-jsonp')
       :                  window.fetch;
+    /* eslint-enable indent */
   }
 
   headers(method: string, body: Object): Object {
