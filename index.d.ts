@@ -214,6 +214,19 @@ declare module blinktrade {
         since?: string;
     }
 
+    interface Ledger extends Pagination {
+        /**
+         * Currency available on the current broker e.g.: `BTC`, `BRL`, `PKR`, `CLP`.
+         * Only one currency is supported on the request.
+         */
+        currency: string;
+
+        /**
+         * *DEPRECATED* Generic filter
+         */
+        filter: Array<string>;
+    }
+
     /**
      *
      */
