@@ -8784,7 +8784,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          _ref$page = _ref.page,
 	          Page = _ref$page === undefined ? 0 : _ref$page,
 	          _ref$pageSize = _ref.pageSize,
-	          PageSize = _ref$pageSize === undefined ? 40 : _ref$pageSize;
+	          PageSize = _ref$pageSize === undefined ? 40 : _ref$pageSize,
+	          filter = _ref.filter;
 	
 	      var callback = arguments[1];
 	
@@ -8794,6 +8795,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        Page: Page,
 	        PageSize: PageSize
 	      };
+	
+	      if (filter) {
+	        msg.Filter = filter;
+	      }
 	
 	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
 	        return _this3.send(msg).then(function (data) {
