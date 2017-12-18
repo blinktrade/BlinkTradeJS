@@ -70,9 +70,14 @@ class BaseTransport extends Base {
     })).nodeify(callback);
   }
 
-  myOrders({ page: Page = 0, pageSize: PageSize = 40 }: {
+  myOrders({
+    page: Page = 0,
+    pageSize: PageSize = 40,
+    filter,
+  }: {
     page?: number,
     pageSize?: number,
+    filter: Array<string>,
   } = {}, callback?: Function): Promise<Object> {
     const msg = {
       MsgType: MsgTypes.ORDER_LIST,
@@ -80,6 +85,10 @@ class BaseTransport extends Base {
       Page,
       PageSize,
     };
+
+    if (filter) {
+      msg.Filter = filter;
+    }
 
     return nodeify.extend(new Promise((resolve, reject) => {
       return this.send(msg).then(data => {
