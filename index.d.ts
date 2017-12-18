@@ -118,6 +118,16 @@ declare module blinktrade {
 
     type WithdrawStatus = '1' | '2' | '4' | '8';
 
+    interface MyOrdersList extends Pagination {
+      /**
+       * All:              empty
+       * Open Orders:      filter: ["has_leaves_qty eq 1"]
+       * Filled Orders:    filter: ["has_cum_qty eq 1"]
+       * Cancelled Orders: filter: ["has_cxl_qty eq 1"]
+       */
+      filter?: Array<string>
+    }
+
     /**
      * Returns all your withdraws.
      */
@@ -242,7 +252,7 @@ declare module blinktrade {
         /**
          * Returns your open orders
          */
-        myOrders(pagination?: Pagination, callback?: Function): Promise<Object>;
+        myOrders(param?: MyOrdersList, callback?: Function): Promise<Object>;
 
         /**
          * Send an order
