@@ -900,7 +900,7 @@ These methods bellow are both availabe under REST and WebSocket API.
 
 ### myOrders [websocket, rest]
 
-`myOrders(Object pagination, Function? callback)` => Promise / callback
+`myOrders(Object params, Function? callback)` => Promise / callback
 
 #### Arguments
 
@@ -908,6 +908,7 @@ These methods bellow are both availabe under REST and WebSocket API.
 |----------|--------|-------------------------------------------------|
 | page     | Number | Current page to fetch, defaults to 0            |
 | pageSize | Number | Number of orders, limits to 40 |
+| filter   | Array  | Optional; Open: ['has_leaves_qty eq 1'], Filled: ['has_cum_qty eq 1'], Cancelled: ['has_cxl_qty eq 1'] |
 
 ### requestLedger [websocket, rest]
 
