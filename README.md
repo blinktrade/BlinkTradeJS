@@ -411,7 +411,7 @@ List the latest trades executed on an exchange since a chosen date.
 
 ```js
 
-blinktrade.trades({ limit: 1000, since: "1472347212" }).then(function(data) {
+blinktrade.trades({ limit: 100, since: 2270000 }).then(function(data) {
   console.log("Trades", data);
 });
 
@@ -744,8 +744,8 @@ blinktrade.onWithdrawRefresh(function(withdraw) {
 
 | Name  | Type   | Description                                                                |
 |-------|--------|----------------------------------------------------------------------------|
-| limit | Number | Limit of trades that will be returned. <NUMBER> should be a positive integer. Optional; defaults to 1000 trades  |
-| since | Number | Date which executed trades must be fetched from. <TIMESTAMP> is in Unix Time date format. Optional; defaults to the date of the first executed trade |
+| limit | Number | Limit of trades that will be returned. <NUMBER> should be a positive integer. Optional; defaults to 100 trades |
+| since | Number | tid (TradeID) which executed trades must be fetched from. Optional; defaults to the date of the first executed trade |
 
 ### orderbook [rest]
 
