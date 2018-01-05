@@ -22,6 +22,6 @@ BlinkTrade.ticker().then(function(data) {
 BlinkTrade.orderbook().then(function(data) {
   console.log('OrderBook', data.pair, 'Bids:', data.bids.length, 'Asks:', data.asks.length);
 });
-BlinkTrade.trades({ limit: 1000, since: since }).then(function(data) {
+BlinkTrade.trades({ limit: 100, since: 2487 }).then(function(data) {
   console.log('Trades', data.length);
 });
