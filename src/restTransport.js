@@ -20,9 +20,10 @@
  * @flow
  */
 
-import sjcl from 'sjcl';
 import url from 'url';
+import sjcl from 'sjcl';
 import path from 'path';
+import fetch from 'isomorphic-fetch';
 import BaseTransport from './baseTransport';
 
 class RestTransport extends BaseTransport {
@@ -41,24 +42,12 @@ class RestTransport extends BaseTransport {
    */
   currency: 'USD' | 'BRL' | 'VEF' | 'CLP' | 'VND' | 'PKR';
 
-  /**
-   * Fetch rest API
-   */
-  fetchRequest: Function
-
   constructor(params: BlinkTradeRest) {
     super(params, 'rest');
 
     this.key = params.key;
     this.secret = params.secret;
     this.currency = params.currency || 'USD';
-
-    /* eslint-disable indent */
-    this.fetchRequest =
-        this.isNode    ? require('isomorphic-fetch')
-      : this.isBrowser ? require('fetch-jsonp')
-      :                  window.fetch;
-    /* eslint-enable indent */
   }
 
   headers(method: string, body: Object): Object {
@@ -79,7 +68,7 @@ class RestTransport extends BaseTransport {
   }
 
   fetch(msg: Object, api: string, headers?: Object = {}): Promise<Object> {
-    return this.fetchRequest(url.resolve(this.endpoint, api), headers)
+    return fetch(url.resolve(this.endpoint, api), headers)
       .then(response => response.json());
   }
 
