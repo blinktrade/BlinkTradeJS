@@ -299,7 +299,7 @@ class BlinkTradeWS extends WebSocketTransport {
   }
 
   tradeHistory({ since, filter, page: Page = 0, pageSize: PageSize = 80 }: {
-    since?: string,
+    since?: number,
     filter?: Array<string>,
     page?: number,
     pageSize?: number,
