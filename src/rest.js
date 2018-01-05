@@ -28,9 +28,9 @@ class BlinkTradeRest extends RestTransport {
     return nodeify.extend(super.fetchPublic('ticker')).nodeify(callback);
   }
 
-  trades({ limit = 1000, since = '0' }: {
+  trades({ limit = 100, since = 0 }: {
     limit: number,
-    since: string,
+    since: number,
   } = {}, callback?: Function): Promise<Object> {
     return nodeify.extend(super.fetchPublic(`trades?limit=${limit}&since=${since}`)).nodeify(callback);
   }

@@ -221,7 +221,7 @@ declare module blinktrade {
         /**
          * Date which executed trades must be fetched from. is in Unix Time date format. Optional; defaults to the date of the first executed trade.
          */
-        since?: string;
+        since?: number;
     }
 
     interface Ledger extends Pagination {
