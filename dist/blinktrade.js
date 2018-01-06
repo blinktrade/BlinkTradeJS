@@ -2118,9 +2118,9 @@ module.exports =
 	    value: function trades() {
 	      var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
 	          _ref$limit = _ref.limit,
-	          limit = _ref$limit === undefined ? 1000 : _ref$limit,
+	          limit = _ref$limit === undefined ? 100 : _ref$limit,
 	          _ref$since = _ref.since,
-	          since = _ref$since === undefined ? '0' : _ref$since;
+	          since = _ref$since === undefined ? 0 : _ref$since;
 	
 	      var callback = arguments[1];
 	
@@ -2150,17 +2150,21 @@ module.exports =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _sjcl = __webpack_require__(25);
-	
-	var _sjcl2 = _interopRequireDefault(_sjcl);
-	
-	var _url = __webpack_require__(26);
+	var _url = __webpack_require__(25);
 	
 	var _url2 = _interopRequireDefault(_url);
+	
+	var _sjcl = __webpack_require__(26);
+	
+	var _sjcl2 = _interopRequireDefault(_sjcl);
 	
 	var _path = __webpack_require__(27);
 	
 	var _path2 = _interopRequireDefault(_path);
+	
+	var _isomorphicFetch = __webpack_require__(28);
+	
+	var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
 	
 	var _baseTransport = __webpack_require__(12);
 	
@@ -2198,11 +2202,7 @@ module.exports =
 	  _inherits(RestTransport, _BaseTransport);
 	
 	  /**
-	   * Exchanges currencies available.
-	   */
-	
-	  /**
-	   * APIKey
+	   * APISecret
 	   */
 	  function RestTransport(params) {
 	    _classCallCheck(this, RestTransport);
@@ -2212,20 +2212,15 @@ module.exports =
 	    _this.key = params.key;
 	    _this.secret = params.secret;
 	    _this.currency = params.currency || 'USD';
-	
-	    /* eslint-disable indent */
-	    _this.fetchRequest = _this.isNode ? __webpack_require__(28) : _this.isBrowser ? __webpack_require__(29) : window.fetch;
-	    /* eslint-enable indent */
 	    return _this;
 	  }
 	
 	  /**
-	   * Fetch rest API
+	   * Exchanges currencies available.
 	   */
 	
-	
 	  /**
-	   * APISecret
+	   * APIKey
 	   */
 	
 	
@@ -2252,7 +2247,7 @@ module.exports =
 	    value: function fetch(msg, api) {
 	      var headers = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 	
-	      return this.fetchRequest(_url2.default.resolve(this.endpoint, api), headers).then(function (response) {
+	      return (0, _isomorphicFetch2.default)(_url2.default.resolve(this.endpoint, api), headers).then(function (response) {
 	        return response.json();
 	      });
 	    }
@@ -2282,13 +2277,13 @@ module.exports =
 /* 25 */
 /***/ function(module, exports) {
 
-	module.exports = require("sjcl");
+	module.exports = require("url");
 
 /***/ },
 /* 26 */
 /***/ function(module, exports) {
 
-	module.exports = require("url");
+	module.exports = require("sjcl");
 
 /***/ },
 /* 27 */
@@ -2301,12 +2296,6 @@ module.exports =
 /***/ function(module, exports) {
 
 	module.exports = require("isomorphic-fetch");
-
-/***/ },
-/* 29 */
-/***/ function(module, exports) {
-
-	module.exports = require("fetch-jsonp");
 
 /***/ }
 /******/ ]);
