@@ -1,6 +1,5 @@
 /* eslint-disable */
 
-var moment = require('moment');
 var BlinkTradeRest = require('blinktrade').BlinkTradeRest;
 
 var BlinkTrade = new BlinkTradeRest({
@@ -8,13 +7,6 @@ var BlinkTrade = new BlinkTradeRest({
   brokerId: 4,
   currency: 'BRL',
 });
-
-var since = moment()
-  .subtract(2, 'days')
-  .toDate()
-  .getTime()
-  .toString()
-  .slice(0, 10);
 
 BlinkTrade.ticker().then(function(data) {
   console.log('Ticker', data);

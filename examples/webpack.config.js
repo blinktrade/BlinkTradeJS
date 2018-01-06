@@ -9,21 +9,10 @@ module.exports = {
     },
   },
   entry: {
-    authWebSocket: './authWebSocket',
-    balance: './balance',
-    deposits: './deposits',
-    myOrders: './myOrders',
-    eventEmitters: './eventEmitters',
-    executionReport: './executionReport',
-    orderBookWebSocket: './orderBookWebSocket',
-    tickerWebSocket: './tickerWebSocket',
-    tradeHistory: './tradeHistory',
-    sendAndCancelOrdersRest: './sendAndCancelOrdersRest',
-    sendAndCancelOrdersWebSocket: './sendAndCancelOrdersWebSocket',
-    withdraw: './withdraw',
+    publicRest: './browser/publicRest',
   },
   output: {
-    path: path.join(__dirname, 'bundle'),
+    path: path.join(__dirname, 'browser/bundle'),
     filename: '[name].bundle.js',
   },
   module: {
