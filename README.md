@@ -33,6 +33,8 @@ All SDK supports either promises and callbacks, if a callback is provided as the
 otherwise it will just return the original promise, we also provide event emitters that you can use to get realtime updates through our WebSocket API,
 you can check the [Event Emitters section.](#event-emitters)
 
+**NOTE** We impose cross origin policy (cors), even though our SDK can work on the browser, it won’t work due our origin policy, so and we recommend you use on server side instead.
+Only the public rest is available on the browser, and other environments only works on testnet and you won’t be able use to use production environment on the browser, this might change in the future.
 
 ## Public REST API
 
