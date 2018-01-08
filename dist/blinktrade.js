@@ -905,12 +905,16 @@ module.exports =
 	  _inherits(WebSocketTransport, _BaseTransport);
 	
 	  /*
-	   * Transport Promise
+	   * Event emitter to dispatch websocket updates
 	   */
 	
 	
 	  /*
-	   * FingerPrint
+	   * Stun object
+	   */
+	
+	  /*
+	   * WebSocket Instance
 	   */
 	  function WebSocketTransport() {
 	    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -923,22 +927,19 @@ module.exports =
 	
 	    _this.getStun();
 	    _this.getFingerPrint(params.fingerPrint);
+	    _this.headers = params.headers;
 	
 	    _this.eventEmitter = new _eventemitter.EventEmitter2({ wildcard: true, delimiter: ':' });
 	    return _this;
 	  }
 	
 	  /*
-	   * Event emitter to dispatch websocket updates
+	   * Transport Promise
 	   */
 	
 	
 	  /*
-	   * Stun object
-	   */
-	
-	  /*
-	   * WebSocket Instance
+	   * FingerPrint
 	   */
 	
 	
@@ -952,7 +953,7 @@ module.exports =
 	
 	        var WebSocket = _this2.isNode ? __webpack_require__(15) : window.WebSocket;
 	
-	        _this2.socket = new WebSocket(_this2.endpoint);
+	        _this2.socket = new WebSocket(_this2.endpoint, null, _this2.headers);
 	        _this2.socket.onopen = _this2.onOpen.bind(_this2);
 	        _this2.socket.onclose = _this2.onClose.bind(_this2);
 	        _this2.socket.onerror = _this2.onError.bind(_this2);
@@ -2158,13 +2159,9 @@ module.exports =
 	
 	var _sjcl2 = _interopRequireDefault(_sjcl);
 	
-	var _path = __webpack_require__(27);
+	var _fetchPonyfill2 = __webpack_require__(27);
 	
-	var _path2 = _interopRequireDefault(_path);
-	
-	var _isomorphicFetch = __webpack_require__(28);
-	
-	var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
+	var _fetchPonyfill3 = _interopRequireDefault(_fetchPonyfill2);
 	
 	var _baseTransport = __webpack_require__(12);
 	
@@ -2197,6 +2194,9 @@ module.exports =
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+	
+	var _fetchPonyfill = (0, _fetchPonyfill3.default)(Promise),
+	    _fetch = _fetchPonyfill.fetch;
 	
 	var RestTransport = function (_BaseTransport) {
 	  _inherits(RestTransport, _BaseTransport);
@@ -2247,14 +2247,14 @@ module.exports =
 	    value: function fetch(msg, api) {
 	      var headers = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 	
-	      return (0, _isomorphicFetch2.default)(_url2.default.resolve(this.endpoint, api), headers).then(function (response) {
+	      return _fetch(_url2.default.resolve(this.endpoint, api), headers).then(function (response) {
 	        return response.json();
 	      });
 	    }
 	  }, {
 	    key: 'fetchPublic',
 	    value: function fetchPublic(api) {
-	      return this.fetch({}, _path2.default.join('api/v1', this.currency, api));
+	      return this.fetch({}, 'api/v1/' + this.currency + '/' + api);
 	    }
 	  }, {
 	    key: 'fetchTrade',
@@ -2289,13 +2289,7 @@ module.exports =
 /* 27 */
 /***/ function(module, exports) {
 
-	module.exports = require("path");
-
-/***/ },
-/* 28 */
-/***/ function(module, exports) {
-
-	module.exports = require("isomorphic-fetch");
+	module.exports = require("fetch-ponyfill");
 
 /***/ }
 /******/ ]);
