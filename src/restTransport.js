@@ -22,9 +22,10 @@
 
 import url from 'url';
 import sjcl from 'sjcl';
-import path from 'path';
-import fetch from 'isomorphic-fetch';
+import fetchPonyfill from 'fetch-ponyfill';
 import BaseTransport from './baseTransport';
+
+const { fetch } = fetchPonyfill(Promise);
 
 class RestTransport extends BaseTransport {
   /**
@@ -73,7 +74,7 @@ class RestTransport extends BaseTransport {
   }
 
   fetchPublic(api: string): Promise<Object> {
-    return this.fetch({}, path.join('api/v1', this.currency, api));
+    return this.fetch({}, `api/v1/${this.currency}/${api}`);
   }
 
   fetchTrade(msg: Object): Promise<Object> {
