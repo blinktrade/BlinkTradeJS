@@ -58,6 +58,8 @@ class WebSocketTransport extends BaseTransport {
    */
   eventEmitter: EventEmitter;
 
+  headers: Object;
+
   constructor(params?: BlinkTradeWS = {}) {
     super(params, 'ws');
 
@@ -65,6 +67,7 @@ class WebSocketTransport extends BaseTransport {
 
     this.getStun();
     this.getFingerPrint(params.fingerPrint);
+    this.headers = params.headers;
 
     this.eventEmitter = new EventEmitter({ wildcard: true, delimiter: ':' });
   }
@@ -75,7 +78,7 @@ class WebSocketTransport extends BaseTransport {
 
       const WebSocket = this.isNode ? require('ws') : window.WebSocket;
 
-      this.socket = new WebSocket(this.endpoint);
+      this.socket = new WebSocket(this.endpoint, null, this.headers);
       this.socket.onopen = this.onOpen.bind(this);
       this.socket.onclose = this.onClose.bind(this);
       this.socket.onerror = this.onError.bind(this);

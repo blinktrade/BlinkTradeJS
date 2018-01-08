@@ -5,6 +5,7 @@ declare interface BlinkTradeBase {
 }
 
 declare interface BlinkTradeWS extends BlinkTradeBase {
+  headers?: Object,
   fingerPrint?: string,
 }
 

@@ -27,6 +27,18 @@ declare module blinktrade {
         brokerId?: number;
     }
 
+    interface BlinkTradeWS extends BlinkTradeBase {
+
+      /**
+       * Custom headers to pass to websocket constructor
+       */
+      headers?: Object;
+      /**
+       * Custom fingerprint
+       */
+      fingerPrint?: String;
+    }
+
     /**
      *
      */
