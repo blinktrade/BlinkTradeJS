@@ -761,11 +761,13 @@ blinktrade.onWithdrawRefresh(function(withdraw) {
 
 #### Arguments
 
-| Name     | Type    | Description                                                  |
-|----------|---------|--------------------------------------------------------------|
-| prod     | Boolean | Production environment, default to false                     |
-| brokerId | Number  | [see brokers list]()                                         |
-| url      | String  | Custom url in case if you're using a custom backend url |
+| Name        | Type    | Description                              |
+|-------------|---------|------------------------------------------|
+| prod        | Boolean | Production environment, default to false |
+| brokerId    | Number  | [see brokers list]() |
+| url         | String  | Custom url in case if you're using a custom backend url |
+| headers     | String  | Custom headers to pass to WebSocket constructor if it supported, (useful on react-native) |
+| fingerPrint | String  | Custom fingerprint if you are not using in either a browser or node (useful on react-native) |
 
 ### connect [websocket]
 
