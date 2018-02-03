@@ -332,7 +332,7 @@ module.exports =
 	          resolve(formatTicker(data));
 	          (0, _listener.registerEventEmitter)({ SecurityStatusReqID: data.SecurityStatusReqID }, function (ticker) {
 	            callback && callback(null, formatTicker(ticker));
-	            return _this5.eventEmitter.emit('BLINK:' + ticker.Symbol, formatTicker(ticker));
+	            return _this5.eventEmitter.emit(ticker.Market + ':' + ticker.Symbol, formatTicker(ticker));
 	          });
 	        }).catch(reject);
 	      }), callback);
