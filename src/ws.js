@@ -176,7 +176,7 @@ class BlinkTradeWS extends WebSocketTransport {
         resolve(formatTicker(data));
         registerEventEmitter({ SecurityStatusReqID: data.SecurityStatusReqID }, (ticker) => {
           callback && callback(null, formatTicker(ticker));
-          return this.eventEmitter.emit(`BLINK:${ticker.Symbol}`, formatTicker(ticker));
+          return this.eventEmitter.emit(`${ticker.Market}:${ticker.Symbol}`, formatTicker(ticker));
         });
       }).catch(reject);
     }), callback);
