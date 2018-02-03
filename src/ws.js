@@ -255,6 +255,7 @@ class BlinkTradeWS extends WebSocketTransport {
                 order.MDEntryPx / 1e8,
                 order.MDEntrySize / 1e8,
                 order.UserID,
+                order.OrderID,
               ]);
               return prev;
             }, []);
