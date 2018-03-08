@@ -15137,7 +15137,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return order.MDEntryType === '0' || order.MDEntryType === '1';
 	    }).reduce(function (prev, order) {
 	      var side = order.MDEntryType === '0' ? 'bids' : 'asks';
-	      (prev[side] || (prev[side] = [])).push([order.MDEntryPx / 1e8, order.MDEntrySize / 1e8, order.UserID]);
+	      (prev[side] || (prev[side] = [])).push([order.MDEntryPx / 1e8, order.MDEntrySize / 1e8, order.UserID, order.OrderID]);
 	      return prev;
 	    }, []),
 	        bids = _data$MDFullGrp$filte.bids,
