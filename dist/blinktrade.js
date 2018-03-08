@@ -60,7 +60,7 @@ module.exports =
 	
 	var _ws2 = _interopRequireDefault(_ws);
 	
-	var _rest = __webpack_require__(23);
+	var _rest = __webpack_require__(25);
 	
 	var _rest2 = _interopRequireDefault(_rest);
 	
@@ -124,31 +124,29 @@ module.exports =
 	
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 	
-	var _lodash = __webpack_require__(3);
-	
-	var _lodash2 = _interopRequireDefault(_lodash);
-	
-	var _nodeify = __webpack_require__(4);
+	var _nodeify = __webpack_require__(3);
 	
 	var _nodeify2 = _interopRequireDefault(_nodeify);
 	
-	var _eventemitter = __webpack_require__(5);
+	var _eventemitter = __webpack_require__(4);
 	
-	var _listener = __webpack_require__(6);
+	var _listener = __webpack_require__(5);
 	
-	var _actionTypes = __webpack_require__(8);
+	var _events = __webpack_require__(10);
 	
-	var _requests = __webpack_require__(9);
+	var _messages = __webpack_require__(6);
 	
-	var _requests2 = _interopRequireDefault(_requests);
+	var _utils = __webpack_require__(11);
 	
-	var _wsTransport = __webpack_require__(10);
+	var _trade = __webpack_require__(12);
 	
-	var _wsTransport2 = _interopRequireDefault(_wsTransport);
+	var _trade2 = _interopRequireDefault(_trade);
+	
+	var _websocket = __webpack_require__(13);
+	
+	var _websocket2 = _interopRequireDefault(_websocket);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
 	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 	
@@ -178,36 +176,51 @@ module.exports =
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
 	
-	var BlinkTradeWS = function (_WebSocketTransport) {
-	  _inherits(BlinkTradeWS, _WebSocketTransport);
+	var BlinkTradeWS = function (_TradeBase) {
+	  _inherits(BlinkTradeWS, _TradeBase);
 	
+	  /**
+	   * Session to store login information
+	   */
 	  function BlinkTradeWS(params) {
 	    _classCallCheck(this, BlinkTradeWS);
 	
 	    var _this = _possibleConstructorReturn(this, (BlinkTradeWS.__proto__ || Object.getPrototypeOf(BlinkTradeWS)).call(this, params));
 	
+	    _this.transport = params.transport || new _websocket2.default(params);
 	    _this.session = {};
 	    return _this;
 	  }
-	  /**
-	   * Session to store login information
-	   */
-	
 	
 	  _createClass(BlinkTradeWS, [{
+	    key: 'connect',
+	    value: function connect(callback) {
+	      return this.transport.connect(callback);
+	    }
+	  }, {
+	    key: 'disconnect',
+	    value: function disconnect() {
+	      return this.transport.disconnect();
+	    }
+	  }, {
+	    key: 'send',
+	    value: function send(msg) {
+	      return this.transport.sendMessageAsPromise(msg);
+	    }
+	  }, {
 	    key: 'heartbeat',
 	    value: function heartbeat(callback) {
 	      var _this2 = this;
 	
 	      var d = new Date();
 	      var msg = {
-	        MsgType: _requests2.default.HEARTBEAT,
+	        MsgType: _messages.ActionMsgReq.HEARTBEAT,
 	        TestReqID: d.getTime(),
 	        SendTime: d.getTime()
 	      };
 	
 	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this2).call(_this2, msg).then(function (data) {
+	        return _this2.send(msg).then(function (data) {
 	          return resolve(_extends({}, data, {
 	            Latency: new Date(Date.now()) - data.SendTime
 	          }));
@@ -233,7 +246,7 @@ module.exports =
 	          UserAgentTimezoneOffset: new Date().getTimezoneOffset()
 	        };
 	      } else {
-	        var os = __webpack_require__(22);
+	        var os = __webpack_require__(24);
 	        userAgent = {
 	          UserAgent: os.type() + ' ' + os.release(),
 	          UserAgentLanguage: 'en_US',
@@ -243,7 +256,7 @@ module.exports =
 	      }
 	
 	      var msg = _extends({
-	        MsgType: _requests2.default.LOGIN,
+	        MsgType: _messages.ActionMsgReq.LOGIN,
 	        UserReqID: (0, _listener.generateRequestId)(),
 	        BrokerID: brokerId || this.brokerId,
 	        Username: username,
@@ -256,7 +269,7 @@ module.exports =
 	      }
 	
 	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this3).call(_this3, msg).then(function (data) {
+	        return _this3.send(msg).then(function (data) {
 	          if (data.UserStatus === 1) {
 	            _this3.session = data;
 	            return resolve(data);
@@ -270,14 +283,14 @@ module.exports =
 	    key: 'logout',
 	    value: function logout(callback) {
 	      var msg = {
-	        MsgType: _requests2.default.LOGOUT,
+	        MsgType: _messages.ActionMsgReq.LOGOUT,
 	        BrokerID: this.brokerId,
 	        UserReqID: (0, _listener.generateRequestId)(),
 	        Username: this.session.Username,
 	        UserReqTyp: '2'
 	      };
 	
-	      return _nodeify2.default.extend(_get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', this).call(this, msg)).nodeify(callback);
+	      return _nodeify2.default.extend(this.send(msg)).nodeify(callback);
 	    }
 	  }, {
 	    key: 'profile',
@@ -293,11 +306,11 @@ module.exports =
 	    value: function balance(callback) {
 	      var _this4 = this;
 	
-	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'emitterPromise', this).call(this, new Promise(function (resolve, reject) {
+	      return this.transport.emitterPromise(new Promise(function (resolve, reject) {
 	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'balance', _this4).call(_this4, callback).then(function (data) {
-	          (0, _listener.registerListener)('U3', function (balance) {
+	          (0, _listener.registerListener)(_messages.ActionMsgReq.BALANCE, function (balance) {
 	            callback && callback(null, balance);
-	            return _this4.eventEmitter.emit(_actionTypes.BALANCE, balance);
+	            return _this4.transport.eventEmitter.emit(_events.BALANCE, balance);
 	          });
 	          return resolve(data);
 	        }).catch(reject);
@@ -309,7 +322,7 @@ module.exports =
 	      var _this5 = this;
 	
 	      var msg = {
-	        MsgType: _requests2.default.SECURITY_STATUS,
+	        MsgType: _messages.ActionMsgReq.SECURITY_STATUS_SUBSCRIBE,
 	        SecurityStatusReqID: (0, _listener.generateRequestId)(),
 	        SubscriptionRequestType: '1',
 	        Instruments: symbols
@@ -327,12 +340,12 @@ module.exports =
 	        });
 	      };
 	
-	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'emitterPromise', this).call(this, new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this5).call(_this5, msg).then(function (data) {
+	      return this.transport.emitterPromise(new Promise(function (resolve, reject) {
+	        return _this5.send(msg).then(function (data) {
 	          resolve(formatTicker(data));
-	          (0, _listener.registerEventEmitter)({ SecurityStatusReqID: data.SecurityStatusReqID }, function (ticker) {
+	          (0, _listener.registerEventEmitter)('SecurityStatusReqID', data.SecurityStatusReqID, function (ticker) {
 	            callback && callback(null, formatTicker(ticker));
-	            return _this5.eventEmitter.emit(ticker.Market + ':' + ticker.Symbol, formatTicker(ticker));
+	            return _this5.transport.eventEmitter.emit(ticker.Market + ':' + ticker.Symbol, formatTicker(ticker));
 	          });
 	        }).catch(reject);
 	      }), callback);
@@ -341,12 +354,12 @@ module.exports =
 	    key: 'unSubscribeTicker',
 	    value: function unSubscribeTicker(SecurityStatusReqID) {
 	      var msg = {
-	        MsgType: _requests2.default.SECURITY_STATUS,
+	        MsgType: _messages.ActionMsgReq.SECURITY_STATUS_SUBSCRIBE,
 	        SecurityStatusReqID: SecurityStatusReqID,
 	        SubscriptionRequestType: '2'
 	      };
 	
-	      _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessage', this).call(this, msg);
+	      this.transport.sendMessage(msg);
 	      return SecurityStatusReqID;
 	    }
 	  }, {
@@ -355,7 +368,7 @@ module.exports =
 	      var _this6 = this;
 	
 	      var msg = {
-	        MsgType: _requests2.default.MARKET_DATA_FULL_REFRESH,
+	        MsgType: _messages.ActionMsgReq.MD_FULL_REFRESH,
 	        MDReqID: (0, _listener.generateRequestId)(),
 	        SubscriptionRequestType: '1',
 	        MarketDepth: 0,
@@ -381,17 +394,17 @@ module.exports =
 	            switch (order.MDEntryType) {
 	              case '0':
 	              case '1':
-	                var orderbookEvent = _actionTypes.ORDER_BOOK + ':' + _actionTypes.EVENTS.ORDERBOOK[order.MDUpdateAction];
+	                var orderbookEvent = 'OB:' + _events.EVENTS.ORDERBOOK[order.MDUpdateAction];
 	                var bidOfferData = _extends({}, dataOrder, { type: orderbookEvent });
 	
 	                callback && callback(null, bidOfferData);
-	                return _this6.eventEmitter.emit(orderbookEvent, bidOfferData);
+	                return _this6.transport.eventEmitter.emit(orderbookEvent, bidOfferData);
 	              case '2':
-	                var tradeEvent = _actionTypes.ORDER_BOOK + ':' + _actionTypes.EVENTS.TRADES[order.MDUpdateAction];
+	                var tradeEvent = 'OB:' + _events.EVENTS.TRADES[order.MDUpdateAction];
 	                var tradeData = _extends({}, dataOrder, { type: tradeEvent });
 	
 	                callback && callback(null, tradeData);
-	                return _this6.eventEmitter.emit(tradeEvent, tradeData);
+	                return _this6.transport.eventEmitter.emit(tradeEvent, tradeData);
 	              case '4':
 	                break;
 	              default:
@@ -402,31 +415,10 @@ module.exports =
 	        }
 	      };
 	
-	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'emitterPromise', this).call(this, new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this6).call(_this6, msg).then(function (data) {
-	          if (data.MsgType === 'W') {
-	            // Split orders in bids and asks
-	            /* eslint-disable no-param-reassign */
-	            var _data$MDFullGrp$filte = data.MDFullGrp.filter(function (order) {
-	              return order.MDEntryType === '0' || order.MDEntryType === '1';
-	            }).reduce(function (prev, order) {
-	              var side = order.MDEntryType === '0' ? 'bids' : 'asks';
-	              (prev[side] || (prev[side] = [])).push([order.MDEntryPx / 1e8, order.MDEntrySize / 1e8, order.UserID]);
-	              return prev;
-	            }, []),
-	                bids = _data$MDFullGrp$filte.bids,
-	                asks = _data$MDFullGrp$filte.asks;
-	            /* eslint-enable no-param-reassign */
-	
-	            (0, _listener.registerEventEmitter)({ MDReqID: data.MDReqID }, subscribeEvent);
-	
-	            return resolve(_extends({}, data, {
-	              MDFullGrp: _defineProperty({}, data.Symbol, {
-	                bids: bids,
-	                asks: asks
-	              })
-	            }));
-	          }
+	      return this.transport.emitterPromise(new Promise(function (resolve, reject) {
+	        return _this6.send(msg).then(function (data) {
+	          (0, _listener.registerEventEmitter)('MDReqID', data.MDReqID, subscribeEvent);
+	          return resolve((0, _utils.formatOrderBook)(data, _this6.level));
 	        }).catch(function (err) {
 	          return reject(err);
 	        });
@@ -436,13 +428,13 @@ module.exports =
 	    key: 'unSubscribeOrderbook',
 	    value: function unSubscribeOrderbook(MDReqID) {
 	      var msg = {
-	        MsgType: _requests2.default.MARKET_DATA_UNSUBSCRIBE,
+	        MsgType: _messages.ActionMsgReq.MD_FULL_REFRESH,
 	        MDReqID: MDReqID,
 	        MarketDepth: 0,
 	        SubscriptionRequestType: '2'
 	      };
 	
-	      _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessage', this).call(this, msg);
+	      this.transport.sendMessage(msg);
 	      return MDReqID;
 	    }
 	  }, {
@@ -452,17 +444,15 @@ module.exports =
 	
 	      (0, _listener.registerListener)('8', function (data) {
 	        callback && callback(data);
-	        var event = _actionTypes.EVENTS.EXECUTION_REPORT[data.ExecType];
-	        return _this7.eventEmitter.emit(_actionTypes.EXECUTION_REPORT + ':' + event, data);
+	        var event = _events.EVENTS.EXECUTION_REPORT[data.ExecType];
+	        return _this7.transport.eventEmitter.emit(_events.EXECUTION_REPORT + ':' + event, data);
 	      });
 	
-	      return this.eventEmitter;
+	      return this.transport.eventEmitter;
 	    }
 	  }, {
 	    key: 'tradeHistory',
 	    value: function tradeHistory() {
-	      var _this8 = this;
-	
 	      var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
 	          since = _ref2.since,
 	          filter = _ref2.filter,
@@ -474,7 +464,7 @@ module.exports =
 	      var callback = arguments[1];
 	
 	      var msg = {
-	        MsgType: _requests2.default.TRADE_HISTORY,
+	        MsgType: _messages.ActionMsgReq.TRADE_HISTORY,
 	        TradeHistoryReqID: (0, _listener.generateRequestId)(),
 	        Page: Page,
 	        PageSize: PageSize
@@ -488,26 +478,14 @@ module.exports =
 	        msg.Since = since;
 	      }
 	
-	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'sendMessageAsPromise', _this8).call(_this8, msg).then(function (data) {
-	          var Columns = data.Columns,
-	              trades = _objectWithoutProperties(data, ['Columns']);
+	      var format = (0, _utils.formatTradeHistory)(this.level);
 	
-	          var TradeHistory = _lodash2.default.groupBy(_lodash2.default.map(data.TradeHistoryGrp, function (trade) {
-	            return _lodash2.default.zipObject(Columns, trade);
-	          }), function (trade) {
-	            return trade.Market;
-	          });
-	          return resolve(_extends({}, trades, {
-	            TradeHistoryGrp: TradeHistory
-	          }));
-	        }).catch(reject);
-	      })).nodeify(callback);
+	      return _nodeify2.default.extend(this.send(msg).then(format)).nodeify(callback);
 	    }
 	  }, {
 	    key: 'requestDeposit',
 	    value: function requestDeposit() {
-	      var _this9 = this;
+	      var _this8 = this;
 	
 	      var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
 	          _ref3$currency = _ref3.currency,
@@ -519,12 +497,12 @@ module.exports =
 	
 	      var subscribeEvent = function subscribeEvent(deposit) {
 	        callback && callback(null, deposit);
-	        return _this9.eventEmitter.emit(_actionTypes.DEPOSIT_REFRESH, deposit);
+	        return _this8.transport.eventEmitter.emit(_events.DEPOSIT_REFRESH, deposit);
 	      };
 	
-	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'emitterPromise', this).call(this, new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'requestDeposit', _this9).call(_this9, { currency: currency, value: value, depositMethodId: depositMethodId }).then(function (deposit) {
-	          (0, _listener.registerEventEmitter)({ ClOrdID: deposit.ClOrdID }, subscribeEvent);
+	      return this.transport.emitterPromise(new Promise(function (resolve, reject) {
+	        return _this8.requestDeposit({ currency: currency, value: value, depositMethodId: depositMethodId }).then(function (deposit) {
+	          (0, _listener.registerEventEmitter)('ClOrdID', deposit.ClOrdID, subscribeEvent);
 	          return resolve(deposit);
 	        }).catch(reject);
 	      }), callback);
@@ -542,7 +520,7 @@ module.exports =
 	  }, {
 	    key: 'requestWithdraw',
 	    value: function requestWithdraw(_ref4, callback) {
-	      var _this10 = this;
+	      var _this9 = this;
 	
 	      var amount = _ref4.amount,
 	          data = _ref4.data,
@@ -553,12 +531,12 @@ module.exports =
 	
 	      var subscribeEvent = function subscribeEvent(withdraw) {
 	        callback && callback(null, withdraw);
-	        return _this10.eventEmitter.emit(_actionTypes.WITHDRAW_REFRESH, withdraw);
+	        return _this9.transport.eventEmitter.emit(_events.WITHDRAW_REFRESH, withdraw);
 	      };
 	
-	      return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'emitterPromise', this).call(this, new Promise(function (resolve, reject) {
-	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'requestWithdraw', _this10).call(_this10, { amount: amount, data: data, currency: currency, method: method }).then(function (withdraw) {
-	          (0, _listener.registerEventEmitter)({ ClOrdID: withdraw.ClOrdID }, subscribeEvent);
+	      return this.transport.emitterPromise(new Promise(function (resolve, reject) {
+	        return _this9.requestWithdraw({ amount: amount, data: data, currency: currency, method: method }).then(function (withdraw) {
+	          (0, _listener.registerEventEmitter)('ClOrdID', withdraw.ClOrdID, subscribeEvent);
 	          return resolve(withdraw);
 	        }).catch(reject);
 	      }), callback);
@@ -576,7 +554,7 @@ module.exports =
 	  }]);
 	
 	  return BlinkTradeWS;
-	}(_wsTransport2.default);
+	}(_trade2.default);
 	
 	exports.default = BlinkTradeWS;
 
@@ -584,22 +562,16 @@ module.exports =
 /* 3 */
 /***/ function(module, exports) {
 
-	module.exports = require("lodash");
+	module.exports = require("nodeify");
 
 /***/ },
 /* 4 */
 /***/ function(module, exports) {
 
-	module.exports = require("nodeify");
-
-/***/ },
-/* 5 */
-/***/ function(module, exports) {
-
 	module.exports = require("eventemitter2");
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -607,55 +579,45 @@ module.exports =
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; /**
-	                                                                                                                                                                                                                                                                   * BlinkTradeJS SDK
-	                                                                                                                                                                                                                                                                   * (c) 2016-present BlinkTrade, Inc.
-	                                                                                                                                                                                                                                                                   *
-	                                                                                                                                                                                                                                                                   * This file is part of BlinkTradeJS
-	                                                                                                                                                                                                                                                                   *
-	                                                                                                                                                                                                                                                                   * This program is free software: you can redistribute it and/or modify
-	                                                                                                                                                                                                                                                                   * it under the terms of the GNU General Public License as published by
-	                                                                                                                                                                                                                                                                   * the Free Software Foundation, either version 3 of the License, or
-	                                                                                                                                                                                                                                                                   * (at your option) any later version.
-	                                                                                                                                                                                                                                                                  
-	                                                                                                                                                                                                                                                                   * This program is distributed in the hope that it will be useful,
-	                                                                                                                                                                                                                                                                   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-	                                                                                                                                                                                                                                                                   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	                                                                                                                                                                                                                                                                   * GNU General Public License for more details.
-	                                                                                                                                                                                                                                                                  
-	                                                                                                                                                                                                                                                                   * You should have received a copy of the GNU General Public License
-	                                                                                                                                                                                                                                                                   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	                                                                                                                                                                                                                                                                   *
-	                                                                                                                                                                                                                                                                   * 
-	                                                                                                                                                                                                                                                                   */
-	
 	exports.getListeners = getListeners;
 	exports.generateRequestId = generateRequestId;
 	exports.getListener = getListener;
 	exports.getRequest = getRequest;
-	exports.registerRequest = registerRequest;
+	exports.setRequest = setRequest;
+	exports.deleteRequest = deleteRequest;
+	exports.getEventEmitter = getEventEmitter;
 	exports.registerEventEmitter = registerEventEmitter;
 	exports.registerListener = registerListener;
-	exports.deleteRequest = deleteRequest;
 	
-	var _lodash = __webpack_require__(3);
+	var _messages = __webpack_require__(6);
 	
-	var _lodash2 = _interopRequireDefault(_lodash);
+	var store = new Map(); /**
+	                        * BlinkTradeJS SDK
+	                        * (c) 2016-present BlinkTrade, Inc.
+	                        *
+	                        * This file is part of BlinkTradeJS
+	                        *
+	                        * This program is free software: you can redistribute it and/or modify
+	                        * it under the terms of the GNU General Public License as published by
+	                        * the Free Software Foundation, either version 3 of the License, or
+	                        * (at your option) any later version.
+	                       
+	                        * This program is distributed in the hope that it will be useful,
+	                        * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	                        * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	                        * GNU General Public License for more details.
+	                       
+	                        * You should have received a copy of the GNU General Public License
+	                        * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	                        *
+	                        * 
+	                        */
 	
-	var _requestTypes = __webpack_require__(7);
-	
-	var RequestTypes = _interopRequireWildcard(_requestTypes);
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var requests = {};
-	var listeners = {};
+	var emitters = new Map();
+	var listeners = new Map();
 	
 	function getListeners() {
-	  return requests;
+	  return listeners;
 	}
 	
 	function generateRequestId() {
@@ -666,95 +628,137 @@ module.exports =
 	  return listeners[msgType];
 	}
 	
-	function getRequest(message) {
-	  var result = void 0;
-	  _lodash2.default.mapKeys(RequestTypes, function (key) {
-	    if (_lodash2.default.has(message, key) && message[key]) {
-	      result = _lodash2.default.find(requests[key], { ReqId: String(message[key]) }) || result;
-	    }
-	  });
-	
-	  return result;
+	function getKey(messages, msg) {
+	  var key = messages[msg.MsgType][1];
+	  var value = msg[key];
+	  return key + ':' + value;
 	}
 	
-	function registerRequest(message, promise) {
-	  _lodash2.default.mapKeys(RequestTypes, function (key) {
-	    if (_lodash2.default.has(message, key)) {
-	      requests[key] = requests[key] || [];
-	      requests[key].push(_extends({ ReqId: String(message[key]) }, promise));
-	    }
-	  });
-	
-	  return requests;
+	function getRequest(msg) {
+	  return store.get(getKey(_messages.MsgActionRes, msg));
 	}
 	
-	function registerEventEmitter(message, callback) {
-	  _lodash2.default.mapKeys(RequestTypes, function (key) {
-	    if (_lodash2.default.has(message, key)) {
-	      if (requests[key] !== []) {
-	        var index = _lodash2.default.findIndex(requests[key], { ReqId: String(message[key]) });
-	        requests[key][index] = _extends({}, requests[key][index], {
-	          resolve: null,
-	          reject: null,
-	          callback: callback
-	        });
-	      }
-	    }
-	  });
+	function setRequest(msg, promise) {
+	  store.set(getKey(_messages.MsgActionReq, msg), promise);
+	}
 	
-	  return requests;
+	function deleteRequest(msg) {
+	  store.delete(getKey(_messages.MsgActionRes, msg));
+	}
+	
+	function getEventEmitter(msg) {
+	  return emitters.get(getKey(_messages.MsgActionRes, msg));
+	}
+	
+	function registerEventEmitter(key, value, callback) {
+	  emitters.set(key + ':' + value, callback);
 	}
 	
 	function registerListener(msgType, callback) {
-	  listeners[msgType] = listeners[msgType] || [];
-	  listeners[msgType] = callback;
-	}
-	
-	function deleteRequest(key) {
-	  requests = _lodash2.default.omit(requests, [key]);
-	  return requests;
+	  listeners.set(msgType, callback);
 	}
 
 /***/ },
-/* 7 */
-/***/ function(module, exports) {
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	var SOCKET_ID = exports.SOCKET_ID = 'SocketID';
-	var REQUEST_ID = exports.REQUEST_ID = 'ReqID';
-	var TEST_REQUEST_ID = exports.TEST_REQUEST_ID = 'TestReqID';
-	var USER_REQUEST_ID = exports.USER_REQUEST_ID = 'UserReqID';
-	var SECURITY_REQUEST_ID = exports.SECURITY_REQUEST_ID = 'SecurityReqID';
-	var RESET_PASSWORD_REQUEST_ID = exports.RESET_PASSWORD_REQUEST_ID = 'ResetPasswordReqID';
-	var DEPOSIT_REQUEST_ID = exports.DEPOSIT_REQUEST_ID = 'DepositReqID';
-	var WITHDRAW_REQUEST_ID = exports.WITHDRAW_REQUEST_ID = 'WithdrawReqID';
-	var BALANCE_REQUEST_ID = exports.BALANCE_REQUEST_ID = 'BalanceReqID';
-	var ORDERS_REQUEST_ID = exports.ORDERS_REQUEST_ID = 'OrdersReqID';
-	var ENABLE_TWO_FACTOR_REQUEST_ID = exports.ENABLE_TWO_FACTOR_REQUEST_ID = 'EnableTwoFactorReqID';
-	var DEPOSIT_METHOD_REQUEST_ID = exports.DEPOSIT_METHOD_REQUEST_ID = 'DepositMethodReqID';
-	var WITHDRAW_LIST_REQUEST_ID = exports.WITHDRAW_LIST_REQUEST_ID = 'WithdrawListReqID';
-	var BROKER_LIST_REQUEST_ID = exports.BROKER_LIST_REQUEST_ID = 'BrokerListReqID';
-	var DEPOSIT_LIST_REQUEST_ID = exports.DEPOSIT_LIST_REQUEST_ID = 'DepositListReqID';
-	var TRADE_HISTORY_REQUEST_ID = exports.TRADE_HISTORY_REQUEST_ID = 'TradeHistoryReqID';
-	var LEDGER_LIST_REQUEST_ID = exports.LEDGER_LIST_REQUEST_ID = 'LedgerListReqID';
-	var TRADERS_RANK_REQUEST_ID = exports.TRADERS_RANK_REQUEST_ID = 'TradersRankReqID';
-	var UPDATE_REQUEST_ID = exports.UPDATE_REQUEST_ID = 'UpdateReqID';
-	var POSITION_REQUEST_ID = exports.POSITION_REQUEST_ID = 'PositionReqID';
-	var SECURITY_STATUS_REQUEST_ID = exports.SECURITY_STATUS_REQUEST_ID = 'SecurityStatusReqID';
-	var API_KEY_LIST_REQUEST_ID = exports.API_KEY_LIST_REQUEST_ID = 'APIKeyListReqID';
-	var API_KEY_CREATE_REQUEST_ID = exports.API_KEY_CREATE_REQUEST_ID = 'APIKeyCreateReqID';
-	var API_KEY_REVOKE_REQUEST_ID = exports.API_KEY_REVOKE_REQUEST_ID = 'APIKeyRevokeReqID';
-	var PROCESS_DEPOSIT_REQUEST_ID = exports.PROCESS_DEPOSIT_REQUEST_ID = 'ProcessDepositReqID';
-	var CUSTOMER_LIST_REQUEST_ID = exports.CUSTOMER_LIST_REQUEST_ID = 'CustomerListReqID';
-	var CUSTOMER_REQUEST_ID = exports.CUSTOMER_REQUEST_ID = 'CustomerReqID';
-	var PROCESS_WITHDRAW_REQUEST_ID = exports.PROCESS_WITHDRAW_REQUEST_ID = 'ProcessWithdrawReqID';
-	var VERIFY_CUSTOMER_REQUEST_ID = exports.VERIFY_CUSTOMER_REQUEST_ID = 'VerifyCustomerReqID';
-	var MD_REQUEST_ID = exports.MD_REQUEST_ID = 'MDReqID';
-	var CLIENT_ORDER_ID = exports.CLIENT_ORDER_ID = 'ClOrdID';
+	exports.ActionMsgRes = exports.ActionMsgReq = exports.MsgActionRes = exports.MsgActionReq = undefined;
+	
+	var _ramda = __webpack_require__(7);
+	
+	var _requestTypes = __webpack_require__(8);
+	
+	var reqs = _interopRequireWildcard(_requestTypes);
+	
+	var _actionTypes = __webpack_require__(9);
+	
+	var actions = _interopRequireWildcard(_actionTypes);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	var msgToAction = (0, _ramda.compose)(_ramda.invertObj, (0, _ramda.map)(_ramda.head));
+	
+	var MsgActionReq = exports.MsgActionReq = {
+	  1: [actions.HEARTBEAT, reqs.TestReqID],
+	  BE: [actions.LOGIN, reqs.UserReqID],
+	  V: [actions.MD_FULL_REFRESH, reqs.MDReqID],
+	  x: [actions.SECURITY_LIST, reqs.SecurityReqID],
+	  e: [actions.SECURITY_STATUS_SUBSCRIBE, reqs.SecurityStatusReqID],
+	  D: [actions.ORDER_SEND, reqs.ClOrdID],
+	  F: [actions.ORDER_CANCEL, reqs.ClOrdID],
+	  U0: [actions.SIGNUP, reqs.UserReqID],
+	  U2: [actions.BALANCE, reqs.BalanceReqID],
+	  U6: [actions.WITHDRAW_REQUEST, reqs.WithdrawReqID],
+	  U4: [actions.ORDER_HISTORY, reqs.OrdersReqID],
+	  U18: [actions.DEPOSIT_REQUEST, reqs.DepositReqID],
+	  U20: [actions.DEPOSIT_METHODS, reqs.DepositMethodReqID],
+	  U24: [actions.WITHDRAW_CONFIRM, reqs.WithdrawReqID],
+	  U26: [actions.WITHDRAW_LIST, reqs.WithdrawListReqID],
+	  U28: [actions.BROKER_LIST, reqs.BrokerListReqID],
+	  U30: [actions.DEPOSIT_LIST, reqs.DepositListReqID],
+	  U32: [actions.TRADE_HISTORY, reqs.TradeHistoryReqID],
+	  U34: [actions.LEDGER_LIST, reqs.LedgerListReqID],
+	  U38: [actions.PROFILE_UPDATE, reqs.UpdateReqID],
+	  U50: [actions.API_KEY_LIST, reqs.APIKeyListReqID],
+	  U52: [actions.API_KEY_CREATE, reqs.APIKeyCreateReqID],
+	  U54: [actions.API_KEY_REVOKE, reqs.APIKeyRevokeReqID],
+	  U70: [actions.WITHDRAW_CANCEL, reqs.WithdrawCancelReqID],
+	  U78: [actions.WITHDRAW_COMMENT, reqs.WithdrawReqID],
+	  B0: [actions.DEPOSIT_PROCESS, reqs.ProcessDepositReqID],
+	  B2: [actions.CUSTOMER_LIST, reqs.CustomerListReqID],
+	  B4: [actions.KYC_REQUEST, reqs.CustomerReqID],
+	  B6: [actions.WITHDRAW_PROCESS, reqs.ProcessWithdrawReqID],
+	  B8: [actions.KYC_VERIFY, reqs.VerifyCustomerReqID]
+	};
+	
+	var MsgActionRes = exports.MsgActionRes = {
+	  0: [actions.HEARTBEAT, reqs.TestReqID],
+	  BF: [actions.LOGIN, reqs.UserReqID],
+	  W: [actions.MD_FULL_REFRESH, reqs.MDReqID],
+	  X: [actions.MD_INCREMENT, reqs.MDReqID],
+	  8: [actions.EXECUTION_REPORT, reqs.ClOrdID],
+	  y: [actions.SECURITY_LIST, reqs.SecurityReqID],
+	  f: [actions.SECURITY_STATUS_SUBSCRIBE, reqs.SecurityStatusReqID],
+	  U3: [actions.BALANCE, reqs.BalanceReqID],
+	  U7: [actions.WITHDRAW_REQUEST, reqs.WithdrawReqID],
+	  U5: [actions.ORDER_HISTORY, reqs.OrdersReqID],
+	  U9: [actions.WITHDRAW_REFRESH, reqs.WithdrawReqID],
+	  U19: [actions.DEPOSIT_REQUEST, reqs.DepositReqID],
+	  U21: [actions.DEPOSIT_METHODS, reqs.DepositMethodReqID],
+	  U23: [actions.DEPOSIT_REFRESH, reqs.DepositReqID],
+	  U25: [actions.WITHDRAW_CONFIRM, reqs.WithdrawReqID],
+	  U27: [actions.WITHDRAW_LIST, reqs.WithdrawListReqID],
+	  U29: [actions.BROKER_LIST, reqs.BrokerListReqID],
+	  U31: [actions.DEPOSIT_LIST, reqs.DepositListReqID],
+	  U33: [actions.TRADE_HISTORY, reqs.TradeHistoryReqID],
+	  U35: [actions.LEDGER_LIST, reqs.LedgerListReqID],
+	  U39: [actions.PROFILE_UPDATE, reqs.UpdateReqID],
+	  U51: [actions.API_KEY_LIST, reqs.APIKeyListReqID],
+	  U53: [actions.API_KEY_CREATE, reqs.APIKeyCreateReqID],
+	  U55: [actions.API_KEY_REVOKE, reqs.APIKeyRevokeReqID],
+	  U71: [actions.WITHDRAW_CANCEL, reqs.WithdrawCancelReqID],
+	  U79: [actions.WITHDRAW_COMMENT, reqs.WithdrawCancelReqID],
+	  B1: [actions.DEPOSIT_PROCESS, reqs.ProcessDepositReqID],
+	  B3: [actions.CUSTOMER_LIST, reqs.CustomerListReqID],
+	  B5: [actions.KYC_REQUEST, reqs.CustomerReqID],
+	  B9: [actions.KYC_VERIFY, reqs.VerifyCustomerReqID],
+	  B7: [actions.WITHDRAW_PROCESS, reqs.ProcessWithdrawReqID],
+	  B11: [actions.CUSTOMER_REFRESH]
+	};
+	
+	var ActionMsgReq = exports.ActionMsgReq = msgToAction(MsgActionReq);
+	var ActionMsgRes = exports.ActionMsgRes = msgToAction(MsgActionRes);
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	module.exports = require("ramda");
 
 /***/ },
 /* 8 */
@@ -765,9 +769,128 @@ module.exports =
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	var ReqID = exports.ReqID = 'ReqID';
+	var TestReqID = exports.TestReqID = 'TestReqID';
+	var UserReqID = exports.UserReqID = 'UserReqID';
+	var SecurityReqID = exports.SecurityReqID = 'SecurityReqID';
+	var ResetPasswordReqID = exports.ResetPasswordReqID = 'ResetPasswordReqID';
+	var DepositReqID = exports.DepositReqID = 'DepositReqID';
+	var WithdrawReqID = exports.WithdrawReqID = 'WithdrawReqID';
+	var BalanceReqID = exports.BalanceReqID = 'BalanceReqID';
+	var OrdersReqID = exports.OrdersReqID = 'OrdersReqID';
+	var EnableTwoFactorReqID = exports.EnableTwoFactorReqID = 'EnableTwoFactorReqID';
+	var DepositMethodReqID = exports.DepositMethodReqID = 'DepositMethodReqID';
+	var WithdrawListReqID = exports.WithdrawListReqID = 'WithdrawListReqID';
+	var WithdrawCancelReqID = exports.WithdrawCancelReqID = 'WithdrawCancelReqID';
+	var BrokerListReqID = exports.BrokerListReqID = 'BrokerListReqID';
+	var DepositListReqID = exports.DepositListReqID = 'DepositListReqID';
+	var TradeHistoryReqID = exports.TradeHistoryReqID = 'TradeHistoryReqID';
+	var LedgerListReqID = exports.LedgerListReqID = 'LedgerListReqID';
+	var TradersRankReqID = exports.TradersRankReqID = 'TradersRankReqID';
+	var UpdateReqID = exports.UpdateReqID = 'UpdateReqID';
+	var PositionReqID = exports.PositionReqID = 'PositionReqID';
+	var SecurityStatusReqID = exports.SecurityStatusReqID = 'SecurityStatusReqID';
+	var APIKeyListReqID = exports.APIKeyListReqID = 'APIKeyListReqID';
+	var APIKeyCreateReqID = exports.APIKeyCreateReqID = 'APIKeyCreateReqID';
+	var APIKeyRevokeReqID = exports.APIKeyRevokeReqID = 'APIKeyRevokeReqID';
+	var ProcessDepositReqID = exports.ProcessDepositReqID = 'ProcessDepositReqID';
+	var CustomerListReqID = exports.CustomerListReqID = 'CustomerListReqID';
+	var CustomerReqID = exports.CustomerReqID = 'CustomerReqID';
+	var ProcessWithdrawReqID = exports.ProcessWithdrawReqID = 'ProcessWithdrawReqID';
+	var VerifyCustomerReqID = exports.VerifyCustomerReqID = 'VerifyCustomerReqID';
+	var MDReqID = exports.MDReqID = 'MDReqID';
+	var ClOrdID = exports.ClOrdID = 'ClOrdID';
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var HEARTBEAT = exports.HEARTBEAT = 'HEARTBEAT';
+	
+	var BROKER_LIST = exports.BROKER_LIST = 'BROKER_LIST';
+	
+	var SECURITY_LIST = exports.SECURITY_LIST = 'SECURITY_LIST';
+	var SECURITY_STATUS_UPDATE = exports.SECURITY_STATUS_UPDATE = 'SECURITY_STATUS_UPDATE';
+	var SECURITY_STATUS_SUBSCRIBE = exports.SECURITY_STATUS_SUBSCRIBE = 'SECURITY_STATUS_SUBSCRIBE';
+	var SECURITY_STATUS_UNSUBSCRIBE = exports.SECURITY_STATUS_UNSUBSCRIBE = 'SECURITY_STATUS_UNSUBSCRIBE';
+	
+	var MD_TRADES = exports.MD_TRADES = 'MD_TRADES';
+	var MD_TRADES_UNSUBSCRIBE = exports.MD_TRADES_UNSUBSCRIBE = 'MD_TRADES_UNSUBSCRIBE';
+	var MD_INCREMENT = exports.MD_INCREMENT = 'MD_INCREMENT';
+	var MD_FULL_REFRESH = exports.MD_FULL_REFRESH = 'MD_FULL_REFRESH';
+	var MD_UNSUBSCRIBE = exports.MD_UNSUBSCRIBE = 'MD_UNSUBSCRIBE';
+	var MD_OPENING = exports.MD_OPENING = 'MD_OPENING';
+	
+	var OB_NEW_ORDER = exports.OB_NEW_ORDER = 'OB_NEW_ORDER';
+	var OB_UPDATE_ORDER = exports.OB_UPDATE_ORDER = 'OB_UPDATE_ORDER';
+	var OB_DELETE_ORDER = exports.OB_DELETE_ORDER = 'OB_DELETE_ORDER';
+	var OB_DELETE_ORDERS_THRU = exports.OB_DELETE_ORDERS_THRU = 'OB_DELETE_ORDERS_THRU';
+	
+	var EXECUTION_REPORT = exports.EXECUTION_REPORT = 'EXECUTION_REPORT';
+	var EXECUTION_REPORT_NEW = exports.EXECUTION_REPORT_NEW = 'EXECUTION_REPORT_NEW';
+	var EXECUTION_REPORT_PARTIAL = exports.EXECUTION_REPORT_PARTIAL = 'EXECUTION_REPORT_PARTIAL';
+	var EXECUTION_REPORT_EXECUTION = exports.EXECUTION_REPORT_EXECUTION = 'EXECUTION_REPORT_EXECUTION';
+	var EXECUTION_REPORT_CANCELED = exports.EXECUTION_REPORT_CANCELED = 'EXECUTION_REPORT_CANCELED';
+	var EXECUTION_REPORT_REJECTED = exports.EXECUTION_REPORT_REJECTED = 'EXECUTION_REPORT_REJECTED';
+	
+	var ORDER_HISTORY = exports.ORDER_HISTORY = 'ORDER_HISTORY';
+	
+	var ORDER_SEND = exports.ORDER_SEND = 'ORDER_SEND';
+	var ORDER_CANCEL = exports.ORDER_CANCEL = 'ORDER_CANCEL';
+	
+	var TRADE_NEW = exports.TRADE_NEW = 'TRADE_NEW';
+	var TRADE_HISTORY = exports.TRADE_HISTORY = 'TRADE_HISTORY';
+	
+	var TRADES = exports.TRADES = 'TRADES';
+	
+	var SIGNUP = exports.SIGNUP = 'SIGNUP';
+	
+	var LOGIN = exports.LOGIN = 'LOGIN';
+	var LOGOUT = exports.LOGOUT = 'LOGOUT';
+	var LOGIN_REQUIRED = exports.LOGIN_REQUIRED = 'LOGIN_REQUIRED';
+	var LOGIN_CLOSE = exports.LOGIN_CLOSE = 'LOGIN_CLOSE';
+	
+	var CHANGE_PASSWORD = exports.CHANGE_PASSWORD = 'CHANGE_PASSWORD';
+	
 	var BALANCE = exports.BALANCE = 'BALANCE';
 	
-	var ORDER_BOOK = exports.ORDER_BOOK = 'OB';
+	var PROFILE_UPDATE = exports.PROFILE_UPDATE = 'PROFILE_UPDATE';
+	
+	var WITHDRAW_LIST = exports.WITHDRAW_LIST = 'WITHDRAW_LIST';
+	var WITHDRAW_CANCEL = exports.WITHDRAW_CANCEL = 'WITHDRAW_CANCEL';
+	var WITHDRAW_FILTER = exports.WITHDRAW_FILTER = 'WITHDRAW_FILTER';
+	var WITHDRAW_REFRESH = exports.WITHDRAW_REFRESH = 'WITHDRAW_REFRESH';
+	var WITHDRAW_PROCESS = exports.WITHDRAW_PROCESS = 'WITHDRAW_PROCESS';
+	var WITHDRAW_CONFIRM = exports.WITHDRAW_CONFIRM = 'WITHDRAW_CONFIRM';
+	var WITHDRAW_COMMENT = exports.WITHDRAW_COMMENT = 'WITHDRAW_COMMENT';
+	var WITHDRAW_REQUEST = exports.WITHDRAW_REQUEST = 'WITHDRAW_REQUEST';
+	var WITHDRAW_SET_NEW_VISIBLE = exports.WITHDRAW_SET_NEW_VISIBLE = 'WITHDRAW_SET_NEW_VISIBLE';
+	
+	var DEPOSIT_LIST = exports.DEPOSIT_LIST = 'DEPOSIT_LIST';
+	var DEPOSIT_FILTER = exports.DEPOSIT_FILTER = 'DEPOSIT_FILTER';
+	var DEPOSIT_REFRESH = exports.DEPOSIT_REFRESH = 'DEPOSIT_REFRESH';
+	var DEPOSIT_PROCESS = exports.DEPOSIT_PROCESS = 'DEPOSIT_PROCESS';
+	var DEPOSIT_REQUEST = exports.DEPOSIT_REQUEST = 'DEPOSIT_REQUEST';
+	var DEPOSIT_METHODS = exports.DEPOSIT_METHODS = 'DEPOSIT_METHODS';
+	var DEPOSIT_SET_NEW_VISIBLE = exports.DEPOSIT_SET_NEW_VISIBLE = 'DEPOSIT_SET_NEW_VISIBLE';
+	
+	var LEDGER_LIST = exports.LEDGER_LIST = 'LEDGER_LIST';
+	var LEDGER_FILTER = exports.LEDGER_FILTER = 'LEDGER_FILTER';
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
 	var ORDER_BOOK_TRADE_NEW = exports.ORDER_BOOK_TRADE_NEW = 'TRADE_NEW';
 	var ORDER_BOOK_NEW_ORDER = exports.ORDER_BOOK_NEW_ORDER = 'NEW_ORDER';
 	var ORDER_BOOK_UPDATE_ORDER = exports.ORDER_BOOK_UPDATE_ORDER = 'UPDATE_ORDER';
@@ -780,9 +903,6 @@ module.exports =
 	var EXECUTION_REPORT_EXECUTION = exports.EXECUTION_REPORT_EXECUTION = 'EXECUTION';
 	var EXECUTION_REPORT_CANCELED = exports.EXECUTION_REPORT_CANCELED = 'CANCELED';
 	var EXECUTION_REPORT_REJECTED = exports.EXECUTION_REPORT_REJECTED = 'REJECTED';
-	
-	var DEPOSIT_REFRESH = exports.DEPOSIT_REFRESH = 'DEPOSIT_REFRESH';
-	var WITHDRAW_REFRESH = exports.WITHDRAW_REFRESH = 'WITHDRAW_REFRESH';
 	
 	/* eslint-disable quote-props */
 	var EVENTS = exports.EVENTS = {
@@ -805,48 +925,422 @@ module.exports =
 	};
 
 /***/ },
-/* 9 */
-/***/ function(module, exports) {
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.default = {
-	  HEARTBEAT: '1',
-	  LOGIN: 'BE',
-	  LOGOUT: 'BE',
-	  CHANGE_PASSWORD: 'BE',
+	exports.formatOrderBook = exports.formatTradeHistory = exports.formatColumns = undefined;
 	
-	  MARKET_DATA_FULL_REFRESH: 'V',
-	  MARKET_DATA_UNSUBSCRIBE: 'V',
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	  ORDER_SEND: 'D',
-	  ORDER_CANCEL: 'F',
+	var _ramda = __webpack_require__(7);
 	
-	  SECURITY_LIST: 'x',
-	  SECURITY_STATUS: 'e',
-	  BALANCE: 'U2',
-	  ORDER_LIST: 'U4',
-	  BROKER_LIST: 'U28',
-	  TRADE_HISTORY: 'U32',
-	  PROFILE_UPDATE: 'U38',
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
-	  REQUEST_DEPOSIT: 'U18',
-	  REQUEST_DEPOSIT_LIST: 'U30',
-	  REQUEST_DEPOSIT_METHODS: 'U20',
-	  REQUEST_WITHDRAW: 'U6',
-	  REQUEST_WITHDRAW_LIST: 'U26',
+	var formatColumns = exports.formatColumns = function formatColumns(field, level) {
+	  return function (data) {
+	    if (level === 2) {
+	      var list = (0, _ramda.map)((0, _ramda.zipObj)(data.Columns), data[field]);
+	      return Promise.resolve(_extends({}, data, _defineProperty({}, field, list)));
+	    }
 	
-	  REQUEST_LEDGER: 'U34',
+	    return Promise.resolve(data);
+	  };
+	};
 	
-	  CONFIRM_WITHDRAW: 'U24',
-	  CANCEL_WITHDRAW: 'U70'
+	var formatTradeHistory = exports.formatTradeHistory = function formatTradeHistory(level) {
+	  return function (data) {
+	    if (level === 2) {
+	      var TradeHistoryGrp = (0, _ramda.compose)((0, _ramda.groupBy)((0, _ramda.prop)('Market')), (0, _ramda.map)((0, _ramda.zipObj)(data.Columns)))(data.TradeHistoryGrp);
+	
+	      return Promise.resolve(_extends({}, data, { TradeHistoryGrp: TradeHistoryGrp }));
+	    }
+	
+	    return Promise.resolve(data);
+	  };
+	};
+	
+	var formatOrderBook = exports.formatOrderBook = function formatOrderBook(data, level) {
+	  if (level === 2) {
+	    var _data$MDFullGrp$filte = data.MDFullGrp.filter(function (order) {
+	      return order.MDEntryType === '0' || order.MDEntryType === '1';
+	    }).reduce(function (prev, order) {
+	      var side = order.MDEntryType === '0' ? 'bids' : 'asks';
+	      (prev[side] || (prev[side] = [])).push([order.MDEntryPx / 1e8, order.MDEntrySize / 1e8, order.UserID]);
+	      return prev;
+	    }, []),
+	        bids = _data$MDFullGrp$filte.bids,
+	        asks = _data$MDFullGrp$filte.asks;
+	
+	    return _extends({}, data, {
+	      MDFullGrp: _defineProperty({}, data.Symbol, {
+	        bids: bids,
+	        asks: asks
+	      })
+	    });
+	  }
+	
+	  return data;
 	};
 
 /***/ },
-/* 10 */
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /**
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * BlinkTradeJS SDK
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * (c) 2016-present BlinkTrade, Inc.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * This file is part of BlinkTradeJS
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * This program is free software: you can redistribute it and/or modify
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * it under the terms of the GNU General Public License as published by
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * the Free Software Foundation, either version 3 of the License, or
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * (at your option) any later version.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * This program is distributed in the hope that it will be useful,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * GNU General Public License for more details.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * You should have received a copy of the GNU General Public License
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * 
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
+	
+	var _nodeify = __webpack_require__(3);
+	
+	var _nodeify2 = _interopRequireDefault(_nodeify);
+	
+	var _messages = __webpack_require__(6);
+	
+	var _utils = __webpack_require__(11);
+	
+	var _listener = __webpack_require__(5);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var TradeBase = function () {
+	  function TradeBase(params) {
+	    _classCallCheck(this, TradeBase);
+	
+	    this.level = params.level;
+	    this.brokerId = params.brokerId;
+	  }
+	
+	  _createClass(TradeBase, [{
+	    key: 'balance',
+	    value: function balance(clientId, callback) {
+	      var msg = {
+	        MsgType: _messages.ActionMsgReq.BALANCE,
+	        BalanceReqID: (0, _listener.generateRequestId)()
+	      };
+	
+	      if (clientId) {
+	        msg.ClientID = clientId;
+	      }
+	
+	      return _nodeify2.default.extend(this.send(msg)).nodeify(callback);
+	    }
+	  }, {
+	    key: 'myOrders',
+	    value: function myOrders() {
+	      var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	          _ref$page = _ref.page,
+	          Page = _ref$page === undefined ? 0 : _ref$page,
+	          _ref$pageSize = _ref.pageSize,
+	          PageSize = _ref$pageSize === undefined ? 40 : _ref$pageSize,
+	          filter = _ref.filter;
+	
+	      var callback = arguments[1];
+	
+	      var msg = {
+	        MsgType: _messages.ActionMsgReq.ORDER_HISTORY,
+	        OrdersReqID: (0, _listener.generateRequestId)(),
+	        Page: Page,
+	        PageSize: PageSize
+	      };
+	
+	      if (filter) {
+	        msg.Filter = filter;
+	      }
+	
+	      var format = (0, _utils.formatColumns)('OrdListGrp', this.level);
+	
+	      return _nodeify2.default.extend(this.send(msg).then(format)).nodeify(callback);
+	    }
+	  }, {
+	    key: 'sendOrder',
+	    value: function sendOrder(_ref2, callback) {
+	      var side = _ref2.side,
+	          amount = _ref2.amount,
+	          price = _ref2.price,
+	          symbol = _ref2.symbol;
+	
+	      var msg = {
+	        MsgType: _messages.ActionMsgReq.ORDER_SEND,
+	        ClOrdID: (0, _listener.generateRequestId)(),
+	        Symbol: symbol,
+	        Side: side,
+	        OrdType: '2',
+	        Price: price,
+	        OrderQty: amount,
+	        BrokerID: this.brokerId
+	      };
+	
+	      return _nodeify2.default.extend(this.send(msg)).nodeify(callback);
+	    }
+	  }, {
+	    key: 'cancelOrder',
+	    value: function cancelOrder() {
+	      var param = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	      var callback = arguments[1];
+	
+	      var orderId = param.orderId ? param.orderId : param;
+	      var msg = {
+	        MsgType: _messages.ActionMsgReq.ORDER_CANCEL
+	      };
+	
+	      if (param.clientId) {
+	        msg.ClOrdID = param.clientId;
+	      }
+	
+	      if (param.orderId) {
+	        msg.OrderID = orderId;
+	      }
+	
+	      return _nodeify2.default.extend(this.send(msg)).nodeify(callback);
+	    }
+	
+	    /**
+	     * status: 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled
+	     */
+	
+	  }, {
+	    key: 'requestWithdrawList',
+	    value: function requestWithdrawList() {
+	      var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	          _ref3$page = _ref3.page,
+	          Page = _ref3$page === undefined ? 0 : _ref3$page,
+	          _ref3$pageSize = _ref3.pageSize,
+	          PageSize = _ref3$pageSize === undefined ? 20 : _ref3$pageSize,
+	          _ref3$status = _ref3.status,
+	          StatusList = _ref3$status === undefined ? ['1', '2', '4', '8'] : _ref3$status,
+	          filter = _ref3.filter,
+	          clientId = _ref3.clientId;
+	
+	      var callback = arguments[1];
+	
+	      var msg = {
+	        MsgType: _messages.ActionMsgReq.WITHDRAW_LIST,
+	        WithdrawListReqID: (0, _listener.generateRequestId)(),
+	        Page: Page,
+	        PageSize: PageSize,
+	        StatusList: StatusList
+	      };
+	
+	      if (filter && filter.length) {
+	        msg.Filter = filter;
+	      }
+	
+	      if (clientId) {
+	        msg.ClientID = clientId;
+	      }
+	
+	      var format = (0, _utils.formatColumns)('WithdrawListGrp', this.level);
+	
+	      return _nodeify2.default.extend(this.send(msg).then(format)).nodeify(callback);
+	    }
+	  }, {
+	    key: 'requestWithdraw',
+	    value: function requestWithdraw(_ref4, callback) {
+	      var amount = _ref4.amount,
+	          data = _ref4.data,
+	          _ref4$currency = _ref4.currency,
+	          currency = _ref4$currency === undefined ? 'BTC' : _ref4$currency,
+	          _ref4$method = _ref4.method,
+	          method = _ref4$method === undefined ? 'bitcoin' : _ref4$method;
+	
+	      var reqId = (0, _listener.generateRequestId)();
+	      var msg = {
+	        MsgType: _messages.ActionMsgReq.WITHDRAW_REQUEST,
+	        WithdrawReqID: reqId,
+	        ClOrdID: reqId,
+	        Method: method,
+	        Amount: amount,
+	        Currency: currency,
+	        Data: data
+	      };
+	
+	      return _nodeify2.default.extend(this.send(msg)).nodeify(callback);
+	    }
+	  }, {
+	    key: 'confirmWithdraw',
+	    value: function confirmWithdraw(_ref5, callback) {
+	      var WithdrawID = _ref5.withdrawId,
+	          confirmationToken = _ref5.confirmationToken,
+	          secondFactor = _ref5.secondFactor;
+	
+	      var msg = {
+	        MsgType: _messages.ActionMsgReq.CONFIRM_WITHDRAW,
+	        WithdrawReqID: (0, _listener.generateRequestId)(),
+	        WithdrawID: WithdrawID
+	      };
+	
+	      if (confirmationToken) {
+	        msg.ConfirmationToken = confirmationToken;
+	      }
+	
+	      if (secondFactor) {
+	        msg.SecondFactor = secondFactor;
+	      }
+	
+	      return _nodeify2.default.extend(this.send(msg)).nodeify(callback);
+	    }
+	  }, {
+	    key: 'cancelWithdraw',
+	    value: function cancelWithdraw(withdrawId, callback) {
+	      var reqId = (0, _listener.generateRequestId)();
+	      var msg = {
+	        MsgType: _messages.ActionMsgReq.CANCEL_WITHDRAW,
+	        WithdrawCancelReqID: reqId,
+	        ClOrdID: reqId,
+	        WithdrawID: withdrawId
+	      };
+	
+	      return _nodeify2.default.extend(this.send(msg)).nodeify(callback);
+	    }
+	  }, {
+	    key: 'requestDepositList',
+	    value: function requestDepositList() {
+	      var _ref6 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	          _ref6$page = _ref6.page,
+	          Page = _ref6$page === undefined ? 0 : _ref6$page,
+	          _ref6$pageSize = _ref6.pageSize,
+	          PageSize = _ref6$pageSize === undefined ? 20 : _ref6$pageSize,
+	          _ref6$status = _ref6.status,
+	          StatusList = _ref6$status === undefined ? ['1', '2', '4', '8'] : _ref6$status,
+	          filter = _ref6.filter,
+	          clientId = _ref6.clientId;
+	
+	      var callback = arguments[1];
+	
+	      var msg = {
+	        MsgType: _messages.ActionMsgReq.DEPOSIT_LIST,
+	        DepositListReqID: (0, _listener.generateRequestId)(),
+	        Page: Page,
+	        PageSize: PageSize,
+	        StatusList: StatusList
+	      };
+	
+	      if (filter && filter.length) {
+	        msg.Filter = filter;
+	      }
+	
+	      if (clientId) {
+	        msg.ClientID = clientId;
+	      }
+	
+	      var format = (0, _utils.formatColumns)('DepositListGrp', this.level);
+	
+	      return _nodeify2.default.extend(this.send(msg).then(format)).nodeify(callback);
+	    }
+	  }, {
+	    key: 'requestDeposit',
+	    value: function requestDeposit() {
+	      var _ref7 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	          _ref7$currency = _ref7.currency,
+	          currency = _ref7$currency === undefined ? 'BTC' : _ref7$currency,
+	          value = _ref7.value,
+	          depositMethodId = _ref7.depositMethodId;
+	
+	      var callback = arguments[1];
+	
+	      var reqId = (0, _listener.generateRequestId)();
+	      var msg = {
+	        MsgType: _messages.ActionMsgReq.DEPOSIT_REQUEST,
+	        DepositReqID: reqId,
+	        ClOrdID: reqId,
+	        Currency: currency,
+	        BrokerID: this.brokerId
+	      };
+	
+	      if (currency !== 'BTC') {
+	        msg.DepositMethodID = depositMethodId;
+	        msg.Value = value;
+	      }
+	
+	      return _nodeify2.default.extend(this.send(msg)).nodeify(callback);
+	    }
+	  }, {
+	    key: 'requestDepositMethods',
+	    value: function requestDepositMethods(callback) {
+	      var msg = {
+	        MsgType: _messages.ActionMsgReq.DEPOSIT_METHODS,
+	        DepositMethodReqID: (0, _listener.generateRequestId)(),
+	        BrokerID: this.brokerId
+	      };
+	
+	      return _nodeify2.default.extend(this.send(msg)).nodeify(callback);
+	    }
+	  }, {
+	    key: 'requestLedger',
+	    value: function requestLedger() {
+	      var _ref8 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	          _ref8$page = _ref8.page,
+	          Page = _ref8$page === undefined ? 0 : _ref8$page,
+	          _ref8$pageSize = _ref8.pageSize,
+	          PageSize = _ref8$pageSize === undefined ? 20 : _ref8$pageSize,
+	          brokerId = _ref8.brokerId,
+	          clientId = _ref8.clientId,
+	          currency = _ref8.currency;
+	
+	      var callback = arguments[1];
+	
+	      var msg = {
+	        MsgType: _messages.ActionMsgReq.LEDGER_LIST,
+	        LedgerListReqID: (0, _listener.generateRequestId)(),
+	        BrokerID: this.brokerId,
+	        Page: Page,
+	        PageSize: PageSize
+	      };
+	
+	      if (brokerId) {
+	        msg.BrokerID = brokerId;
+	      }
+	      if (currency) {
+	        msg.Currency = currency;
+	      }
+	      if (clientId) {
+	        msg.ClientID = clientId;
+	      }
+	
+	      var format = (0, _utils.formatColumns)('LedgerListGrp', this.level);
+	
+	      return _nodeify2.default.extend(this.send(msg).then(format)).nodeify(callback);
+	    }
+	  }]);
+	
+	  return TradeBase;
+	}();
+	
+	exports.default = TradeBase;
+
+/***/ },
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -857,21 +1351,21 @@ module.exports =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _nodeify = __webpack_require__(4);
+	var _nodeify = __webpack_require__(3);
 	
 	var _nodeify2 = _interopRequireDefault(_nodeify);
 	
-	var _fingerprintjs = __webpack_require__(11);
+	var _fingerprintjs = __webpack_require__(14);
 	
 	var _fingerprintjs2 = _interopRequireDefault(_fingerprintjs);
 	
-	var _eventemitter = __webpack_require__(5);
+	var _eventemitter = __webpack_require__(4);
 	
-	var _baseTransport = __webpack_require__(12);
+	var _transport = __webpack_require__(15);
 	
-	var _baseTransport2 = _interopRequireDefault(_baseTransport);
+	var _transport2 = _interopRequireDefault(_transport);
 	
-	var _listener = __webpack_require__(6);
+	var _listener = __webpack_require__(5);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -901,8 +1395,8 @@ module.exports =
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
 	
-	var WebSocketTransport = function (_BaseTransport) {
-	  _inherits(WebSocketTransport, _BaseTransport);
+	var WebSocketTransport = function (_Transport) {
+	  _inherits(WebSocketTransport, _Transport);
 	
 	  /*
 	   * Event emitter to dispatch websocket updates
@@ -951,7 +1445,7 @@ module.exports =
 	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
 	        _this2.request = { resolve: resolve, reject: reject };
 	
-	        var WebSocket = _this2.isNode ? __webpack_require__(15) : window.WebSocket;
+	        var WebSocket = _this2.isNode ? __webpack_require__(17) : window.WebSocket;
 	
 	        _this2.socket = new WebSocket(_this2.endpoint, null, _this2.headers);
 	        _this2.socket.onopen = _this2.onOpen.bind(_this2);
@@ -978,12 +1472,9 @@ module.exports =
 	    value: function onError(error) {
 	      this.request.reject(error);
 	    }
-	
-	    /* eslint-disable no-unused-vars */
-	
 	  }, {
 	    key: 'sendMessage',
-	    value: function sendMessage(msg, promise) {
+	    value: function sendMessage(msg) {
 	      if (this.socket.readyState === 1) {
 	        var data = msg;
 	
@@ -993,8 +1484,6 @@ module.exports =
 	        this.socket.send(JSON.stringify(data));
 	      }
 	    }
-	    /* eslint-enable no-unused-vars */
-	
 	  }, {
 	    key: 'sendMessageAsPromise',
 	    value: function sendMessageAsPromise(msg) {
@@ -1002,7 +1491,7 @@ module.exports =
 	
 	      return new Promise(function (resolve, reject) {
 	        var promise = { resolve: resolve, reject: reject };
-	        (0, _listener.registerRequest)(msg, promise);
+	        (0, _listener.setRequest)(msg, { resolve: resolve, reject: reject });
 	        // We are passing the promise as a parameter to spy it in our tests
 	        _this3.sendMessage(msg, promise);
 	      });
@@ -1016,22 +1505,28 @@ module.exports =
 	      }
 	
 	      var request = (0, _listener.getRequest)(data);
+	      var emitter = (0, _listener.getEventEmitter)(data);
 	      var listener = (0, _listener.getListener)(data.MsgType);
+	
 	      this.dispatchPromise(request, data);
+	      this.dispatchEventEmitters(emitter, data);
 	      this.dispatchListeners(listener, data);
 	    }
-	
-	    /* eslint-disable indent */
-	
 	  }, {
 	    key: 'dispatchPromise',
 	    value: function dispatchPromise(request, data) {
-	      if (request) {
-	        return request.resolve ? request.resolve(data) : request.callback ? request.callback(data) : null;
+	      if (request && request.resolve) {
+	        (0, _listener.deleteRequest)(data);
+	        return request.resolve(data);
 	      }
 	    }
-	    /* eslint-enable indent */
-	
+	  }, {
+	    key: 'dispatchEventEmitters',
+	    value: function dispatchEventEmitters(emitter, data) {
+	      if (emitter) {
+	        return emitter(data);
+	      }
+	    }
 	  }, {
 	    key: 'dispatchListeners',
 	    value: function dispatchListeners(listener, data) {
@@ -1043,12 +1538,12 @@ module.exports =
 	      var _this4 = this;
 	
 	      if (this.isNode) {
-	        return __webpack_require__(16).getMac(function (macAddress) {
+	        return __webpack_require__(18).getMac(function (macAddress) {
 	          _this4.fingerPrint = macAddress;
 	        });
 	      } else if (this.isBrowser) {
 	        return new _fingerprintjs2.default().get(function (fingerPrint) {
-	          _this4.fingerPrint = Math.abs(__webpack_require__(18).encodeByteArray(fingerPrint)).toString();
+	          _this4.fingerPrint = Math.abs(__webpack_require__(20).encodeByteArray(fingerPrint)).toString();
 	        });
 	      } else if (customFingerprint) {
 	        this.fingerPrint = customFingerprint;
@@ -1062,7 +1557,7 @@ module.exports =
 	      var _this5 = this;
 	
 	      if (this.isNode) {
-	        __webpack_require__(19).getStun(function (data) {
+	        __webpack_require__(21).getStun(function (data) {
 	          _this5.stun = data;
 	        });
 	      }
@@ -1111,18 +1606,18 @@ module.exports =
 	  }]);
 	
 	  return WebSocketTransport;
-	}(_baseTransport2.default);
+	}(_transport2.default);
 	
 	exports.default = WebSocketTransport;
 
 /***/ },
-/* 11 */
+/* 14 */
 /***/ function(module, exports) {
 
 	module.exports = require("fingerprintjs2");
 
 /***/ },
-/* 12 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1131,439 +1626,7 @@ module.exports =
 	  value: true
 	});
 	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _lodash = __webpack_require__(3);
-	
-	var _lodash2 = _interopRequireDefault(_lodash);
-	
-	var _nodeify = __webpack_require__(4);
-	
-	var _nodeify2 = _interopRequireDefault(_nodeify);
-	
-	var _base = __webpack_require__(13);
-	
-	var _base2 = _interopRequireDefault(_base);
-	
-	var _requests = __webpack_require__(9);
-	
-	var _requests2 = _interopRequireDefault(_requests);
-	
-	var _requestTypes = __webpack_require__(7);
-	
-	var RequestTypes = _interopRequireWildcard(_requestTypes);
-	
-	var _listener = __webpack_require__(6);
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * BlinkTradeJS SDK
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * (c) 2016-present BlinkTrade, Inc.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This file is part of BlinkTradeJS
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This program is free software: you can redistribute it and/or modify
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * it under the terms of the GNU General Public License as published by
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * the Free Software Foundation, either version 3 of the License, or
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * (at your option) any later version.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This program is distributed in the hope that it will be useful,
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * but WITHOUT ANY WARRANTY; without even the implied warranty of
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * GNU General Public License for more details.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * You should have received a copy of the GNU General Public License
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-	
-	var BaseTransport = function (_Base) {
-	  _inherits(BaseTransport, _Base);
-	
-	  function BaseTransport(params, env) {
-	    _classCallCheck(this, BaseTransport);
-	
-	    var _this = _possibleConstructorReturn(this, (BaseTransport.__proto__ || Object.getPrototypeOf(BaseTransport)).call(this, params, env));
-	
-	    _this.send = env === 'ws' ? _this.sendMessageAsPromise : _this.fetchTrade;
-	    return _this;
-	  }
-	
-	  _createClass(BaseTransport, [{
-	    key: 'balance',
-	    value: function balance(callback) {
-	      var _this2 = this;
-	
-	      var msg = {
-	        MsgType: _requests2.default.BALANCE,
-	        BalanceReqID: (0, _listener.generateRequestId)()
-	      };
-	
-	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
-	        return _this2.send(msg).then(function (data) {
-	          var Available = {};
-	          var balances = data[_this2.brokerId];
-	          if (balances) {
-	            Object.keys(balances).map(function (currency) {
-	              if (!currency.includes('locked')) {
-	                Available[currency] = balances[currency] - balances[currency + '_locked'];
-	              }
-	              return Available;
-	            });
-	          }
-	
-	          return resolve(_extends({}, data, { Available: Available }));
-	        }).catch(reject);
-	      })).nodeify(callback);
-	    }
-	  }, {
-	    key: 'myOrders',
-	    value: function myOrders() {
-	      var _this3 = this;
-	
-	      var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-	          _ref$page = _ref.page,
-	          Page = _ref$page === undefined ? 0 : _ref$page,
-	          _ref$pageSize = _ref.pageSize,
-	          PageSize = _ref$pageSize === undefined ? 40 : _ref$pageSize,
-	          filter = _ref.filter;
-	
-	      var callback = arguments[1];
-	
-	      var msg = {
-	        MsgType: _requests2.default.ORDER_LIST,
-	        OrdersReqID: (0, _listener.generateRequestId)(),
-	        Page: Page,
-	        PageSize: PageSize
-	      };
-	
-	      if (filter) {
-	        msg.Filter = filter;
-	      }
-	
-	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
-	        return _this3.send(msg).then(function (data) {
-	          var Columns = data.Columns,
-	              orders = _objectWithoutProperties(data, ['Columns']);
-	
-	          var OrdListGrp = _lodash2.default.map(data.OrdListGrp, function (order) {
-	            return _lodash2.default.zipObject(Columns, order);
-	          });
-	          return resolve(_extends({}, orders, {
-	            OrdListGrp: OrdListGrp
-	          }));
-	        }).catch(reject);
-	      })).nodeify(callback);
-	    }
-	  }, {
-	    key: 'sendOrder',
-	    value: function sendOrder(_ref2, callback) {
-	      var _this4 = this;
-	
-	      var side = _ref2.side,
-	          amount = _ref2.amount,
-	          price = _ref2.price,
-	          symbol = _ref2.symbol;
-	
-	      var msg = {
-	        MsgType: _requests2.default.ORDER_SEND,
-	        ClOrdID: (0, _listener.generateRequestId)(),
-	        Symbol: symbol,
-	        Side: side,
-	        OrdType: '2',
-	        Price: price,
-	        OrderQty: amount,
-	        BrokerID: this.brokerId
-	      };
-	
-	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
-	        return _this4.send(msg).then(function (data) {
-	          (0, _listener.deleteRequest)(RequestTypes.CLIENT_ORDER_ID);
-	          resolve(data);
-	        }).catch(reject);
-	      })).nodeify(callback);
-	    }
-	  }, {
-	    key: 'cancelOrder',
-	    value: function cancelOrder() {
-	      var param = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-	      var callback = arguments[1];
-	
-	      var orderId = param.orderId ? param.orderId : param;
-	      var msg = {
-	        MsgType: _requests2.default.ORDER_CANCEL
-	      };
-	
-	      if (param.clientId) {
-	        msg.ClOrdID = param.clientId;
-	      }
-	
-	      if (param.orderId) {
-	        msg.OrderID = orderId;
-	      }
-	
-	      return _nodeify2.default.extend(this.send(msg)).nodeify(callback);
-	    }
-	
-	    /**
-	     * statusList: 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled
-	     */
-	
-	  }, {
-	    key: 'requestWithdrawList',
-	    value: function requestWithdrawList() {
-	      var _this5 = this;
-	
-	      var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-	          _ref3$page = _ref3.page,
-	          Page = _ref3$page === undefined ? 0 : _ref3$page,
-	          _ref3$pageSize = _ref3.pageSize,
-	          PageSize = _ref3$pageSize === undefined ? 20 : _ref3$pageSize,
-	          _ref3$statusList = _ref3.statusList,
-	          StatusList = _ref3$statusList === undefined ? ['1', '2', '4', '8'] : _ref3$statusList;
-	
-	      var callback = arguments[1];
-	
-	      var msg = {
-	        MsgType: _requests2.default.REQUEST_WITHDRAW_LIST,
-	        WithdrawListReqID: (0, _listener.generateRequestId)(),
-	        Page: Page,
-	        PageSize: PageSize,
-	        StatusList: StatusList
-	      };
-	
-	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
-	        return _this5.send(msg).then(function (data) {
-	          var Columns = data.Columns,
-	              withdrawData = _objectWithoutProperties(data, ['Columns']);
-	
-	          var WithdrawListGrp = _lodash2.default.map(data.WithdrawListGrp, function (withdraw) {
-	            return _lodash2.default.zipObject(Columns, withdraw);
-	          });
-	          return resolve(_extends({}, withdrawData, {
-	            WithdrawListGrp: WithdrawListGrp
-	          }));
-	        }).catch(reject);
-	      })).nodeify(callback);
-	    }
-	  }, {
-	    key: 'requestWithdraw',
-	    value: function requestWithdraw(_ref4, callback) {
-	      var amount = _ref4.amount,
-	          data = _ref4.data,
-	          _ref4$currency = _ref4.currency,
-	          currency = _ref4$currency === undefined ? 'BTC' : _ref4$currency,
-	          _ref4$method = _ref4.method,
-	          method = _ref4$method === undefined ? 'bitcoin' : _ref4$method;
-	
-	      var reqId = (0, _listener.generateRequestId)();
-	      var msg = {
-	        MsgType: _requests2.default.REQUEST_WITHDRAW,
-	        WithdrawReqID: reqId,
-	        ClOrdID: reqId,
-	        Method: method,
-	        Amount: amount,
-	        Currency: currency,
-	        Data: data
-	      };
-	
-	      return _nodeify2.default.extend(this.send(msg)).nodeify(callback);
-	    }
-	  }, {
-	    key: 'confirmWithdraw',
-	    value: function confirmWithdraw(_ref5, callback) {
-	      var _this6 = this;
-	
-	      var WithdrawID = _ref5.withdrawId,
-	          confirmationToken = _ref5.confirmationToken,
-	          secondFactor = _ref5.secondFactor;
-	
-	      var msg = {
-	        MsgType: _requests2.default.CONFIRM_WITHDRAW,
-	        WithdrawReqID: (0, _listener.generateRequestId)(),
-	        WithdrawID: WithdrawID
-	      };
-	
-	      if (confirmationToken) {
-	        msg.ConfirmationToken = confirmationToken;
-	      }
-	
-	      if (secondFactor) {
-	        msg.SecondFactor = secondFactor;
-	      }
-	
-	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
-	        return _this6.send(msg).then(function (data) {
-	          return resolve(_extends({}, data));
-	        }).catch(reject);
-	      })).nodeify(callback);
-	    }
-	  }, {
-	    key: 'cancelWithdraw',
-	    value: function cancelWithdraw(withdrawId, callback) {
-	      var _this7 = this;
-	
-	      var reqId = (0, _listener.generateRequestId)();
-	      var msg = {
-	        MsgType: _requests2.default.CANCEL_WITHDRAW,
-	        WithdrawCancelReqID: reqId,
-	        ClOrdID: reqId,
-	        WithdrawID: withdrawId
-	      };
-	
-	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
-	        return _this7.send(msg).then(function (data) {
-	          return resolve(_extends({}, data));
-	        }).catch(reject);
-	      })).nodeify(callback);
-	    }
-	  }, {
-	    key: 'requestDepositList',
-	    value: function requestDepositList() {
-	      var _this8 = this;
-	
-	      var _ref6 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-	          _ref6$page = _ref6.page,
-	          Page = _ref6$page === undefined ? 0 : _ref6$page,
-	          _ref6$pageSize = _ref6.pageSize,
-	          PageSize = _ref6$pageSize === undefined ? 20 : _ref6$pageSize,
-	          _ref6$status = _ref6.status,
-	          StatusList = _ref6$status === undefined ? ['1', '2', '4', '8'] : _ref6$status;
-	
-	      var callback = arguments[1];
-	
-	      var msg = {
-	        MsgType: _requests2.default.REQUEST_DEPOSIT_LIST,
-	        DepositListReqID: (0, _listener.generateRequestId)(),
-	        Page: Page,
-	        PageSize: PageSize,
-	        StatusList: StatusList
-	      };
-	
-	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
-	        return _this8.send(msg).then(function (data) {
-	          var Columns = data.Columns,
-	              depositData = _objectWithoutProperties(data, ['Columns']);
-	
-	          var DepositListGrp = _lodash2.default.map(data.DepositListGrp, function (deposit) {
-	            return _lodash2.default.zipObject(Columns, deposit);
-	          });
-	          return resolve(_extends({}, depositData, {
-	            DepositListGrp: DepositListGrp
-	          }));
-	        }).catch(reject);
-	      })).nodeify(callback);
-	    }
-	  }, {
-	    key: 'requestDeposit',
-	    value: function requestDeposit() {
-	      var _ref7 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-	          _ref7$currency = _ref7.currency,
-	          currency = _ref7$currency === undefined ? 'BTC' : _ref7$currency,
-	          value = _ref7.value,
-	          depositMethodId = _ref7.depositMethodId;
-	
-	      var callback = arguments[1];
-	
-	      var reqId = (0, _listener.generateRequestId)();
-	      var msg = {
-	        MsgType: _requests2.default.REQUEST_DEPOSIT,
-	        DepositReqID: reqId,
-	        ClOrdID: reqId,
-	        Currency: currency,
-	        BrokerID: this.brokerId
-	      };
-	
-	      if (currency !== 'BTC') {
-	        msg.DepositMethodID = depositMethodId;
-	        msg.Value = value;
-	      }
-	
-	      return _nodeify2.default.extend(this.send(msg)).nodeify(callback);
-	    }
-	  }, {
-	    key: 'requestDepositMethods',
-	    value: function requestDepositMethods(callback) {
-	      var msg = {
-	        MsgType: _requests2.default.REQUEST_DEPOSIT_METHODS,
-	        DepositMethodReqID: (0, _listener.generateRequestId)()
-	      };
-	
-	      return _nodeify2.default.extend(this.send(msg)).nodeify(callback);
-	    }
-	  }, {
-	    key: 'requestLedger',
-	    value: function requestLedger() {
-	      var _this9 = this;
-	
-	      var _ref8 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-	          _ref8$page = _ref8.page,
-	          Page = _ref8$page === undefined ? 0 : _ref8$page,
-	          _ref8$pageSize = _ref8.pageSize,
-	          PageSize = _ref8$pageSize === undefined ? 20 : _ref8$pageSize,
-	          currency = _ref8.currency,
-	          filter = _ref8.filter;
-	
-	      var callback = arguments[1];
-	
-	      var msg = {
-	        MsgType: _requests2.default.REQUEST_LEDGER,
-	        LedgerListReqID: (0, _listener.generateRequestId)(),
-	        Page: Page,
-	        PageSize: PageSize
-	      };
-	
-	      if (currency) {
-	        msg.Currency = currency;
-	      }
-	      if (filter) {
-	        msg.Filter = filter;
-	      }
-	
-	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
-	        return _this9.send(msg).then(function (data) {
-	          var Columns = data.Columns,
-	              ledgerData = _objectWithoutProperties(data, ['Columns']);
-	
-	          var LedgerListGrp = _lodash2.default.map(data.LedgerListGrp, function (ledger) {
-	            return _lodash2.default.zipObject(Columns, ledger);
-	          });
-	          resolve(_extends({}, ledgerData, {
-	            LedgerListGrp: LedgerListGrp
-	          }));
-	        }).catch(reject);
-	      })).nodeify(callback);
-	    }
-	  }]);
-	
-	  return BaseTransport;
-	}(_base2.default);
-	
-	exports.default = BaseTransport;
-
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _common = __webpack_require__(14);
+	var _common = __webpack_require__(16);
 	
 	var _common2 = _interopRequireDefault(_common);
 	
@@ -1594,11 +1657,12 @@ module.exports =
 	var Base =
 	
 	/*
-	 * Is node.js environment.
+	 * Is browser environment.
 	 */
 	
+	
 	/*
-	 * url endpoint.
+	 * Broker id
 	 */
 	function Base() {
 	  var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -1610,28 +1674,28 @@ module.exports =
 	  var endpoint = params.url ? params.url : params.prod ? _common2.default.prod[env] : _common2.default.testnet[env];
 	  /* eslint-enable indent */
 	
-	  this.brokerId = params.brokerId || 5;
-	
 	  this.endpoint = endpoint;
+	
+	  this.level = params.level || '2';
+	  this.brokerId = params.brokerId || 5;
 	
 	  this.isNode = typeof window === 'undefined';
 	  this.isBrowser = typeof document !== 'undefined';
 	}
 	
 	/*
-	 * Is browser environment.
+	 * Is node.js environment.
 	 */
 	
-	
 	/*
-	 * Broker id
+	 * url endpoint.
 	 */
 	;
 	
 	exports.default = Base;
 
 /***/ },
-/* 14 */
+/* 16 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1651,13 +1715,13 @@ module.exports =
 	};
 
 /***/ },
-/* 15 */
+/* 17 */
 /***/ function(module, exports) {
 
 	module.exports = require("ws");
 
 /***/ },
-/* 16 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1667,7 +1731,7 @@ module.exports =
 	});
 	exports.getMac = getMac;
 	
-	var _macaddress = __webpack_require__(17);
+	var _macaddress = __webpack_require__(19);
 	
 	var _macaddress2 = _interopRequireDefault(_macaddress);
 	
@@ -1724,13 +1788,13 @@ module.exports =
 	/* eslint-disable import/prefer-default-export */
 
 /***/ },
-/* 17 */
+/* 19 */
 /***/ function(module, exports) {
 
 	module.exports = require("macaddress");
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1872,7 +1936,7 @@ module.exports =
 	}
 
 /***/ },
-/* 19 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1909,11 +1973,11 @@ module.exports =
 	
 	exports.getStun = getStun;
 	
-	var _ip = __webpack_require__(20);
+	var _ip = __webpack_require__(22);
 	
 	var _ip2 = _interopRequireDefault(_ip);
 	
-	var _dgram = __webpack_require__(21);
+	var _dgram = __webpack_require__(23);
 	
 	var _dgram2 = _interopRequireDefault(_dgram);
 	
@@ -2033,25 +2097,25 @@ module.exports =
 	}
 
 /***/ },
-/* 20 */
+/* 22 */
 /***/ function(module, exports) {
 
 	module.exports = require("ip");
 
 /***/ },
-/* 21 */
+/* 23 */
 /***/ function(module, exports) {
 
 	module.exports = require("dgram");
 
 /***/ },
-/* 22 */
+/* 24 */
 /***/ function(module, exports) {
 
 	module.exports = require("os");
 
 /***/ },
-/* 23 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2062,15 +2126,17 @@ module.exports =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-	
-	var _nodeify = __webpack_require__(4);
+	var _nodeify = __webpack_require__(3);
 	
 	var _nodeify2 = _interopRequireDefault(_nodeify);
 	
-	var _restTransport = __webpack_require__(24);
+	var _rest = __webpack_require__(26);
 	
-	var _restTransport2 = _interopRequireDefault(_restTransport);
+	var _rest2 = _interopRequireDefault(_rest);
+	
+	var _trade = __webpack_require__(12);
+	
+	var _trade2 = _interopRequireDefault(_trade);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -2100,19 +2166,32 @@ module.exports =
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
 	
-	var BlinkTradeRest = function (_RestTransport) {
-	  _inherits(BlinkTradeRest, _RestTransport);
+	var BlinkTradeRest = function (_TradeBase) {
+	  _inherits(BlinkTradeRest, _TradeBase);
 	
-	  function BlinkTradeRest() {
+	  function BlinkTradeRest(params) {
 	    _classCallCheck(this, BlinkTradeRest);
 	
-	    return _possibleConstructorReturn(this, (BlinkTradeRest.__proto__ || Object.getPrototypeOf(BlinkTradeRest)).apply(this, arguments));
+	    var _this = _possibleConstructorReturn(this, (BlinkTradeRest.__proto__ || Object.getPrototypeOf(BlinkTradeRest)).call(this, params));
+	
+	    _this.transport = params.transport || new _rest2.default(params);
+	    return _this;
 	  }
 	
 	  _createClass(BlinkTradeRest, [{
+	    key: 'send',
+	    value: function send(path) {
+	      return this.transport.fetchTrade(path);
+	    }
+	  }, {
+	    key: 'fetchPublic',
+	    value: function fetchPublic(path) {
+	      return this.transport.fetchPublic(path);
+	    }
+	  }, {
 	    key: 'ticker',
 	    value: function ticker(callback) {
-	      return _nodeify2.default.extend(_get(BlinkTradeRest.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeRest.prototype), 'fetchPublic', this).call(this, 'ticker')).nodeify(callback);
+	      return _nodeify2.default.extend(this.fetchPublic('ticker')).nodeify(callback);
 	    }
 	  }, {
 	    key: 'trades',
@@ -2125,22 +2204,22 @@ module.exports =
 	
 	      var callback = arguments[1];
 	
-	      return _nodeify2.default.extend(_get(BlinkTradeRest.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeRest.prototype), 'fetchPublic', this).call(this, 'trades?limit=' + limit + '&since=' + since)).nodeify(callback);
+	      return _nodeify2.default.extend(this.fetchPublic('trades?limit=' + limit + '&since=' + since)).nodeify(callback);
 	    }
 	  }, {
 	    key: 'orderbook',
 	    value: function orderbook(callback) {
-	      return _nodeify2.default.extend(_get(BlinkTradeRest.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeRest.prototype), 'fetchPublic', this).call(this, 'orderbook')).nodeify(callback);
+	      return _nodeify2.default.extend(this.fetchPublic('orderbook')).nodeify(callback);
 	    }
 	  }]);
 	
 	  return BlinkTradeRest;
-	}(_restTransport2.default);
+	}(_trade2.default);
 	
 	exports.default = BlinkTradeRest;
 
 /***/ },
-/* 24 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2151,21 +2230,21 @@ module.exports =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _url = __webpack_require__(25);
+	var _url = __webpack_require__(27);
 	
 	var _url2 = _interopRequireDefault(_url);
 	
-	var _sjcl = __webpack_require__(26);
+	var _sjcl = __webpack_require__(28);
 	
 	var _sjcl2 = _interopRequireDefault(_sjcl);
 	
-	var _fetchPonyfill2 = __webpack_require__(27);
+	var _fetchPonyfill2 = __webpack_require__(29);
 	
 	var _fetchPonyfill3 = _interopRequireDefault(_fetchPonyfill2);
 	
-	var _baseTransport = __webpack_require__(12);
+	var _transport = __webpack_require__(15);
 	
-	var _baseTransport2 = _interopRequireDefault(_baseTransport);
+	var _transport2 = _interopRequireDefault(_transport);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -2198,8 +2277,8 @@ module.exports =
 	var _fetchPonyfill = (0, _fetchPonyfill3.default)(Promise),
 	    _fetch = _fetchPonyfill.fetch;
 	
-	var RestTransport = function (_BaseTransport) {
-	  _inherits(RestTransport, _BaseTransport);
+	var RestTransport = function (_Transport) {
+	  _inherits(RestTransport, _Transport);
 	
 	  /**
 	   * APISecret
@@ -2269,24 +2348,24 @@ module.exports =
 	  }]);
 	
 	  return RestTransport;
-	}(_baseTransport2.default);
+	}(_transport2.default);
 	
 	exports.default = RestTransport;
 
 /***/ },
-/* 25 */
+/* 27 */
 /***/ function(module, exports) {
 
 	module.exports = require("url");
 
 /***/ },
-/* 26 */
+/* 28 */
 /***/ function(module, exports) {
 
 	module.exports = require("sjcl");
 
 /***/ },
-/* 27 */
+/* 29 */
 /***/ function(module, exports) {
 
 	module.exports = require("fetch-ponyfill");
