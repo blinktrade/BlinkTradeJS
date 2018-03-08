@@ -24,15 +24,17 @@ import nodeify from 'nodeify';
 import Fingerprint2 from 'fingerprintjs2';
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 
-import BaseTransport from './baseTransport';
+import Transport from './transport';
 
 import {
   getRequest,
+  setRequest,
+  deleteRequest,
   getListener,
-  registerRequest,
-} from './listener';
+  getEventEmitter,
+} from '../listener';
 
-class WebSocketTransport extends BaseTransport {
+class WebSocketTransport extends Transport {
   /*
    * WebSocket Instance
    */
@@ -46,7 +48,7 @@ class WebSocketTransport extends BaseTransport {
   /*
    * Stun object
    */
-  stun: Stun;
+  stuntip: Stun;
 
   /*
    * Transport Promise
@@ -101,8 +103,7 @@ class WebSocketTransport extends BaseTransport {
     this.request.reject(error);
   }
 
-  /* eslint-disable no-unused-vars */
-  sendMessage(msg: Object, promise: any): void {
+  sendMessage(msg: Object): void {
     if (this.socket.readyState === 1) {
       const data = msg;
 
@@ -112,12 +113,11 @@ class WebSocketTransport extends BaseTransport {
       this.socket.send(JSON.stringify(data));
     }
   }
-  /* eslint-enable no-unused-vars */
 
   sendMessageAsPromise(msg: Object): Promise<Object> {
     return new Promise((resolve, reject) => {
       const promise = { resolve, reject };
-      registerRequest(msg, promise);
+      setRequest(msg, { resolve, reject });
       // We are passing the promise as a parameter to spy it in our tests
       this.sendMessage(msg, promise);
     });
@@ -130,20 +130,26 @@ class WebSocketTransport extends BaseTransport {
     }
 
     const request = getRequest(data);
+    const emitter = getEventEmitter(data);
     const listener = getListener(data.MsgType);
+
     this.dispatchPromise(request, data);
+    this.dispatchEventEmitters(emitter, data);
     this.dispatchListeners(listener, data);
   }
 
-  /* eslint-disable indent */
   dispatchPromise(request: ?Request, data: Object): any {
-    if (request) {
-      return request.resolve  ? request.resolve(data)
-           : request.callback ? request.callback(data)
-           : null;
+    if (request && request.resolve) {
+      deleteRequest(data);
+      return request.resolve(data);
     }
   }
-  /* eslint-enable indent */
+
+  dispatchEventEmitters(emitter, data: Object): any {
+    if (emitter) {
+      return emitter(data);
+    }
+  }
 
   dispatchListeners(listener: Function, data: Object): void {
     return listener && listener(data);
@@ -151,12 +157,12 @@ class WebSocketTransport extends BaseTransport {
 
   getFingerPrint(customFingerprint?: string): void {
     if (this.isNode) {
-      return require('./util/macaddress').getMac(macAddress => {
+      return require('../util/macaddress').getMac(macAddress => {
         this.fingerPrint = macAddress;
       });
     } else if (this.isBrowser) {
       return new Fingerprint2().get(fingerPrint => {
-        this.fingerPrint = Math.abs(require('./util/hash32').encodeByteArray(fingerPrint)).toString();
+        this.fingerPrint = Math.abs(require('../util/hash32').encodeByteArray(fingerPrint)).toString();
       });
     } else if (customFingerprint) {
       this.fingerPrint = customFingerprint;
@@ -167,7 +173,7 @@ class WebSocketTransport extends BaseTransport {
 
   getStun(): void {
     if (this.isNode) {
-      require('./util/stun').getStun(data => {
+      require('../util/stun').getStun(data => {
         this.stun = data;
       });
     }

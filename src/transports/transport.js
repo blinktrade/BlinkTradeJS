@@ -20,7 +20,7 @@
  * @flow
  */
 
-import common from './constants/common';
+import common from '../constants/common';
 
 class Base {
   /*
@@ -43,6 +43,8 @@ class Base {
    */
   isBrowser: boolean;
 
+  level: '1' | '2';
+
   constructor(params: BlinkTradeBase = {}, env: BlinkTradeEnv) {
     /* eslint-disable indent */
     const endpoint =
@@ -51,9 +53,10 @@ class Base {
       :               common.testnet[env];
     /* eslint-enable indent */
 
-    this.brokerId = params.brokerId || 5;
-
     this.endpoint = endpoint;
+
+    this.level = params.level || '2';
+    this.brokerId = params.brokerId || 5;
 
     this.isNode    = typeof window === 'undefined';
     this.isBrowser = typeof document !== 'undefined';

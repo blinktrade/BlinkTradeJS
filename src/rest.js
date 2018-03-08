@@ -21,22 +21,36 @@
  */
 
 import nodeify from 'nodeify';
-import RestTransport from './restTransport';
+import RestTransport from './transports/rest';
+import TradeBase from './trade';
 
-class BlinkTradeRest extends RestTransport {
+class BlinkTradeRest extends TradeBase {
+  constructor(params?: BlinkTradeBase) {
+    super(params);
+    this.transport = params.transport || new RestTransport(params);
+  }
+
+  send(path) {
+    return this.transport.fetchTrade(path);
+  }
+
+  fetchPublic(path) {
+    return this.transport.fetchPublic(path);
+  }
+
   ticker(callback?: Function): Promise<Object> {
-    return nodeify.extend(super.fetchPublic('ticker')).nodeify(callback);
+    return nodeify.extend(this.fetchPublic('ticker')).nodeify(callback);
   }
 
   trades({ limit = 100, since = 0 }: {
     limit: number,
     since: number,
   } = {}, callback?: Function): Promise<Object> {
-    return nodeify.extend(super.fetchPublic(`trades?limit=${limit}&since=${since}`)).nodeify(callback);
+    return nodeify.extend(this.fetchPublic(`trades?limit=${limit}&since=${since}`)).nodeify(callback);
   }
 
   orderbook(callback?: Function): Promise<Object> {
-    return nodeify.extend(super.fetchPublic('orderbook')).nodeify(callback);
+    return nodeify.extend(this.fetchPublic('orderbook')).nodeify(callback);
   }
 }
 

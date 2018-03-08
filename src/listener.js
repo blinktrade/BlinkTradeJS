@@ -20,14 +20,14 @@
  * @flow
  */
 
-import lodash from 'lodash';
-import * as RequestTypes from './constants/requestTypes';
+import { MsgActionReq, MsgActionRes } from './constants/messages';
 
-let requests: Object = {};
-const listeners: Object = {};
+const store = new Map();
+const emitters = new Map();
+const listeners = new Map();
 
 export function getListeners() {
-  return requests;
+  return listeners;
 }
 
 export function generateRequestId(): number {
@@ -38,52 +38,32 @@ export function getListener(msgType: string): Function {
   return listeners[msgType];
 }
 
-export function getRequest(message: Object): ?Request {
-  let result;
-  lodash.mapKeys(RequestTypes, (key) => {
-    if (lodash.has(message, key) && message[key]) {
-      result = lodash.find(requests[key], { ReqId: String(message[key]) }) || result;
-    }
-  });
-
-  return result;
+function getKey(messages: MsgTypes, msg: Object): string {
+  const key = messages[msg.MsgType][1];
+  const value = msg[key];
+  return key + ':' + value;
 }
 
-export function registerRequest(message: Object, promise: Request): Object {
-  lodash.mapKeys(RequestTypes, (key) => {
-    if (lodash.has(message, key)) {
-      requests[key] = requests[key] || [];
-      requests[key].push({ ReqId: String(message[key]), ...promise });
-    }
-  });
-
-  return requests;
+export function getRequest(msg: Message): ?ResolveReject {
+  return store.get(getKey(MsgActionRes, msg));
 }
 
-export function registerEventEmitter(message: Object, callback: Function): Object {
-  lodash.mapKeys(RequestTypes, (key) => {
-    if (lodash.has(message, key)) {
-      if (requests[key] !== []) {
-        const index = lodash.findIndex(requests[key], { ReqId: String(message[key]) });
-        requests[key][index] = {
-          ...requests[key][index],
-          resolve: null,
-          reject: null,
-          callback,
-        };
-      }
-    }
-  });
+export function setRequest(msg: Message, promise: ResolveReject): void {
+  store.set(getKey(MsgActionReq, msg), promise);
+}
 
-  return requests;
+export function deleteRequest(msg: Message): void {
+  store.delete(getKey(MsgActionRes, msg));
+}
+
+export function getEventEmitter(msg: Message): ?Function {
+  return emitters.get(getKey(MsgActionRes, msg));
+}
+
+export function registerEventEmitter(key: string, value: number, callback: Function): Object {
+  emitters.set(key + ':' + value, callback);
 }
 
 export function registerListener(msgType: string, callback: Function): void {
-  listeners[msgType] = listeners[msgType] || [];
-  listeners[msgType] = callback;
-}
-
-export function deleteRequest(key: string): Object {
-  requests = lodash.omit(requests, [key]);
-  return requests;
+  listeners.set(msgType, callback);
 }

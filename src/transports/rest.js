@@ -23,11 +23,12 @@
 import url from 'url';
 import sjcl from 'sjcl';
 import fetchPonyfill from 'fetch-ponyfill';
-import BaseTransport from './baseTransport';
+
+import Transport from './transport';
 
 const { fetch } = fetchPonyfill(Promise);
 
-class RestTransport extends BaseTransport {
+class RestTransport extends Transport {
   /**
    * APIKey
    */

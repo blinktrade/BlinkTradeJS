@@ -20,19 +20,14 @@
  * @flow
  */
 
-import _ from 'lodash';
 import nodeify from 'nodeify';
-import Base from './base';
-import MsgTypes from './constants/requests';
-import * as RequestTypes from './constants/requestTypes';
-import {
-  deleteRequest,
-  generateRequestId,
-} from './listener';
+import { ActionMsgReq } from './constants/messages';
+import { formatColumns } from './util/utils';
+import { generateRequestId } from './listener';
 
 type StatusListType = '1' | '2' | '4' | '8';
 
-class BaseTransport extends Base {
+class TradeBase {
   env: BlinkTradeEnv;
 
   send: (msg: Object) => Promise<Object>;
@@ -41,33 +36,22 @@ class BaseTransport extends Base {
 
   +sendMessageAsPromise: (msg: Object) => Promise<Object>;
 
-  constructor(params?: BlinkTradeBase, env: BlinkTradeEnv) {
-    super(params, env);
-    this.send = env === 'ws' ? this.sendMessageAsPromise : this.fetchTrade;
+  constructor(params?: BlinkTradeBase) {
+    this.level = params.level;
+    this.brokerId = params.brokerId;
   }
 
-  balance(callback?: Function): Promise<Object> {
+  balance(clientId, callback?: Function): Promise<Object> {
     const msg = {
-      MsgType: MsgTypes.BALANCE,
+      MsgType: ActionMsgReq.BALANCE,
       BalanceReqID: generateRequestId(),
     };
 
-    return nodeify.extend(new Promise((resolve, reject) => {
-      return this.send(msg).then(data => {
-        const Available = {};
-        const balances = data[this.brokerId];
-        if (balances) {
-          Object.keys(balances).map(currency => {
-            if (!currency.includes('locked')) {
-              Available[currency] = balances[currency] - balances[`${currency}_locked`];
-            }
-            return Available;
-          });
-        }
+    if (clientId) {
+      msg.ClientID = clientId;
+    }
 
-        return resolve({ ...data, Available });
-      }).catch(reject);
-    })).nodeify(callback);
+    return nodeify.extend(this.send(msg)).nodeify(callback);
   }
 
   myOrders({
@@ -80,7 +64,7 @@ class BaseTransport extends Base {
     filter: Array<string>,
   } = {}, callback?: Function): Promise<Object> {
     const msg = {
-      MsgType: MsgTypes.ORDER_LIST,
+      MsgType: ActionMsgReq.ORDER_HISTORY,
       OrdersReqID: generateRequestId(),
       Page,
       PageSize,
@@ -90,16 +74,9 @@ class BaseTransport extends Base {
       msg.Filter = filter;
     }
 
-    return nodeify.extend(new Promise((resolve, reject) => {
-      return this.send(msg).then(data => {
-        const { Columns, ...orders } = data;
-        const OrdListGrp = _.map(data.OrdListGrp, order => _.zipObject(Columns, order));
-        return resolve({
-          ...orders,
-          OrdListGrp,
-        });
-      }).catch(reject);
-    })).nodeify(callback);
+    const format = formatColumns('OrdListGrp', this.level);
+
+    return nodeify.extend(this.send(msg).then(format)).nodeify(callback);
   }
 
   sendOrder({ side, amount, price, symbol }: {
@@ -109,7 +86,7 @@ class BaseTransport extends Base {
     symbol: string,
   }, callback?: Function): Promise<Object> {
     const msg = {
-      MsgType: MsgTypes.ORDER_SEND,
+      MsgType: ActionMsgReq.ORDER_SEND,
       ClOrdID: generateRequestId(),
       Symbol: symbol,
       Side: side,
@@ -119,12 +96,7 @@ class BaseTransport extends Base {
       BrokerID: this.brokerId,
     };
 
-    return nodeify.extend(new Promise((resolve, reject) => {
-      return this.send(msg).then(data => {
-        deleteRequest(RequestTypes.CLIENT_ORDER_ID);
-        resolve(data);
-      }).catch(reject);
-    })).nodeify(callback);
+    return nodeify.extend(this.send(msg)).nodeify(callback);
   }
 
   cancelOrder(param?: number | {
@@ -133,7 +105,7 @@ class BaseTransport extends Base {
   } = {}, callback?: Function): Promise<Object> {
     const orderId = param.orderId ? param.orderId : param;
     const msg: Object = {
-      MsgType: MsgTypes.ORDER_CANCEL,
+      MsgType: ActionMsgReq.ORDER_CANCEL,
     };
 
     if (param.clientId) {
@@ -148,35 +120,40 @@ class BaseTransport extends Base {
   }
 
   /**
-   * statusList: 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled
+   * status: 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled
    */
   requestWithdrawList({
     page: Page = 0,
     pageSize: PageSize = 20,
-    statusList: StatusList = ['1', '2', '4', '8'],
+    status: StatusList = ['1', '2', '4', '8'],
+    filter,
+    clientId,
   }: {
     page?: number,
     pageSize?: number,
-    statusList?: Array<StatusListType>,
+    clientId: string,
+    filter?: Array<string>,
+    status?: Array<StatusListType>,
   } = {}, callback?: Function): Promise<Object> {
     const msg = {
-      MsgType: MsgTypes.REQUEST_WITHDRAW_LIST,
+      MsgType: ActionMsgReq.WITHDRAW_LIST,
       WithdrawListReqID: generateRequestId(),
       Page,
       PageSize,
       StatusList,
     };
 
-    return nodeify.extend(new Promise((resolve, reject) => {
-      return this.send(msg).then(data => {
-        const { Columns, ...withdrawData } = data;
-        const WithdrawListGrp = _.map(data.WithdrawListGrp, withdraw => _.zipObject(Columns, withdraw));
-        return resolve({
-          ...withdrawData,
-          WithdrawListGrp,
-        });
-      }).catch(reject);
-    })).nodeify(callback);
+    if (filter && filter.length) {
+      msg.Filter = filter;
+    }
+
+    if (clientId) {
+      msg.ClientID = clientId;
+    }
+
+    const format = formatColumns('WithdrawListGrp', this.level);
+
+    return nodeify.extend(this.send(msg).then(format)).nodeify(callback);
   }
 
   requestWithdraw({ amount, data, currency = 'BTC', method = 'bitcoin' }: {
@@ -187,7 +164,7 @@ class BaseTransport extends Base {
   }, callback?: Function): Promise<Object> {
     const reqId = generateRequestId();
     const msg = {
-      MsgType: MsgTypes.REQUEST_WITHDRAW,
+      MsgType: ActionMsgReq.WITHDRAW_REQUEST,
       WithdrawReqID: reqId,
       ClOrdID: reqId,
       Method: method,
@@ -205,7 +182,7 @@ class BaseTransport extends Base {
     secondFactor?: string,
   }, callback: Function): Promise<Object> {
     const msg: Object = {
-      MsgType: MsgTypes.CONFIRM_WITHDRAW,
+      MsgType: ActionMsgReq.CONFIRM_WITHDRAW,
       WithdrawReqID: generateRequestId(),
       WithdrawID,
     };
@@ -218,60 +195,52 @@ class BaseTransport extends Base {
       msg.SecondFactor = secondFactor;
     }
 
-    return nodeify.extend(new Promise((resolve, reject) => {
-      return this.send(msg).then(data => {
-        return resolve({
-          ...data,
-        });
-      }).catch(reject);
-    })).nodeify(callback);
+    return nodeify.extend(this.send(msg)).nodeify(callback);
   }
 
   cancelWithdraw(withdrawId: string, callback: Function): Promise<Object> {
     const reqId = generateRequestId();
     const msg = {
-      MsgType: MsgTypes.CANCEL_WITHDRAW,
+      MsgType: ActionMsgReq.CANCEL_WITHDRAW,
       WithdrawCancelReqID: reqId,
       ClOrdID: reqId,
       WithdrawID: withdrawId,
     };
 
-    return nodeify.extend(new Promise((resolve, reject) => {
-      return this.send(msg).then(data => {
-        return resolve({
-          ...data,
-        });
-      }).catch(reject);
-    })).nodeify(callback);
+    return nodeify.extend(this.send(msg)).nodeify(callback);
   }
 
   requestDepositList({
     page: Page = 0,
     pageSize: PageSize = 20,
     status: StatusList = ['1', '2', '4', '8'],
+    filter,
+    clientId,
   }: {
     page: number,
     pageSize: number,
     status: Array<StatusListType>,
+    filter?: Array<string>,
   } = {}, callback?: Function): Promise<Object> {
     const msg = {
-      MsgType: MsgTypes.REQUEST_DEPOSIT_LIST,
+      MsgType: ActionMsgReq.DEPOSIT_LIST,
       DepositListReqID: generateRequestId(),
       Page,
       PageSize,
       StatusList,
     };
 
-    return nodeify.extend(new Promise((resolve, reject) => {
-      return this.send(msg).then(data => {
-        const { Columns, ...depositData } = data;
-        const DepositListGrp = _.map(data.DepositListGrp, deposit => _.zipObject(Columns, deposit));
-        return resolve({
-          ...depositData,
-          DepositListGrp,
-        });
-      }).catch(reject);
-    })).nodeify(callback);
+    if (filter && filter.length) {
+      msg.Filter = filter;
+    }
+
+    if (clientId) {
+      msg.ClientID = clientId;
+    }
+
+    const format = formatColumns('DepositListGrp', this.level);
+
+    return nodeify.extend(this.send(msg).then(format)).nodeify(callback);
   }
 
   requestDeposit({ currency = 'BTC', value, depositMethodId }: {
@@ -281,7 +250,7 @@ class BaseTransport extends Base {
   } = {}, callback?: Function): Promise<Object> {
     const reqId = generateRequestId();
     const msg: Object = {
-      MsgType: MsgTypes.REQUEST_DEPOSIT,
+      MsgType: ActionMsgReq.DEPOSIT_REQUEST,
       DepositReqID: reqId,
       ClOrdID: reqId,
       Currency: currency,
@@ -298,8 +267,9 @@ class BaseTransport extends Base {
 
   requestDepositMethods(callback?: Function): Promise<Object> {
     const msg = {
-      MsgType: MsgTypes.REQUEST_DEPOSIT_METHODS,
+      MsgType: ActionMsgReq.DEPOSIT_METHODS,
       DepositMethodReqID: generateRequestId(),
+      BrokerID: this.brokerId,
     };
 
     return nodeify.extend(this.send(msg)).nodeify(callback);
@@ -308,39 +278,38 @@ class BaseTransport extends Base {
   requestLedger({
     page: Page = 0,
     pageSize: PageSize = 20,
+    brokerId,
+    clientId,
     currency,
-    filter,
   }: {
     page: number,
     pageSize: number,
     currency: string,
-    filter: Array<string>,
+    brokerId?: number,
+    clientId?: string,
   } = {}, callback?: Function) {
     const msg: Object = {
-      MsgType: MsgTypes.REQUEST_LEDGER,
+      MsgType: ActionMsgReq.LEDGER_LIST,
       LedgerListReqID: generateRequestId(),
+      BrokerID: this.brokerId,
       Page,
       PageSize,
     };
 
+    if (brokerId) {
+      msg.BrokerID = brokerId;
+    }
     if (currency) {
       msg.Currency = currency;
     }
-    if (filter) {
-      msg.Filter = filter;
+    if (clientId) {
+      msg.ClientID = clientId;
     }
 
-    return nodeify.extend(new Promise((resolve, reject) => {
-      return this.send(msg).then(data => {
-        const { Columns, ...ledgerData } = data;
-        const LedgerListGrp = _.map(data.LedgerListGrp, ledger => _.zipObject(Columns, ledger));
-        resolve({
-          ...ledgerData,
-          LedgerListGrp,
-        });
-      }).catch(reject);
-    })).nodeify(callback);
+    const format = formatColumns('LedgerListGrp', this.level);
+
+    return nodeify.extend(this.send(msg).then(format)).nodeify(callback);
   }
 }
 
-export default BaseTransport;
+export default TradeBase;
