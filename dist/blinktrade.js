@@ -1042,6 +1042,11 @@ module.exports =
 	  }
 	
 	  _createClass(TradeBase, [{
+	    key: 'changeBrokerId',
+	    value: function changeBrokerId(brokerId) {
+	      this.brokerId = brokerId;
+	    }
+	  }, {
 	    key: 'balance',
 	    value: function balance(clientId, callback) {
 	      var msg = {
@@ -1654,30 +1659,27 @@ module.exports =
 	                                                                                                                                                           * 
 	                                                                                                                                                           */
 	
-	var Base =
+	var Transport =
 	
 	/*
 	 * Is browser environment.
 	 */
 	
-	
 	/*
-	 * Broker id
+	 * url endpoint.
 	 */
-	function Base() {
+	function Transport() {
 	  var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 	  var env = arguments[1];
 	
-	  _classCallCheck(this, Base);
+	  _classCallCheck(this, Transport);
 	
 	  /* eslint-disable indent */
 	  var endpoint = params.url ? params.url : params.prod ? _common2.default.prod[env] : _common2.default.testnet[env];
 	  /* eslint-enable indent */
 	
 	  this.endpoint = endpoint;
-	
 	  this.level = params.level || '2';
-	  this.brokerId = params.brokerId || 5;
 	
 	  this.isNode = typeof window === 'undefined';
 	  this.isBrowser = typeof document !== 'undefined';
@@ -1686,13 +1688,9 @@ module.exports =
 	/*
 	 * Is node.js environment.
 	 */
-	
-	/*
-	 * url endpoint.
-	 */
 	;
 	
-	exports.default = Base;
+	exports.default = Transport;
 
 /***/ },
 /* 16 */
@@ -1799,10 +1797,6 @@ module.exports =
 
 	"use strict";
 	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.encodeByteArray = encodeByteArray;
 	/* eslint-disable no-var */
 	/* eslint-disable no-bitwise */
 	/* eslint-disable no-param-reassign */
@@ -1883,7 +1877,7 @@ module.exports =
 	/**
 	 * Hashes a "byte" array to a 32-bit value using the supplied seed.
 	 */
-	function encodeByteArray(bytes) {
+	module.exports.encodeByteArray = function encodeByteArray(bytes) {
 	  var offset = 0;
 	  var length = bytes.length;
 	  var seed = SEED32;
@@ -1933,7 +1927,7 @@ module.exports =
 	    // case 0 : nothing left to add
 	  }
 	  return mix32_(mix);
-	}
+	};
 
 /***/ },
 /* 21 */
