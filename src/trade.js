@@ -41,6 +41,10 @@ class TradeBase {
     this.brokerId = params.brokerId;
   }
 
+  changeBrokerId(brokerId: number) {
+    this.brokerId = brokerId;
+  }
+
   balance(clientId, callback?: Function): Promise<Object> {
     const msg = {
       MsgType: ActionMsgReq.BALANCE,

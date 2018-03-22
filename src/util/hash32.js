@@ -78,7 +78,7 @@ const wordAt_ = (bytes, offset) => {
 /**
  * Hashes a "byte" array to a 32-bit value using the supplied seed.
  */
-export function encodeByteArray(bytes) {
+module.exports.encodeByteArray = function encodeByteArray(bytes) {
   var offset = 0;
   var length = bytes.length;
   var seed = SEED32;

@@ -22,16 +22,11 @@
 
 import common from '../constants/common';
 
-class Base {
+class Transport {
   /*
    * url endpoint.
    */
   endpoint: string;
-
-  /*
-   * Broker id
-   */
-  brokerId: number;
 
   /*
    * Is node.js environment.
@@ -54,13 +49,11 @@ class Base {
     /* eslint-enable indent */
 
     this.endpoint = endpoint;
-
     this.level = params.level || '2';
-    this.brokerId = params.brokerId || 5;
 
     this.isNode    = typeof window === 'undefined';
     this.isBrowser = typeof document !== 'undefined';
   }
 }
 
-export default Base;
+export default Transport;
