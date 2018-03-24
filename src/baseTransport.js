@@ -110,7 +110,7 @@ class BaseTransport extends Base {
   }, callback?: Function): Promise<Object> {
     const msg = {
       MsgType: MsgTypes.ORDER_SEND,
-      ClOrdID: generateRequestId(),
+      ClOrdID: generateRequestId().toString(),
       Symbol: symbol,
       Side: side,
       OrdType: '2',
