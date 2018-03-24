@@ -43,7 +43,7 @@ module.exports =
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -90,9 +90,9 @@ module.exports =
 	                                          * 
 	                                          */
 
-/***/ }),
+/***/ },
 /* 1 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	"use strict";
 	
@@ -108,9 +108,9 @@ module.exports =
 	  CHILEBIT: 9
 	};
 
-/***/ }),
+/***/ },
 /* 2 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -580,27 +580,27 @@ module.exports =
 	
 	exports.default = BlinkTradeWS;
 
-/***/ }),
+/***/ },
 /* 3 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	module.exports = require("lodash");
 
-/***/ }),
+/***/ },
 /* 4 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	module.exports = require("nodeify");
 
-/***/ }),
+/***/ },
 /* 5 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	module.exports = require("eventemitter2");
 
-/***/ }),
+/***/ },
 /* 6 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -715,9 +715,9 @@ module.exports =
 	  return requests;
 	}
 
-/***/ }),
+/***/ },
 /* 7 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	'use strict';
 	
@@ -756,9 +756,9 @@ module.exports =
 	var MD_REQUEST_ID = exports.MD_REQUEST_ID = 'MDReqID';
 	var CLIENT_ORDER_ID = exports.CLIENT_ORDER_ID = 'ClOrdID';
 
-/***/ }),
+/***/ },
 /* 8 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	'use strict';
 	
@@ -804,9 +804,9 @@ module.exports =
 	  }
 	};
 
-/***/ }),
+/***/ },
 /* 9 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	'use strict';
 	
@@ -845,9 +845,9 @@ module.exports =
 	  CANCEL_WITHDRAW: 'U70'
 	};
 
-/***/ }),
+/***/ },
 /* 10 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -1115,15 +1115,15 @@ module.exports =
 	
 	exports.default = WebSocketTransport;
 
-/***/ }),
+/***/ },
 /* 11 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	module.exports = require("fingerprintjs2");
 
-/***/ }),
+/***/ },
 /* 12 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -1279,7 +1279,7 @@ module.exports =
 	
 	      var msg = {
 	        MsgType: _requests2.default.ORDER_SEND,
-	        ClOrdID: (0, _listener.generateRequestId)(),
+	        ClOrdID: (0, _listener.generateRequestId)().toString(),
 	        Symbol: symbol,
 	        Side: side,
 	        OrdType: '2',
@@ -1553,9 +1553,9 @@ module.exports =
 	
 	exports.default = BaseTransport;
 
-/***/ }),
+/***/ },
 /* 13 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -1630,9 +1630,9 @@ module.exports =
 	
 	exports.default = Base;
 
-/***/ }),
+/***/ },
 /* 14 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	'use strict';
 	
@@ -1650,15 +1650,15 @@ module.exports =
 	  }
 	};
 
-/***/ }),
+/***/ },
 /* 15 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	module.exports = require("ws");
 
-/***/ }),
+/***/ },
 /* 16 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -1723,15 +1723,15 @@ module.exports =
 	/* eslint-disable no-plusplus */
 	/* eslint-disable import/prefer-default-export */
 
-/***/ }),
+/***/ },
 /* 17 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	module.exports = require("macaddress");
 
-/***/ }),
+/***/ },
 /* 18 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	"use strict";
 	
@@ -1871,9 +1871,9 @@ module.exports =
 	  return mix32_(mix);
 	}
 
-/***/ }),
+/***/ },
 /* 19 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -2032,27 +2032,27 @@ module.exports =
 	  });
 	}
 
-/***/ }),
+/***/ },
 /* 20 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	module.exports = require("ip");
 
-/***/ }),
+/***/ },
 /* 21 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	module.exports = require("dgram");
 
-/***/ }),
+/***/ },
 /* 22 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	module.exports = require("os");
 
-/***/ }),
+/***/ },
 /* 23 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -2139,9 +2139,9 @@ module.exports =
 	
 	exports.default = BlinkTradeRest;
 
-/***/ }),
+/***/ },
 /* 24 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -2273,24 +2273,24 @@ module.exports =
 	
 	exports.default = RestTransport;
 
-/***/ }),
+/***/ },
 /* 25 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	module.exports = require("url");
 
-/***/ }),
+/***/ },
 /* 26 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	module.exports = require("sjcl");
 
-/***/ }),
+/***/ },
 /* 27 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	module.exports = require("fetch-ponyfill");
 
-/***/ })
+/***/ }
 /******/ ]);
 //# sourceMappingURL=blinktrade.js.map
