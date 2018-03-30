@@ -501,7 +501,7 @@ module.exports =
 	      };
 	
 	      return this.transport.emitterPromise(new Promise(function (resolve, reject) {
-	        return _this8.requestDeposit({ currency: currency, value: value, depositMethodId: depositMethodId }).then(function (deposit) {
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'requestDeposit', _this8).call(_this8, { currency: currency, value: value, depositMethodId: depositMethodId }).then(function (deposit) {
 	          (0, _listener.registerEventEmitter)('ClOrdID', deposit.ClOrdID, subscribeEvent);
 	          return resolve(deposit);
 	        }).catch(reject);
@@ -535,7 +535,7 @@ module.exports =
 	      };
 	
 	      return this.transport.emitterPromise(new Promise(function (resolve, reject) {
-	        return _this9.requestWithdraw({ amount: amount, data: data, currency: currency, method: method }).then(function (withdraw) {
+	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'requestWithdraw', _this9).call(_this9, { amount: amount, data: data, currency: currency, method: method }).then(function (withdraw) {
 	          (0, _listener.registerEventEmitter)('ClOrdID', withdraw.ClOrdID, subscribeEvent);
 	          return resolve(withdraw);
 	        }).catch(reject);
