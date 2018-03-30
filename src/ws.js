@@ -325,7 +325,7 @@ class BlinkTradeWS extends TradeBase {
     };
 
     return this.transport.emitterPromise(new Promise((resolve, reject) => {
-      return this.requestDeposit({ currency, value, depositMethodId }).then(deposit => {
+      return super.requestDeposit({ currency, value, depositMethodId }).then(deposit => {
         registerEventEmitter('ClOrdID', deposit.ClOrdID, subscribeEvent);
         return resolve(deposit);
       }).catch(reject);
@@ -353,7 +353,7 @@ class BlinkTradeWS extends TradeBase {
     };
 
     return this.transport.emitterPromise(new Promise((resolve, reject) => {
-      return this.requestWithdraw({ amount, data, currency, method }).then(withdraw => {
+      return super.requestWithdraw({ amount, data, currency, method }).then(withdraw => {
         registerEventEmitter('ClOrdID', withdraw.ClOrdID, subscribeEvent);
         return resolve(withdraw);
       }).catch(reject);
