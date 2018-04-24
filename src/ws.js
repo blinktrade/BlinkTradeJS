@@ -87,11 +87,13 @@ class BlinkTradeWS extends TradeBase {
     })).nodeify(callback);
   }
 
-  login({ username, password, secondFactor, brokerId }: {
+  login({ username, password, secondFactor, token, trustedDevice, brokerId }: {
     username: string,
     password: string,
+    token?: string,
     secondFactor?: string,
     brokerId?: number,
+    trustedDevice?: boolean,
   }, callback?: Function): Promise<Object> {
     let userAgent;
     if (!this.isNode) {
@@ -118,11 +120,16 @@ class BlinkTradeWS extends TradeBase {
       Username: username,
       Password: password,
       UserReqTyp: '1',
+      TrustedDevice: trustedDevice || false,
       ...userAgent,
     };
 
     if (secondFactor) {
       msg.SecondFactor = secondFactor;
+    }
+
+    if (token) {
+      msg.Token = token;
     }
 
     return nodeify.extend(new Promise((resolve, reject) => {

@@ -65,12 +65,12 @@ declare module blinktrade {
     interface Login {
 
         /**
-         * Account username
+         * Account username or an API Key
          */
         username: string;
 
         /**
-         * Password username
+         * Password or an API Password
          */
         password: string;
 
@@ -78,6 +78,21 @@ declare module blinktrade {
          * Optional secondFactor, if the authentication require second factor, you'll receive an error with NeedSecondFactor = true
          */
         secondFactor?: string;
+
+        /**
+         * Optional token, sent by email to authorize your IP address
+         */
+        token?: string;
+
+        /**
+         * Optional boolean, trust this device for 30 days
+         */
+        trustedDevice?: boolean;
+
+        /**
+         * Optional brokerId
+         */
+        brokerId?: number;
     }
 
     /**
