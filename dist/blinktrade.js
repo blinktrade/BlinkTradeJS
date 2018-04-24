@@ -235,6 +235,8 @@ module.exports =
 	      var username = _ref.username,
 	          password = _ref.password,
 	          secondFactor = _ref.secondFactor,
+	          token = _ref.token,
+	          trustedDevice = _ref.trustedDevice,
 	          brokerId = _ref.brokerId;
 	
 	      var userAgent = void 0;
@@ -261,11 +263,16 @@ module.exports =
 	        BrokerID: brokerId || this.brokerId,
 	        Username: username,
 	        Password: password,
-	        UserReqTyp: '1'
+	        UserReqTyp: '1',
+	        TrustedDevice: trustedDevice || false
 	      }, userAgent);
 	
 	      if (secondFactor) {
 	        msg.SecondFactor = secondFactor;
+	      }
+	
+	      if (token) {
+	        msg.Token = token;
 	      }
 	
 	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
