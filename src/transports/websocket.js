@@ -24,7 +24,7 @@ import nodeify from 'nodeify';
 import Fingerprint2 from 'fingerprintjs2';
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 
-import Transport from './transport';
+import Transport, { IS_NODE, IS_BROKER } from './transport';
 
 import {
   getRequest,
@@ -78,7 +78,7 @@ class WebSocketTransport extends Transport {
     return nodeify.extend(new Promise((resolve, reject) => {
       this.request = { resolve, reject };
 
-      const WebSocket = this.isNode ? require('ws') : window.WebSocket;
+      const WebSocket = IS_NODE ? require('ws') : window.WebSocket;
 
       this.socket = new WebSocket(this.endpoint, null, this.headers);
       this.socket.onopen = this.onOpen.bind(this);
@@ -156,11 +156,11 @@ class WebSocketTransport extends Transport {
   }
 
   getFingerPrint(customFingerprint?: string): void {
-    if (this.isNode) {
+    if (IS_NODE) {
       return require('../util/macaddress').getMac(macAddress => {
         this.fingerPrint = macAddress;
       });
-    } else if (this.isBrowser) {
+    } else if (IS_BROKER) {
       return new Fingerprint2().get(fingerPrint => {
         this.fingerPrint = Math.abs(require('../util/hash32').encodeByteArray(fingerPrint)).toString();
       });
@@ -172,7 +172,7 @@ class WebSocketTransport extends Transport {
   }
 
   getStun(): void {
-    if (this.isNode) {
+    if (IS_NODE) {
       require('../util/stun').getStun(data => {
         this.stun = data;
       });

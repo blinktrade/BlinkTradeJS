@@ -41,6 +41,7 @@ import { formatOrderBook, formatTradeHistory } from './util/utils';
 
 import TradeBase from './trade';
 import WebSocketTransport from './transports/websocket';
+import { IS_NODE } from './transports/transport';
 
 class BlinkTradeWS extends TradeBase {
   /**
@@ -96,7 +97,7 @@ class BlinkTradeWS extends TradeBase {
     trustedDevice?: boolean,
   }, callback?: Function): Promise<Object> {
     let userAgent;
-    if (!this.isNode) {
+    if (!IS_NODE) {
       userAgent = {
         UserAgent: window.navigator.userAgent,
         UserAgentLanguage: window.navigator.language,

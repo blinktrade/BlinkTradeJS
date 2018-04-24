@@ -22,21 +22,14 @@
 
 import common from '../constants/common';
 
+export const IS_NODE = typeof window === 'undefined';
+export const IS_BROKER = typeof document !== 'undefined';
+
 class Transport {
   /*
    * url endpoint.
    */
   endpoint: string;
-
-  /*
-   * Is node.js environment.
-   */
-  isNode: boolean;
-
-  /*
-   * Is browser environment.
-   */
-  isBrowser: boolean;
 
   level: '1' | '2';
 
@@ -50,9 +43,6 @@ class Transport {
 
     this.endpoint = endpoint;
     this.level = params.level || '2';
-
-    this.isNode    = typeof window === 'undefined';
-    this.isBrowser = typeof document !== 'undefined';
   }
 }
 
