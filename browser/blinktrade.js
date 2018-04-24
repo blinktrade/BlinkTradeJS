@@ -155,6 +155,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _websocket2 = _interopRequireDefault(_websocket);
 	
+	var _transport = __webpack_require__(338);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
@@ -249,7 +251,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          brokerId = _ref.brokerId;
 	
 	      var userAgent = void 0;
-	      if (!this.isNode) {
+	      if (!_transport.IS_NODE) {
 	        userAgent = {
 	          UserAgent: window.navigator.userAgent,
 	          UserAgentLanguage: window.navigator.language,
@@ -15624,7 +15626,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
 	        _this2.request = { resolve: resolve, reject: reject };
 	
-	        var WebSocket = _this2.isNode ? __webpack_require__(340) : window.WebSocket;
+	        var WebSocket = _transport.IS_NODE ? __webpack_require__(340) : window.WebSocket;
 	
 	        _this2.socket = new WebSocket(_this2.endpoint, null, _this2.headers);
 	        _this2.socket.onopen = _this2.onOpen.bind(_this2);
@@ -15716,11 +15718,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function getFingerPrint(customFingerprint) {
 	      var _this4 = this;
 	
-	      if (this.isNode) {
+	      if (_transport.IS_NODE) {
 	        return __webpack_require__(441).getMac(function (macAddress) {
 	          _this4.fingerPrint = macAddress;
 	        });
-	      } else if (this.isBrowser) {
+	      } else if (_transport.IS_BROKER) {
 	        return new _fingerprintjs2.default().get(function (fingerPrint) {
 	          _this4.fingerPrint = Math.abs(__webpack_require__(447).encodeByteArray(fingerPrint)).toString();
 	        });
@@ -15735,7 +15737,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function getStun() {
 	      var _this5 = this;
 	
-	      if (this.isNode) {
+	      if (_transport.IS_NODE) {
 	        __webpack_require__(448).getStun(function (data) {
 	          _this5.stun = data;
 	        });
@@ -15805,6 +15807,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.IS_BROKER = exports.IS_NODE = undefined;
 	
 	var _common = __webpack_require__(339);
 	
@@ -15834,12 +15837,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                                                                                                                                           * 
 	                                                                                                                                                           */
 	
+	var IS_NODE = exports.IS_NODE = typeof window === 'undefined';
+	var IS_BROKER = exports.IS_BROKER = typeof document !== 'undefined';
+	
 	var Transport =
-	
-	/*
-	 * Is browser environment.
-	 */
-	
 	/*
 	 * url endpoint.
 	 */
@@ -15855,15 +15856,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  this.endpoint = endpoint;
 	  this.level = params.level || '2';
-	
-	  this.isNode = typeof window === 'undefined';
-	  this.isBrowser = typeof document !== 'undefined';
-	}
-	
-	/*
-	 * Is node.js environment.
-	 */
-	;
+	};
 	
 	exports.default = Transport;
 
