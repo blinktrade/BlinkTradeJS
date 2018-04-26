@@ -21,7 +21,6 @@
  */
 
 import nodeify from 'nodeify';
-import Fingerprint2 from 'fingerprintjs2';
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 
 import BaseTransport from './baseTransport';
@@ -155,6 +154,7 @@ class WebSocketTransport extends BaseTransport {
         this.fingerPrint = macAddress;
       });
     } else if (this.isBrowser) {
+      const Fingerprint2 = require('fingerprintjs2');
       return new Fingerprint2().get(fingerPrint => {
         this.fingerPrint = Math.abs(require('./util/hash32').encodeByteArray(fingerPrint)).toString();
       });
