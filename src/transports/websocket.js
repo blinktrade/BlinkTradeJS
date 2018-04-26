@@ -21,7 +21,6 @@
  */
 
 import nodeify from 'nodeify';
-import Fingerprint2 from 'fingerprintjs2';
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 
 import Transport, { IS_NODE, IS_BROKER } from './transport';
@@ -161,6 +160,7 @@ class WebSocketTransport extends Transport {
         this.fingerPrint = macAddress;
       });
     } else if (IS_BROKER) {
+      const Fingerprint2 = require('fingerprintjs2');
       return new Fingerprint2().get(fingerPrint => {
         this.fingerPrint = Math.abs(require('../util/hash32').encodeByteArray(fingerPrint)).toString();
       });
