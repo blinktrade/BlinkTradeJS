@@ -146,7 +146,7 @@ module.exports =
 	
 	var _websocket2 = _interopRequireDefault(_websocket);
 	
-	var _transport = __webpack_require__(15);
+	var _transport = __webpack_require__(14);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -1369,13 +1369,9 @@ module.exports =
 	
 	var _nodeify2 = _interopRequireDefault(_nodeify);
 	
-	var _fingerprintjs = __webpack_require__(14);
-	
-	var _fingerprintjs2 = _interopRequireDefault(_fingerprintjs);
-	
 	var _eventemitter = __webpack_require__(4);
 	
-	var _transport = __webpack_require__(15);
+	var _transport = __webpack_require__(14);
 	
 	var _transport2 = _interopRequireDefault(_transport);
 	
@@ -1459,7 +1455,7 @@ module.exports =
 	      return _nodeify2.default.extend(new Promise(function (resolve, reject) {
 	        _this2.request = { resolve: resolve, reject: reject };
 	
-	        var WebSocket = _transport.IS_NODE ? __webpack_require__(17) : window.WebSocket;
+	        var WebSocket = _transport.IS_NODE ? __webpack_require__(16) : window.WebSocket;
 	
 	        _this2.socket = new WebSocket(_this2.endpoint, null, _this2.headers);
 	        _this2.socket.onopen = _this2.onOpen.bind(_this2);
@@ -1552,11 +1548,12 @@ module.exports =
 	      var _this4 = this;
 	
 	      if (_transport.IS_NODE) {
-	        return __webpack_require__(18).getMac(function (macAddress) {
+	        return __webpack_require__(17).getMac(function (macAddress) {
 	          _this4.fingerPrint = macAddress;
 	        });
 	      } else if (_transport.IS_BROKER) {
-	        return new _fingerprintjs2.default().get(function (fingerPrint) {
+	        var Fingerprint2 = __webpack_require__(19);
+	        return new Fingerprint2().get(function (fingerPrint) {
 	          _this4.fingerPrint = Math.abs(__webpack_require__(20).encodeByteArray(fingerPrint)).toString();
 	        });
 	      } else if (customFingerprint) {
@@ -1626,12 +1623,6 @@ module.exports =
 
 /***/ },
 /* 14 */
-/***/ function(module, exports) {
-
-	module.exports = require("fingerprintjs2");
-
-/***/ },
-/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1641,7 +1632,7 @@ module.exports =
 	});
 	exports.IS_BROKER = exports.IS_NODE = undefined;
 	
-	var _common = __webpack_require__(16);
+	var _common = __webpack_require__(15);
 	
 	var _common2 = _interopRequireDefault(_common);
 	
@@ -1693,7 +1684,7 @@ module.exports =
 	exports.default = Transport;
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1713,13 +1704,13 @@ module.exports =
 	};
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports) {
 
 	module.exports = require("ws");
 
 /***/ },
-/* 18 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1729,7 +1720,7 @@ module.exports =
 	});
 	exports.getMac = getMac;
 	
-	var _macaddress = __webpack_require__(19);
+	var _macaddress = __webpack_require__(18);
 	
 	var _macaddress2 = _interopRequireDefault(_macaddress);
 	
@@ -1786,10 +1777,16 @@ module.exports =
 	/* eslint-disable import/prefer-default-export */
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports) {
 
 	module.exports = require("macaddress");
+
+/***/ },
+/* 19 */
+/***/ function(module, exports) {
+
+	module.exports = require("fingerprintjs2");
 
 /***/ },
 /* 20 */
@@ -2236,7 +2233,7 @@ module.exports =
 	
 	var _fetchPonyfill3 = _interopRequireDefault(_fetchPonyfill2);
 	
-	var _transport = __webpack_require__(15);
+	var _transport = __webpack_require__(14);
 	
 	var _transport2 = _interopRequireDefault(_transport);
 	
