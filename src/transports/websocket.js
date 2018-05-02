@@ -62,7 +62,7 @@ class WebSocketTransport extends Transport {
   headers: Object;
 
   constructor(params?: BlinkTradeWS = {}) {
-    super(params, 'ws');
+    super(params, params.brokerId === 11 ? 'wsBitcambio' : 'ws');
 
     this.stun = { local: null, public: [] };
 

@@ -45,7 +45,7 @@ class RestTransport extends Transport {
   currency: 'USD' | 'BRL' | 'VEF' | 'CLP' | 'VND' | 'PKR';
 
   constructor(params: BlinkTradeRest) {
-    super(params, 'rest');
+    super(params, params.brokerId === 11 ? 'restBitcambio' : 'rest');
 
     this.key = params.key;
     this.secret = params.secret;
