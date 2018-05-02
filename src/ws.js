@@ -28,13 +28,13 @@ import {
   registerEventEmitter,
 } from './listener';
 
+import { EVENTS } from './constants/events';
 import {
-  EVENTS,
   BALANCE,
   DEPOSIT_REFRESH,
   WITHDRAW_REFRESH,
   EXECUTION_REPORT,
-} from './constants/events';
+} from './constants/actionTypes';
 
 import { ActionMsgReq } from './constants/messages';
 import { formatOrderBook, formatTradeHistory } from './util/utils';
