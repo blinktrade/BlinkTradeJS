@@ -1,58 +1,33 @@
-import { expect } from 'chai';
-
 import {
-  getRequest,
+  setRequest,
   deleteRequest,
-  registerRequest,
   generateRequestId,
-  registerEventEmitter,
 } from '../src/listener';
 
 let TestReqID = 0;
-let TestReqID2 = 0;
 
 const promise = {
   resolve: () => {},
   reject: () => {},
 };
 
-describe('Listeners', () => {
-  it('Register Listener TestReqID', () => {
+describe('Request Listeners', () => {
+  test('Register Request TestReqID', () => {
     TestReqID = generateRequestId();
-
-    const listeners = registerRequest({ TestReqID }, promise);
-    expect(listeners).to.be.eql({
-      TestReqID: [{ ReqId: TestReqID.toString(), ...promise }],
-    });
+    const reqs = setRequest({ MsgType: '1', TestReqID }, promise);
+    expect(reqs.size).toBe(1);
+    expect(reqs.get('TestReqID:' + TestReqID)).toEqual(promise);
   });
 
-  it('Register Second TestReqID', () => {
-    TestReqID2 = generateRequestId();
-
-    const listeners = registerRequest({ TestReqID: TestReqID2 }, promise);
-    expect(listeners).to.be.eql({
-      TestReqID: [
-        { ReqId: TestReqID.toString(), ...promise },
-        { ReqId: TestReqID2.toString(), ...promise },
-      ],
-    });
+  test('Register a second TestReqID', () => {
+    TestReqID = generateRequestId();
+    const reqs = setRequest({ MsgType: '1', TestReqID }, promise);
+    expect(reqs.size).toBe(2);
+    expect(reqs.get('TestReqID:' + TestReqID)).toEqual(promise);
   });
 
-  it('Register EventEmitter function', () => {
-    const callback = () => {};
-    registerEventEmitter({ TestReqID }, callback);
-    const request = getRequest({ TestReqID });
-    expect(request).to.be.eql({
-      ReqId: TestReqID.toString(),
-      ...promise,
-      resolve: null,
-      reject: null,
-      callback,
-    });
-  });
-
-  it('Delete Listener', () => {
-    const listeners = deleteRequest('TestReqID');
-    expect(listeners).to.be.eql({});
+  test('Delete Request from a response message', () => {
+    const reqs = deleteRequest({ MsgType: '0', TestReqID });
+    expect(reqs.size).toBe(1);
   });
 });

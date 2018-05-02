@@ -22,7 +22,7 @@
 
 import { MsgActionReq, MsgActionRes } from './constants/messages';
 
-const store = new Map();
+const reqs = new Map();
 const emitters = new Map();
 const listeners = new Map();
 
@@ -45,15 +45,17 @@ function getKey(messages: MsgTypes, msg: Object): string {
 }
 
 export function getRequest(msg: Message): ?ResolveReject {
-  return store.get(getKey(MsgActionRes, msg));
+  return reqs.get(getKey(MsgActionRes, msg));
 }
 
 export function setRequest(msg: Message, promise: ResolveReject): void {
-  store.set(getKey(MsgActionReq, msg), promise);
+  reqs.set(getKey(MsgActionReq, msg), promise);
+  return reqs;
 }
 
 export function deleteRequest(msg: Message): void {
-  store.delete(getKey(MsgActionRes, msg));
+  reqs.delete(getKey(MsgActionRes, msg));
+  return reqs;
 }
 
 export function getEventEmitter(msg: Message): ?Function {
