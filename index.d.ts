@@ -126,6 +126,11 @@ declare module blinktrade {
          * Currency pair symbol, check symbols table
          */
         symbol: string;
+
+        /**
+         * Optional Client ID
+         */
+        clientId?: string;
     }
 
     /**
@@ -140,7 +145,7 @@ declare module blinktrade {
         /**
          * You need to pass the clientId (ClOrdID) in order to get a response
          */
-        clientId?: number;
+        clientId?: string;
     }
 
     type WithdrawStatus = '1' | '2' | '4' | '8';

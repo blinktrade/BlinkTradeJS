@@ -83,15 +83,16 @@ class TradeBase {
     return nodeify.extend(this.send(msg).then(format)).nodeify(callback);
   }
 
-  sendOrder({ side, amount, price, symbol }: {
+  sendOrder({ side, amount, price, symbol, clientId }: {
     side: '1' | '2',
     price: number,
     amount: number,
     symbol: string,
+    clientId?: string,
   }, callback?: Function): Promise<Object> {
     const msg = {
       MsgType: ActionMsgReq.ORDER_SEND,
-      ClOrdID: generateRequestId(),
+      ClOrdID: clientId || generateRequestId().toString(),
       Symbol: symbol,
       Side: side,
       OrdType: '2',
@@ -105,7 +106,7 @@ class TradeBase {
 
   cancelOrder(param?: number | {
     orderId?: number,
-    clientId?: number,
+    clientId?: string,
   } = {}, callback?: Function): Promise<Object> {
     const orderId = param.orderId ? param.orderId : param;
     const msg: Object = {
