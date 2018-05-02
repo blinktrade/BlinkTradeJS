@@ -23,7 +23,7 @@
 import common from '../constants/common';
 
 export const IS_NODE = typeof window === 'undefined';
-export const IS_BROKER = typeof document !== 'undefined';
+export const IS_BROWSER = typeof document !== 'undefined';
 
 class Transport {
   /*
