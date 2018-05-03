@@ -29,6 +29,8 @@ import dgram from 'dgram';
 
 const stunIp = { local: null, public: [] };
 
+let socket;
+
 function addIPAddress(ipAddress) {
   if (ipAddress.match(/^(192\.168\.|169\.254\.|10\.|172\.(1[6-9]|2\d|3[01]))/)) {
     stunIp.local = ipAddress;
@@ -37,8 +39,12 @@ function addIPAddress(ipAddress) {
   }
 }
 
+export function closeStun() {
+  socket.close();
+}
+
 export function getStun(callback) {
-  const socket = dgram.createSocket('udp4');
+  socket = dgram.createSocket('udp4');
 
   const STUN_HEADER_LENGTH = 20;
   const stunRequest = new Buffer(STUN_HEADER_LENGTH);

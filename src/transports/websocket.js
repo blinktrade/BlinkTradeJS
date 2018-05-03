@@ -89,6 +89,7 @@ class WebSocketTransport extends Transport {
 
   disconnect(): void {
     this.socket.close();
+    this.closeStun();
   }
 
   onOpen(): void {
@@ -176,6 +177,12 @@ class WebSocketTransport extends Transport {
       require('../util/stun').getStun(data => {
         this.stun = data;
       });
+    }
+  }
+
+  closeStun(): void {
+    if (IS_NODE) {
+      require('../util/stun').closeStun();
     }
   }
 
