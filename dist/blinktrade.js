@@ -105,7 +105,8 @@ module.exports =
 	  FOXBIT: 4,
 	  TESTNET: 5,
 	  URDUBIT: 8,
-	  CHILEBIT: 9
+	  CHILEBIT: 9,
+	  BITCAMBIO: 11
 	};
 
 /***/ },
@@ -133,6 +134,8 @@ module.exports =
 	var _listener = __webpack_require__(5);
 	
 	var _events = __webpack_require__(10);
+	
+	var _actionTypes = __webpack_require__(9);
 	
 	var _messages = __webpack_require__(6);
 	
@@ -319,7 +322,7 @@ module.exports =
 	        return _get(BlinkTradeWS.prototype.__proto__ || Object.getPrototypeOf(BlinkTradeWS.prototype), 'balance', _this4).call(_this4, callback).then(function (data) {
 	          (0, _listener.registerListener)(_messages.ActionMsgReq.BALANCE, function (balance) {
 	            callback && callback(null, balance);
-	            return _this4.transport.eventEmitter.emit(_events.BALANCE, balance);
+	            return _this4.transport.eventEmitter.emit(_actionTypes.BALANCE, balance);
 	          });
 	          return resolve(data);
 	        }).catch(reject);
@@ -454,7 +457,7 @@ module.exports =
 	      (0, _listener.registerListener)('8', function (data) {
 	        callback && callback(data);
 	        var event = _events.EVENTS.EXECUTION_REPORT[data.ExecType];
-	        return _this7.transport.eventEmitter.emit(_events.EXECUTION_REPORT + ':' + event, data);
+	        return _this7.transport.eventEmitter.emit(_actionTypes.EXECUTION_REPORT + ':' + event, data);
 	      });
 	
 	      return this.transport.eventEmitter;
@@ -506,7 +509,7 @@ module.exports =
 	
 	      var subscribeEvent = function subscribeEvent(deposit) {
 	        callback && callback(null, deposit);
-	        return _this8.transport.eventEmitter.emit(_events.DEPOSIT_REFRESH, deposit);
+	        return _this8.transport.eventEmitter.emit(_actionTypes.DEPOSIT_REFRESH, deposit);
 	      };
 	
 	      return this.transport.emitterPromise(new Promise(function (resolve, reject) {
@@ -540,7 +543,7 @@ module.exports =
 	
 	      var subscribeEvent = function subscribeEvent(withdraw) {
 	        callback && callback(null, withdraw);
-	        return _this9.transport.eventEmitter.emit(_events.WITHDRAW_REFRESH, withdraw);
+	        return _this9.transport.eventEmitter.emit(_actionTypes.WITHDRAW_REFRESH, withdraw);
 	      };
 	
 	      return this.transport.emitterPromise(new Promise(function (resolve, reject) {
@@ -600,27 +603,27 @@ module.exports =
 	
 	var _messages = __webpack_require__(6);
 	
-	var store = new Map(); /**
-	                        * BlinkTradeJS SDK
-	                        * (c) 2016-present BlinkTrade, Inc.
-	                        *
-	                        * This file is part of BlinkTradeJS
-	                        *
-	                        * This program is free software: you can redistribute it and/or modify
-	                        * it under the terms of the GNU General Public License as published by
-	                        * the Free Software Foundation, either version 3 of the License, or
-	                        * (at your option) any later version.
-	                       
-	                        * This program is distributed in the hope that it will be useful,
-	                        * but WITHOUT ANY WARRANTY; without even the implied warranty of
-	                        * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	                        * GNU General Public License for more details.
-	                       
-	                        * You should have received a copy of the GNU General Public License
-	                        * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	                        *
-	                        * 
-	                        */
+	var reqs = new Map(); /**
+	                       * BlinkTradeJS SDK
+	                       * (c) 2016-present BlinkTrade, Inc.
+	                       *
+	                       * This file is part of BlinkTradeJS
+	                       *
+	                       * This program is free software: you can redistribute it and/or modify
+	                       * it under the terms of the GNU General Public License as published by
+	                       * the Free Software Foundation, either version 3 of the License, or
+	                       * (at your option) any later version.
+	                      
+	                       * This program is distributed in the hope that it will be useful,
+	                       * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	                       * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	                       * GNU General Public License for more details.
+	                      
+	                       * You should have received a copy of the GNU General Public License
+	                       * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	                       *
+	                       * 
+	                       */
 	
 	var emitters = new Map();
 	var listeners = new Map();
@@ -644,15 +647,17 @@ module.exports =
 	}
 	
 	function getRequest(msg) {
-	  return store.get(getKey(_messages.MsgActionRes, msg));
+	  return reqs.get(getKey(_messages.MsgActionRes, msg));
 	}
 	
 	function setRequest(msg, promise) {
-	  store.set(getKey(_messages.MsgActionReq, msg), promise);
+	  reqs.set(getKey(_messages.MsgActionReq, msg), promise);
+	  return reqs;
 	}
 	
 	function deleteRequest(msg) {
-	  store.delete(getKey(_messages.MsgActionRes, msg));
+	  reqs.delete(getKey(_messages.MsgActionRes, msg));
+	  return reqs;
 	}
 	
 	function getEventEmitter(msg) {
@@ -944,7 +949,27 @@ module.exports =
 	});
 	exports.formatOrderBook = exports.formatTradeHistory = exports.formatColumns = undefined;
 	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; /**
+	                                                                                                                                                                                                                                                                   * BlinkTradeJS SDK
+	                                                                                                                                                                                                                                                                   * (c) 2016-present BlinkTrade, Inc.
+	                                                                                                                                                                                                                                                                   *
+	                                                                                                                                                                                                                                                                   * This file is part of BlinkTradeJS
+	                                                                                                                                                                                                                                                                   *
+	                                                                                                                                                                                                                                                                   * This program is free software: you can redistribute it and/or modify
+	                                                                                                                                                                                                                                                                   * it under the terms of the GNU General Public License as published by
+	                                                                                                                                                                                                                                                                   * the Free Software Foundation, either version 3 of the License, or
+	                                                                                                                                                                                                                                                                   * (at your option) any later version.
+	                                                                                                                                                                                                                                                                  
+	                                                                                                                                                                                                                                                                   * This program is distributed in the hope that it will be useful,
+	                                                                                                                                                                                                                                                                   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	                                                                                                                                                                                                                                                                   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	                                                                                                                                                                                                                                                                   * GNU General Public License for more details.
+	                                                                                                                                                                                                                                                                  
+	                                                                                                                                                                                                                                                                   * You should have received a copy of the GNU General Public License
+	                                                                                                                                                                                                                                                                   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	                                                                                                                                                                                                                                                                   *
+	                                                                                                                                                                                                                                                                   * 
+	                                                                                                                                                                                                                                                                   */
 	
 	var _ramda = __webpack_require__(7);
 	
@@ -1102,11 +1127,12 @@ module.exports =
 	      var side = _ref2.side,
 	          amount = _ref2.amount,
 	          price = _ref2.price,
-	          symbol = _ref2.symbol;
+	          symbol = _ref2.symbol,
+	          clientId = _ref2.clientId;
 	
 	      var msg = {
 	        MsgType: _messages.ActionMsgReq.ORDER_SEND,
-	        ClOrdID: (0, _listener.generateRequestId)(),
+	        ClOrdID: clientId || (0, _listener.generateRequestId)().toString(),
 	        Symbol: symbol,
 	        Side: side,
 	        OrdType: '2',
@@ -1425,7 +1451,7 @@ module.exports =
 	
 	    _classCallCheck(this, WebSocketTransport);
 	
-	    var _this = _possibleConstructorReturn(this, (WebSocketTransport.__proto__ || Object.getPrototypeOf(WebSocketTransport)).call(this, params, 'ws'));
+	    var _this = _possibleConstructorReturn(this, (WebSocketTransport.__proto__ || Object.getPrototypeOf(WebSocketTransport)).call(this, params, params.brokerId === 11 ? 'wsBitcambio' : 'ws'));
 	
 	    _this.stun = { local: null, public: [] };
 	
@@ -1468,6 +1494,7 @@ module.exports =
 	    key: 'disconnect',
 	    value: function disconnect() {
 	      this.socket.close();
+	      this.closeStun();
 	    }
 	  }, {
 	    key: 'onOpen',
@@ -1551,7 +1578,7 @@ module.exports =
 	        return __webpack_require__(17).getMac(function (macAddress) {
 	          _this4.fingerPrint = macAddress;
 	        });
-	      } else if (_transport.IS_BROKER) {
+	      } else if (_transport.IS_BROWSER) {
 	        var Fingerprint2 = __webpack_require__(19);
 	        return new Fingerprint2().get(function (fingerPrint) {
 	          _this4.fingerPrint = Math.abs(__webpack_require__(20).encodeByteArray(fingerPrint)).toString();
@@ -1571,6 +1598,13 @@ module.exports =
 	        __webpack_require__(21).getStun(function (data) {
 	          _this5.stun = data;
 	        });
+	      }
+	    }
+	  }, {
+	    key: 'closeStun',
+	    value: function closeStun() {
+	      if (_transport.IS_NODE) {
+	        __webpack_require__(21).closeStun();
 	      }
 	    }
 	
@@ -1630,7 +1664,7 @@ module.exports =
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.IS_BROKER = exports.IS_NODE = undefined;
+	exports.IS_BROWSER = exports.IS_NODE = undefined;
 	
 	var _common = __webpack_require__(15);
 	
@@ -1661,7 +1695,7 @@ module.exports =
 	                                                                                                                                                           */
 	
 	var IS_NODE = exports.IS_NODE = typeof window === 'undefined';
-	var IS_BROKER = exports.IS_BROKER = typeof document !== 'undefined';
+	var IS_BROWSER = exports.IS_BROWSER = typeof document !== 'undefined';
 	
 	var Transport =
 	/*
@@ -1695,11 +1729,15 @@ module.exports =
 	exports.default = {
 	  prod: {
 	    ws: 'wss://ws.blinktrade.com/trade/',
-	    rest: 'https://api.blinktrade.com/'
+	    wsBitcambio: 'wss://bitcambio_api.blinktrade.com/trade/',
+	    rest: 'https://api.blinktrade.com/',
+	    restBitcambio: 'https://bitcambio_api.blinktrade.com/'
 	  },
 	  testnet: {
 	    ws: 'wss://api_testnet.blinktrade.com/trade/',
-	    rest: 'https://api_testnet.blinktrade.com/'
+	    wsBitcambio: 'wss://api_testnet.blinktrade.com/trade/',
+	    rest: 'https://api_testnet.blinktrade.com/',
+	    restBitcambio: 'https://api_testnet.blinktrade.com/'
 	  }
 	};
 
@@ -1962,6 +2000,7 @@ module.exports =
 	/* eslint-disable no-restricted-properties */
 	/* eslint-disable no-buffer-constructor */
 	
+	exports.closeStun = closeStun;
 	exports.getStun = getStun;
 	
 	var _ip = __webpack_require__(22);
@@ -1976,6 +2015,8 @@ module.exports =
 	
 	var stunIp = { local: null, public: [] };
 	
+	var socket = void 0;
+	
 	function addIPAddress(ipAddress) {
 	  if (ipAddress.match(/^(192\.168\.|169\.254\.|10\.|172\.(1[6-9]|2\d|3[01]))/)) {
 	    stunIp.local = ipAddress;
@@ -1984,8 +2025,12 @@ module.exports =
 	  }
 	}
 	
+	function closeStun() {
+	  socket.close();
+	}
+	
 	function getStun(callback) {
-	  var socket = _dgram2.default.createSocket('udp4');
+	  socket = _dgram2.default.createSocket('udp4');
 	
 	  var STUN_HEADER_LENGTH = 20;
 	  var stunRequest = new Buffer(STUN_HEADER_LENGTH);
@@ -2277,7 +2322,7 @@ module.exports =
 	  function RestTransport(params) {
 	    _classCallCheck(this, RestTransport);
 	
-	    var _this = _possibleConstructorReturn(this, (RestTransport.__proto__ || Object.getPrototypeOf(RestTransport)).call(this, params, 'rest'));
+	    var _this = _possibleConstructorReturn(this, (RestTransport.__proto__ || Object.getPrototypeOf(RestTransport)).call(this, params, params.brokerId === 11 ? 'restBitcambio' : 'rest'));
 	
 	    _this.key = params.key;
 	    _this.secret = params.secret;
