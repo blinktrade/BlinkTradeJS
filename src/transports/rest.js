@@ -20,13 +20,12 @@
  * @flow
  */
 
-import url from 'url';
-import sjcl from 'sjcl';
+import sha256 from 'js-sha256';
 import fetchPonyfill from 'fetch-ponyfill';
 
 import Transport from './transport';
 
-const { fetch } = fetchPonyfill(Promise);
+const { fetch } = fetchPonyfill({ Promise });
 
 class RestTransport extends Transport {
   /**
@@ -54,9 +53,8 @@ class RestTransport extends Transport {
 
   headers(method: string, body: Object): Object {
     const timeStamp = Date.now().toString();
-    const hexKey = sjcl.codec.utf8String.toBits(this.secret);
-    const hmac = new sjcl.misc.hmac(hexKey, sjcl.hash.sha256);
-    const Signature = sjcl.codec.hex.fromBits(hmac.encrypt(timeStamp));
+    const Signature = sha256.hmac.create(this.secret).update(timeStamp).hex();
+
     return {
       method,
       headers: {
@@ -70,7 +68,7 @@ class RestTransport extends Transport {
   }
 
   fetch(msg: Object, api: string, headers?: Object = {}): Promise<Object> {
-    return fetch(url.resolve(this.endpoint, api), headers)
+    return fetch(this.endpoint + api, headers)
       .then(response => response.json());
   }
 
