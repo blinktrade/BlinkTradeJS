@@ -19,6 +19,7 @@
     "build:prod": "yarn build:umd:min",
     "build:dev": "yarn build:commonjs && yarn build:umd && yarn build:es",
     "build": "yarn build:dev && yarn build:prod",
+    "prepare": "yarn build",
     "test": "jest",
     "test:cov": "jest --coverage",
     "test:watch": "jest --watch"
