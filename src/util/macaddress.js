@@ -23,8 +23,7 @@
 /* eslint-disable operator-assignment */
 /* eslint-disable no-plusplus */
 /* eslint-disable import/prefer-default-export */
-
-import macaddress from 'macaddress';
+import macaddress from 'macaddress-secure';
 
 export function getMac(callback: Function): void {
   macaddress.all((err, all) => {
