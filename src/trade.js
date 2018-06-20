@@ -187,7 +187,7 @@ class TradeBase {
     secondFactor?: string,
   }, callback: Function): Promise<Object> {
     const msg: Object = {
-      MsgType: ActionMsgReq.CONFIRM_WITHDRAW,
+      MsgType: ActionMsgReq.WITHDRAW_CONFIRM,
       WithdrawReqID: generateRequestId(),
       WithdrawID,
     };
@@ -206,7 +206,7 @@ class TradeBase {
   cancelWithdraw(withdrawId: string, callback: Function): Promise<Object> {
     const reqId = generateRequestId();
     const msg = {
-      MsgType: ActionMsgReq.CANCEL_WITHDRAW,
+      MsgType: ActionMsgReq.WITHDRAW_CANCEL,
       WithdrawCancelReqID: reqId,
       ClOrdID: reqId,
       WithdrawID: withdrawId,
