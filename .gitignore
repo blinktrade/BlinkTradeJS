@@ -37,8 +37,10 @@ examples/browser/bundle
 node_modules
 jspm_packages
 
-# lib prepublish compiled
+# prepublish compiled
 lib
+dist
+es
 
 # Optional npm cache directory
 .npm
