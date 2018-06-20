@@ -1,8 +1,8 @@
-import { map, compose, groupBy, prop, zipObj } from 'ramda';
+import * as R from 'ramda';
 
 export const formatColumns = (field, level) => (data) => {
   if (level === 2) {
-    const list = map(zipObj(data.Columns), data[field]);
+    const list = R.map(R.zipObj(data.Columns), data[field]);
     return Promise.resolve({ ...data, [field]: list });
   }
 
@@ -11,9 +11,9 @@ export const formatColumns = (field, level) => (data) => {
 
 export const formatTradeHistory = (level) => (data) => {
   if (level === 2) {
-    const TradeHistoryGrp = compose(
-      groupBy(prop('Market')),
-      map(zipObj(data.Columns)),
+    const TradeHistoryGrp = R.compose(
+      R.groupBy(R.prop('Market')),
+      R.map(R.zipObj(data.Columns)),
     )(data.TradeHistoryGrp);
 
     return Promise.resolve({ ...data, TradeHistoryGrp });
