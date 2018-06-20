@@ -9,6 +9,7 @@
     "flowtype/semi": [2, "always"],
     "flowtype/object-type-delimiter": [2, "comma"],
     "import/prefer-default-export": 0,
+    "prefer-template": 0,
     "max-len": 0,
     "global-require": 0,
     "arrow-body-style": 0,
@@ -34,7 +35,8 @@
     "Stun": true,
     "Request": true,
     "Listener": true,
-    "window": true
+    "window": true,
+    "expect": true
   },
   "plugins": ["flowtype"]
 }
