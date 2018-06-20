@@ -20,6 +20,7 @@
  * @flow
  */
 
+import os from 'os';
 import nodeify from 'nodeify';
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import {
@@ -105,7 +106,6 @@ class BlinkTradeWS extends TradeBase {
         UserAgentTimezoneOffset: new Date().getTimezoneOffset(),
       };
     } else {
-      const os = require('os');
       userAgent = {
         UserAgent: `${os.type()} ${os.release()}`,
         UserAgentLanguage: 'en_US',

@@ -20,8 +20,13 @@
  * @flow
  */
 
+import WS from 'ws';
 import nodeify from 'nodeify';
-import { EventEmitter2 as EventEmitter } from 'eventemitter2';
+import Fingerprint2 from 'fingerprintjs2';
+import EventEmitter from 'eventemitter2';
+import { getMac } from '../util/macaddress';
+import { getStun, closeStun } from '../util/stun';
+import { encodeByteArray } from '../util/hash32';
 
 import Transport, { IS_NODE, IS_BROWSER } from './transport';
 
@@ -77,9 +82,9 @@ class WebSocketTransport extends Transport {
     return nodeify.extend(new Promise((resolve, reject) => {
       this.request = { resolve, reject };
 
-      const WebSocket = IS_NODE ? require('ws') : window.WebSocket;
+      const WebSocket = IS_NODE ? WS : window.WebSocket;
 
-      this.socket = new WebSocket(this.endpoint, null, this.headers);
+      this.socket = new WebSocket(this.endpoint, [], this.headers);
       this.socket.onopen = this.onOpen.bind(this);
       this.socket.onclose = this.onClose.bind(this);
       this.socket.onerror = this.onError.bind(this);
@@ -157,13 +162,12 @@ class WebSocketTransport extends Transport {
 
   getFingerPrint(customFingerprint?: string): void {
     if (IS_NODE) {
-      return require('../util/macaddress').getMac(macAddress => {
+      return getMac(macAddress => {
         this.fingerPrint = macAddress;
       });
     } else if (IS_BROWSER) {
-      const Fingerprint2 = require('fingerprintjs2');
       return new Fingerprint2().get(fingerPrint => {
-        this.fingerPrint = Math.abs(require('../util/hash32').encodeByteArray(fingerPrint)).toString();
+        this.fingerPrint = Math.abs(encodeByteArray(fingerPrint)).toString();
       });
     } else if (customFingerprint) {
       this.fingerPrint = customFingerprint;
@@ -174,7 +178,7 @@ class WebSocketTransport extends Transport {
 
   getStun(): void {
     if (IS_NODE) {
-      require('../util/stun').getStun(data => {
+      getStun(data => {
         this.stun = data;
       });
     }
@@ -182,7 +186,7 @@ class WebSocketTransport extends Transport {
 
   closeStun(): void {
     if (IS_NODE) {
-      require('../util/stun').closeStun();
+      closeStun();
     }
   }
 
