@@ -67,6 +67,24 @@ class BlinkTradeWS extends TradeBase {
     return this.transport.sendMessageAsPromise(msg);
   }
 
+  onEvent(event, callback) {
+    if (this.transport.eventEmitter) {
+      return this.transport.eventEmitter.on(event, callback);
+    }
+  }
+
+  emit(event) {
+    if (this.transport.eventEmitter) {
+      return this.transport.eventEmitter.emit(event);
+    }
+  }
+
+  emitterPromise(promise) {
+    return this.transport.emitterPromise
+      ? this.transport.emitterPromise(promise)
+      : promise;
+  }
+
   heartbeat(callback?: Function): Promise<Object> {
     const d = new Date();
     const msg: Object = {
@@ -159,11 +177,11 @@ class BlinkTradeWS extends TradeBase {
   }
 
   balance(clientId, callback?: Function): PromiseEmitter<Object> {
-    return this.transport.emitterPromise(new Promise((resolve, reject) => {
+    return this.emitterPromise(new Promise((resolve, reject) => {
       return super.balance(clientId, callback).then((data) => {
-        this.transport.eventEmitter.on(ActionMsgRes.BALANCE, (balance) => {
+        this.onEvent(ActionMsgRes.BALANCE, (balance) => {
           callback && callback(null, balance);
-          return this.transport.eventEmitter.emit(BALANCE, balance);
+          return this.emit(BALANCE, balance);
         });
         return resolve(data);
       }).catch(reject);
@@ -171,7 +189,7 @@ class BlinkTradeWS extends TradeBase {
   }
 
   onBalanceUpdate(callback?: Function) {
-    return this.transport.eventEmitter.on(ActionMsgRes.BALANCE, callback);
+    return this.onEvent(ActionMsgRes.BALANCE, callback);
   }
 
   subscribeTicker(symbols: Array<string>, callback?: Function): PromiseEmitter<Object> {
@@ -193,14 +211,14 @@ class BlinkTradeWS extends TradeBase {
       BestBid: data.BestBid / 1e8,
     });
 
-    return this.transport.emitterPromise(new Promise((resolve, reject) => {
+    return this.emitterPromise(new Promise((resolve, reject) => {
       return this.send(msg).then(data => {
         resolve(formatTicker(data));
         const event = ActionMsgRes.SECURITY_STATUS_SUBSCRIBE + ':' + data.SecurityStatusReqID;
-        this.transport.eventEmitter.on(event, (ticker) => {
+        this.onEvent(event, (ticker) => {
           const tickerFormatted = formatTicker(ticker);
           callback && callback(null, tickerFormatted);
-          return this.transport.eventEmitter.emit(`${ticker.Market}:${ticker.Symbol}`, tickerFormatted);
+          return this.emit(`${ticker.Market}:${ticker.Symbol}`, tickerFormatted);
         });
       }).catch(reject);
     }), callback);
@@ -249,13 +267,13 @@ class BlinkTradeWS extends TradeBase {
               const bidOfferData = { ...dataOrder, type: orderbookEvent };
 
               callback && callback(null, bidOfferData);
-              return this.transport.eventEmitter.emit(orderbookEvent, bidOfferData);
+              return this.emit(orderbookEvent, bidOfferData);
             case '2':
               const tradeEvent = `OB:${EVENTS.TRADES[order.MDUpdateAction]}`;
               const tradeData = { ...dataOrder, type: tradeEvent };
 
               callback && callback(null, tradeData);
-              return this.transport.eventEmitter.emit(tradeEvent, tradeData);
+              return this.emit(tradeEvent, tradeData);
             case '4':
               break;
             default:
@@ -266,10 +284,9 @@ class BlinkTradeWS extends TradeBase {
       }
     };
 
-    return this.transport.emitterPromise(new Promise((resolve, reject) => {
+    return this.emitterPromise(new Promise((resolve, reject) => {
       return this.send(msg).then(data => {
-        const event = ActionMsgRes.MD_INCREMENT + ':' + data.MDReqID;
-        this.transport.eventEmitter.on(event, subscribeEvent);
+        this.onEvent(ActionMsgRes.MD_INCREMENT + ':' + data.MDReqID, subscribeEvent);
         return resolve(formatOrderBook(data, this.level));
       }).catch(err => reject(err));
     }), callback);
@@ -288,10 +305,10 @@ class BlinkTradeWS extends TradeBase {
   }
 
   executionReport(callback?: Function): EventEmitter {
-    return this.transport.eventEmitter.on(ActionMsgRes.EXECUTION_REPORT, (data) => {
+    return this.onEvent(ActionMsgRes.EXECUTION_REPORT, (data) => {
       callback && callback(data);
       const event = EVENTS.EXECUTION_REPORT[data.ExecType];
-      return this.transport.eventEmitter.emit(`${EXECUTION_REPORT}:${event}`, data);
+      return this.emit(`${EXECUTION_REPORT}:${event}`, data);
     });
   }
 
@@ -328,20 +345,20 @@ class BlinkTradeWS extends TradeBase {
   } = {}, callback?: Function): PromiseEmitter<Object> {
     const subscribeEvent = (deposit) => {
       callback && callback(null, deposit);
-      return this.transport.eventEmitter.emit(DEPOSIT_REFRESH, deposit);
+      return this.emit(DEPOSIT_REFRESH, deposit);
     };
 
-    return this.transport.emitterPromise(new Promise((resolve, reject) => {
+    return this.emitterPromise(new Promise((resolve, reject) => {
       return super.requestDeposit({ currency, value, depositMethodId }).then(deposit => {
         const event = ActionMsgRes.DEPOSIT_REFRESH + ':' + deposit.ClOrdID;
-        this.transport.eventEmitter.on(event, subscribeEvent);
+        this.onEvent(event, subscribeEvent);
         return resolve(deposit);
       }).catch(reject);
     }), callback);
   }
 
   onDepositRefresh(callback?: Function): Promise<Object> {
-    return this.transport.eventEmitter.on(ActionMsgRes.DEPOSIT_REFRESH, callback);
+    return this.onEvent(ActionMsgRes.DEPOSIT_REFRESH, callback);
   }
 
   requestWithdraw({ amount, data, currency = 'BTC', method = 'bitcoin' }: {
@@ -352,20 +369,19 @@ class BlinkTradeWS extends TradeBase {
   }, callback?: Function): PromiseEmitter<Object> {
     const subscribeEvent = (withdraw) => {
       callback && callback(null, withdraw);
-      return this.transport.eventEmitter.emit(WITHDRAW_REFRESH, withdraw);
+      return this.emit(WITHDRAW_REFRESH, withdraw);
     };
 
-    return this.transport.emitterPromise(new Promise((resolve, reject) => {
+    return this.emitterPromise(new Promise((resolve, reject) => {
       return super.requestWithdraw({ amount, data, currency, method }).then(withdraw => {
-        const event = ActionMsgRes.WITHDRAW_REFRESH + ':' + withdraw.ClOrdID;
-        this.transport.eventEmitter.on(event, subscribeEvent);
+        this.onEvent(ActionMsgRes.WITHDRAW_REFRESH + ':' + withdraw.ClOrdID, subscribeEvent);
         return resolve(withdraw);
       }).catch(reject);
     }), callback);
   }
 
   onWithdrawRefresh(callback?: Function): Promise<Object> {
-    return this.transport.eventEmitter.on(ActionMsgRes.WITHDRAW_REFRESH, callback);
+    return this.onEvent(ActionMsgRes.WITHDRAW_REFRESH, callback);
   }
 }
 
