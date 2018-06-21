@@ -3,7 +3,7 @@ var BlinkTradeWS = require('blinktrade').BlinkTradeWS;
 var blinktrade = new BlinkTradeWS();
 
 blinktrade.connect().then(function() {
-  return blinktrade.subscribeOrderbook(['BTCUSD'])
+  return blinktrade.subscribeOrderbook(['BTCBRL'])
 }).then(function(orderbook) {
   console.log(orderbook);
 }).catch(function(err) {

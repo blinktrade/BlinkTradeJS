@@ -13,14 +13,14 @@ blinktrade.connect().then(function() {
 }).then(function(profile) {
   console.log('My Profile', profile);
 
-  return blinktrade.subscribeTicker(['BLINK:BTCUSD'])
-  .on('BLINK:BTCUSD', function(data) {
+  return blinktrade.subscribeTicker(['BLINK:BTCBRL'])
+  .on('BLINK:BTCBRL', function(data) {
     console.log('Ticker Updated', data);
   });
 }).then(function(ticker) {
 
   console.log('Ticker', ticker);
-  return blinktrade.subscribeOrderbook(['BTCUSD'])
+  return blinktrade.subscribeOrderbook(['BTCBRL'])
   .on('OB:NEW_ORDER', (data) => {
     console.log('OB:NEW_ORDER', data);
   }).on('OB:UPDATE_ORDER', (data) => {
@@ -35,7 +35,7 @@ blinktrade.connect().then(function() {
 
 }).then(function(marketData) {
   console.log('OrderBook FULL REFRESH');
-  console.log(marketData.MDFullGrp.BTCUSD);
+  console.log(marketData.MDFullGrp.BTCBRL);
   return blinktrade.balance()
   .on('BALANCE', (data) => {
     console.log('Balance Updated', data);
@@ -58,7 +58,7 @@ blinktrade.connect().then(function() {
     side: '1',
     price: parseInt((550 * 1e8).toFixed(0), 10),
     amount: parseInt((0.05 * 1e8).toFixed(0), 10),
-    symbol: 'BTCUSD',
+    symbol: 'BTCBRL',
   });
 }).then(function(order) {
   console.log('Cancelling order');

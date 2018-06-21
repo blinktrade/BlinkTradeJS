@@ -43,7 +43,7 @@ class TradeBase {
   constructor(params?: BlinkTradeBase = {}) {
     this.level = params.level === undefined ? 2 : params.level;
 
-    this.brokerId = params.brokerId || 5;
+    this.brokerId = params.brokerId || 4;
   }
 
   changeBrokerId(brokerId: number) {

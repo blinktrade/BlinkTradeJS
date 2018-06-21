@@ -30,9 +30,9 @@ blinktrade.connect().then(function() {
 
   return blinktrade.sendOrder({
     side: '1',
-    price: parseInt(550 * 1e8, 10),
+    price: parseInt(10 * 1e8, 10),
     amount: parseInt(0.05 * 1e8, 10),
-    symbol: 'BTCUSD',
+    symbol: 'BTCBRL',
   });
 }).then(function(order) {
   // Cancel order after 5 seconds

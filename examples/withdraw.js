@@ -7,8 +7,8 @@ blinktrade.connect().then(function() {
 }).then(function(logged) {
   return blinktrade.requestWithdraw({
     amount: parseInt(200 * 1e8),
-    currency: 'USD',
-    method: 'PayPal',
+    currency: 'BRL',
+    method: 'Paypal',
     data: {
       Email: 'user@blinktrade.com'
     }

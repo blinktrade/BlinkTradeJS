@@ -9,9 +9,9 @@ var blinktrade = new BlinkTradeRest({
 
 blinktrade.sendOrder({
   side: '1',
-  price: parseInt(550 * 1e8, 10),
+  price: parseInt(100 * 1e8, 10),
   amount: parseInt(0.05 * 1e8, 10),
-  symbol: 'BTCUSD',
+  symbol: 'BTCBRL',
 }).then(function(order) {
   console.log(order);
   console.log('Cancelling order: #' + order[0].OrderID);

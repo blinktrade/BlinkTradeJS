@@ -41,9 +41,7 @@ function onOrderBookTradeNew(data) {
 function onAnyTicker(data) {
   console.log('Any Ticker Updated');
 }
-function onBTCUSD(data) {
-  console.log('BTCUSD', data);
-}
+
 function onBTCBRL(data) {
   console.log('BTCBRL', data);
 }
@@ -56,31 +54,32 @@ blinktrade.connect().then(function() {
   console.log('Balance', balance);
 
   blinktrade.executionReport()
-  .on('EXECUTION_REPORT:NEW', onExecutionReportNew)
-  .on('EXECUTION_REPORT:PARTIAL', onExecutionReportPartial)
-  .on('EXECUTION_REPORT:EXECUTION', onExecutionReportExecution)
-  .on('EXECUTION_REPORT:CANCELED', onExecutionReportCanceled)
-  .on('EXECUTION_REPORT:REJECTED', onExecutionReportRejected);
+    .on('EXECUTION_REPORT:NEW', onExecutionReportNew)
+    .on('EXECUTION_REPORT:PARTIAL', onExecutionReportPartial)
+    .on('EXECUTION_REPORT:EXECUTION', onExecutionReportExecution)
+    .on('EXECUTION_REPORT:CANCELED', onExecutionReportCanceled)
+    .on('EXECUTION_REPORT:REJECTED', onExecutionReportRejected);
 
-  return blinktrade.subscribeOrderbook(['BTCUSD'])
-  .on('OB:NEW_ORDER', onOrderBookNewOrder)
-  .on('OB:UPDATE_ORDER', onOrderBookUpdateOrder)
-  .on('OB:DELETE_ORDER', onOrderBookDeleteOrder)
-  .on('OB:DELETE_ORDERS_THRU', onOrderBookDeleteThruOrder)
-  .on('OB:TRADE_NEW', onOrderBookTradeNew);
+
+  return blinktrade.subscribeOrderbook(['BTCBRL'])
+    .on('OB:NEW_ORDER', onOrderBookNewOrder)
+    .on('OB:UPDATE_ORDER', onOrderBookUpdateOrder)
+    .on('OB:DELETE_ORDER', onOrderBookDeleteOrder)
+    .on('OB:DELETE_ORDERS_THRU', onOrderBookDeleteThruOrder)
+    .on('OB:TRADE_NEW', onOrderBookTradeNew);
 
 }).then(function(orderbook) {
 
-  return blinktrade.subscribeTicker(['BLINK:BTCUSD', 'BLINK:BTCBRL'])
-  .on('BLINK:*', onAnyTicker)
-  .on('BLINK:BTCUSD', onBTCUSD)
-  .many('BLINK:BTCBRL', 2, onBTCBRL);
+  return blinktrade.subscribeTicker(['BLINK:BTCBRL'])
+    .on('BLINK:*', onAnyTicker)
+    .on('BLINK:BTCBRL', onBTCBRL)
+    .many('BLINK:BTCBRL', 2, onBTCBRL);
 }).then(function(ticker) {
   return blinktrade.sendOrder({
     side: '1',
-    price: parseInt(550 * 1e8, 10),
+    price: parseInt(10 * 1e8, 10),
     amount: parseInt(0.05 * 1e8, 10),
-    symbol: 'BTCUSD',
+    symbol: 'BTCBRL',
   });
 }).then(function(order) {
   return blinktrade.cancelOrder({

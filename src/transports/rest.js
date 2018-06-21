@@ -48,7 +48,7 @@ class RestTransport extends Transport {
 
     this.key = params.key;
     this.secret = params.secret;
-    this.currency = params.currency || 'USD';
+    this.currency = params.currency || 'BRL';
   }
 
   headers(method: string, body: Object): Object {
