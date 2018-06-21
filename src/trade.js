@@ -30,15 +30,20 @@ type StatusListType = '1' | '2' | '4' | '8';
 class TradeBase {
   env: BlinkTradeEnv;
 
+  level: number;
+
+  brokerId: number;
+
   send: (msg: Object) => Promise<Object>;
 
   +fetchTrade: (msg: Object) => Promise<Object>;
 
   +sendMessageAsPromise: (msg: Object) => Promise<Object>;
 
-  constructor(params?: BlinkTradeBase) {
-    this.level = params.level;
-    this.brokerId = params.brokerId;
+  constructor(params?: BlinkTradeBase = {}) {
+    this.level = params.level === undefined ? 2 : params.level;
+
+    this.brokerId = params.brokerId || 5;
   }
 
   changeBrokerId(brokerId: number) {

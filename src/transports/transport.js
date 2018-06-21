@@ -31,18 +31,13 @@ class Transport {
    */
   endpoint: string;
 
-  level: '1' | '2';
-
   constructor(params: BlinkTradeBase = {}, env: BlinkTradeEnv) {
     /* eslint-disable indent */
-    const endpoint =
+    this.endpoint =
         params.url  ? params.url
       : params.prod ? common.prod[env]
       :               common.testnet[env];
     /* eslint-enable indent */
-
-    this.endpoint = endpoint;
-    this.level = params.level || '2';
   }
 }
 

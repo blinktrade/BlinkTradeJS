@@ -52,7 +52,7 @@ class BlinkTradeWS extends TradeBase {
 
   transport: Object;
 
-  constructor(params?: BlinkTradeBase) {
+  constructor(params?: BlinkTradeBase = {}) {
     super(params);
 
     this.transport = params.transport || new WebSocketTransport(params);

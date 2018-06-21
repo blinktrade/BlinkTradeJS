@@ -25,7 +25,7 @@ import RestTransport from './transports/rest';
 import TradeBase from './trade';
 
 class BlinkTradeRest extends TradeBase {
-  constructor(params?: BlinkTradeBase) {
+  constructor(params?: BlinkTradeBase = {}) {
     super(params);
     this.transport = params.transport || new RestTransport(params);
   }
