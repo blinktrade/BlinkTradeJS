@@ -27,6 +27,7 @@ import EventEmitter from 'eventemitter2';
 import { getMac } from '../util/macaddress';
 import { getStun, closeStun } from '../util/stun';
 import { encodeByteArray } from '../util/hash32';
+import { MsgActionRes } from '../constants/messages';
 
 import Transport, { IS_NODE, IS_BROWSER } from './transport';
 
@@ -34,8 +35,6 @@ import {
   getRequest,
   setRequest,
   deleteRequest,
-  getListener,
-  getEventEmitter,
 } from '../listener';
 
 class WebSocketTransport extends Transport {
@@ -130,34 +129,35 @@ class WebSocketTransport extends Transport {
 
   onMessage(msg: Object): void {
     const data = JSON.parse(msg.data);
-    if (data.MsgType === 'ERROR') {
-      throw new Error(`Error: ${data.Detail} ${data.Description}`);
+
+    if (!MsgActionRes[data.MsgType]) {
+      if (data.MsgType === 'ERROR') {
+        throw new Error(`${data.Detail} ${data.Description}`);
+      }
+
+      return;
     }
 
-    const request = getRequest(data);
-    const emitter = getEventEmitter(data);
-    const listener = getListener(data.MsgType);
-
-    this.dispatchPromise(request, data);
-    this.dispatchEventEmitters(emitter, data);
-    this.dispatchListeners(listener, data);
+    this.dispatchPromise(data);
+    this.dispatchEventEmitters(data);
   }
 
-  dispatchPromise(request: ?Request, data: Object): any {
+  dispatchPromise(data: Object): any {
+    const request = getRequest(data);
     if (request && request.resolve) {
       deleteRequest(data);
       return request.resolve(data);
     }
   }
 
-  dispatchEventEmitters(emitter, data: Object): any {
-    if (emitter) {
-      return emitter(data);
-    }
-  }
+  dispatchEventEmitters(data: Object): any {
+    const type = data.MsgType;
+    const reqId = MsgActionRes[type][1];
 
-  dispatchListeners(listener: Function, data: Object): void {
-    return listener && listener(data);
+    this.eventEmitter.emit(type, data);
+    if (data[reqId]) {
+      this.eventEmitter.emit(type + ':' + data[reqId], data);
+    }
   }
 
   getFingerPrint(customFingerprint?: string): void {

@@ -23,19 +23,9 @@
 import { MsgActionReq, MsgActionRes } from './constants/messages';
 
 const reqs = new Map();
-const emitters = new Map();
-const listeners = new Map();
-
-export function getListeners() {
-  return listeners;
-}
 
 export function generateRequestId(): number {
   return parseInt(String(1e7 * Math.random()), 10);
-}
-
-export function getListener(msgType: string): Function {
-  return listeners[msgType];
 }
 
 function getKey(messages: MsgTypes, msg: Object): string {
@@ -56,16 +46,4 @@ export function setRequest(msg: Message, promise: ResolveReject): void {
 export function deleteRequest(msg: Message): void {
   reqs.delete(getKey(MsgActionRes, msg));
   return reqs;
-}
-
-export function getEventEmitter(msg: Message): ?Function {
-  return emitters.get(getKey(MsgActionRes, msg));
-}
-
-export function registerEventEmitter(key: string, value: number, callback: Function): Object {
-  emitters.set(key + ':' + value, callback);
-}
-
-export function registerListener(msgType: string, callback: Function): void {
-  listeners.set(msgType, callback);
 }
