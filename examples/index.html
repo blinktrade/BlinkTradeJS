@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BlinkTradeJS on the browser</title>
+  <script src="./node_modules/blinktrade/dist/blinktrade.js"></script>
+  <script>
+    const BlinkTradeRest = window.blinktrade.BlinkTradeRest;
+    const BlinkTradeWS = window.blinktrade.BlinkTradeWS;
+    const blinktrade = new BlinkTradeWS({
+      brokerId: 4,
+      prod: false,
+    });
+
+    const rest = new BlinkTradeRest({
+      brokerId: 4,
+      prod: true,
+      currency: 'BRL',
+    });
+
+    rest.ticker().then(console.log);
+    rest.orderbook().then(console.log);
+    rest.trades({ limit: 100 }).then(console.log);
+
+    blinktrade.connect().then(() => {
+      console.log('WebSocket Connected!');
+      return blinktrade.login({ username: 'cesaraugusto', password: 'abc12345' });
+    }).then((data) => {
+      console.log('Logged', data);
+    })
+  </script>
+</head>
+<body>
+</body>
+</html>
