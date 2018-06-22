@@ -21,13 +21,6 @@ const config = {
       preferConst: true,
     }),
     flow({ all: true }),
-    babel({
-      babelrc: false,
-      plugins: [
-        'transform-object-rest-spread',
-        'external-helpers',
-      ],
-    }),
     resolve({
       jsnext: true,
       browser: format === 'umd',
@@ -35,6 +28,14 @@ const config = {
     }),
     commonjs({
       include: 'node_modules/**',
+    }),
+    babel({
+      babelrc: false,
+      presets: [['env', { modules: false }]],
+      plugins: [
+        'transform-object-rest-spread',
+        'external-helpers',
+      ],
     }),
     uglify({
       mangle: env === 'production',
@@ -52,11 +53,11 @@ const config = {
 };
 
 if (format === 'umd') {
-  // Remove modules that are not used on the browser
+  // Remove modules that can't be bundled on the browser
   config.plugins.unshift(shim({
-    ws: 'export default () => {}',
-    ip: 'export default () => {}',
-    dgram: 'export default () => {}',
+    ws: 'export default {}',
+    ip: 'export default {}',
+    dgram: 'export default {}',
     os: 'export default {}',
     'macaddress-secure': 'export default {}',
   }));
