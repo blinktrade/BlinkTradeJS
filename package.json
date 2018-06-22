@@ -5,6 +5,7 @@
   "homepage": "https://blinktrade.com/docs",
   "main": "lib/blinktrade.js",
   "browser": "dist/blinktrade.js",
+  "module": "es/blinktrade.js",
   "directories": {
     "test": "test"
   },
