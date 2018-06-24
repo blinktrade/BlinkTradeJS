@@ -1,8 +1,6 @@
-import * as R from 'ramda';
 import * as reqs from './requestTypes';
 import * as actions from './actionTypes';
-
-const msgToAction = R.compose(R.invertObj, R.map(R.head));
+import { msgToAction } from '../util/utils';
 
 export const MsgActionReq = {
   1:   [actions.HEARTBEAT, reqs.TestReqID],

@@ -1,8 +1,22 @@
-import * as R from 'ramda';
+/* eslint-disable no-param-reassign */
+
+const zipColumns = (arr, columns) => (
+  arr.reduce((prev, val, i) => {
+    prev[columns[i]] = val;
+    return prev;
+  }, {})
+);
+
+export const msgToAction = (messages) => {
+  return Object.entries(messages).reduce((prev, val) => {
+    prev[val[1][0]] = val[0];
+    return prev;
+  }, {});
+};
 
 export const formatColumns = (field, level) => (data) => {
   if (level === 2) {
-    const list = R.map(R.zipObj(data.Columns), data[field]);
+    const list = data[field].map(row => zipColumns(row, data.Columns));
     return Promise.resolve({ ...data, [field]: list });
   }
 
@@ -11,10 +25,12 @@ export const formatColumns = (field, level) => (data) => {
 
 export const formatTradeHistory = (level) => (data) => {
   if (level === 2) {
-    const TradeHistoryGrp = R.compose(
-      R.groupBy(R.prop('Market')),
-      R.map(R.zipObj(data.Columns)),
-    )(data.TradeHistoryGrp);
+    const TradeHistoryGrp = data.TradeHistoryGrp
+      .map(row => zipColumns(row, data.Columns))
+      .reduce((prev, val) => {
+        (prev[val.Market] = prev[val.Market] || []).push(val);
+        return prev;
+      }, {});
 
     return Promise.resolve({ ...data, TradeHistoryGrp });
   }
