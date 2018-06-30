@@ -23,6 +23,7 @@
 import sha256 from 'js-sha256';
 import fetchPonyfill from 'fetch-ponyfill';
 
+import BROKERS from '../constants/brokers';
 import Transport from './transport';
 
 const { fetch } = fetchPonyfill({ Promise });
@@ -44,7 +45,7 @@ class RestTransport extends Transport {
   currency: 'USD' | 'BRL' | 'VEF' | 'CLP' | 'VND' | 'PKR';
 
   constructor(params: BlinkTradeRest = {}) {
-    super(params, params.brokerId === 11 ? 'restBitcambio' : 'rest');
+    super(params, params.brokerId === BROKERS.BITCAMBIO ? 'restBitcambio' : 'rest');
 
     this.key = params.key;
     this.secret = params.secret;

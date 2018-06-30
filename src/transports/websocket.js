@@ -29,6 +29,8 @@ import { getStun, closeStun } from '../util/stun';
 import { encodeByteArray } from '../util/hash32';
 import { MsgActionRes } from '../constants/messages';
 
+import BROKERS from '../constants/brokers';
+
 import Transport, { IS_NODE, IS_BROWSER } from './transport';
 
 import {
@@ -66,7 +68,7 @@ class WebSocketTransport extends Transport {
   headers: Object;
 
   constructor(params?: BlinkTradeWS = {}) {
-    super(params, params.brokerId === 11 ? 'wsBitcambio' : 'ws');
+    super(params, params.brokerId === BROKERS.BITCAMBIO ? 'wsBitcambio' : 'ws');
 
     this.stun = { local: null, public: [] };
 
