@@ -728,7 +728,7 @@ blinktrade.onWithdrawRefresh(function(withdraw) {
 | Name     | Type    | Description                                                                |
 |----------|---------|----------------------------------------------------------------------------|
 | prod     | Boolean | Production environment, default to false                                   |
-| brokerId | Number  | [see brokers list]()                                                       |
+| brokerId | Number  | [see brokers list](https://blinktrade.com/docs/#brokers)                                                       |
 | key      | String  | API Key generated on our platform, it only needed on the Trade endpoint    |
 | secret   | String  | API Secret generated on our platform, it only needed on the Trade endpoint |
 | currency | String  | Currency symbol to fetch public endpoint                                   |
@@ -763,7 +763,7 @@ blinktrade.onWithdrawRefresh(function(withdraw) {
 | Name        | Type    | Description                              |
 |-------------|---------|------------------------------------------|
 | prod        | Boolean | Production environment, default to false |
-| brokerId    | Number  | [see brokers list]() |
+| brokerId    | Number  | [see brokers list](https://blinktrade.com/docs/#brokers) |
 | url         | String  | Custom url in case if you're using a custom backend url |
 | headers     | String  | Custom headers to pass to WebSocket constructor if it supported, (useful on react-native) |
 | fingerPrint | String  | Custom fingerprint if you are not using in either a browser or node (useful on react-native) |
@@ -953,23 +953,6 @@ These methods bellow are both availabe under REST and WebSocket API.
 | Event            | Description                    |
 |------------------|--------------------------------|
 | WITHDRAW_REFRESH | Callback when withdraw refresh |
-
-**FOXBIT**
-
-| Methods               | Required Data fields                                                      |
-|-----------------------|---------------------------------------------------------------------------|
-| bradesco              | AccountBranch, AccountNumber, AccountType, CPF_CNPJ                       |
-| bb                    | AccountBranch, AccountNumber, AccountType, CPF_CNPJ                       |
-| Caixa                 | AccountBranch, AccountNumber, AccountType, CPF_CNPJ                       |
-| ted                   | BankName, BankNumber, AccountBranch, AccountNumber, AccountType, CPF_CNPJ |
-
-**VBTC**
-
-| Methods                | Required Data fields                                                                                             |
-|------------------------|------------------------------------------------------------------------------------------------------------------|
-| banktransfer           | BankName, AccountBranch, BankCity, AccountName, AccountNumber, BankSwift                                         |
-| VPBankinternaltransfer | VPbankbranch, BankCity, AccountName, AccountNumber, BankSwift                                                    |
-| cashtoID               | BankName, BankBranch, BankCity, Clientname, ClientIDNr, Issue Date ID, Place of Issue, Phone Number of Recipient |
 
 ### confirmWithdraw [websocket, rest]
 
