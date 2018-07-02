@@ -20,7 +20,9 @@
     "build:dev": "yarn run build:commonjs && yarn run build:browser",
     "build": "yarn run build:src && yarn run build:dev && yarn run build:prod",
     "test": "NODE_ENV=test mocha --exit --compilers js:babel-register --recursive",
-    "prepublish": "yarn run build"
+    "prepublish": "yarn run build",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "keywords": [
     "blinktrade",
@@ -37,7 +39,8 @@
     "macaddress": "^0.2.8",
     "nodeify": "^1.0.0",
     "sjcl": "^1.0.3",
-    "ws": "^3.3.1"
+    "ws": "^3.3.1",
+    "snyk": "^1.88.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -59,5 +62,6 @@
     "sinon": "^1.17.6",
     "webpack": "^1.13.2",
     "webpack-node-externals": "^1.3.3"
-  }
+  },
+  "snyk": true
 }
