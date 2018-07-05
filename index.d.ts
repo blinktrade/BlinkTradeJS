@@ -90,6 +90,11 @@ declare module blinktrade {
         trustedDevice?: boolean;
 
         /**
+         * Cancel all orders sent by the session when the websocket disconnects
+         */
+        cancelOnDisconnect?: boolean;
+
+        /**
          * Optional brokerId
          */
         brokerId?: number;

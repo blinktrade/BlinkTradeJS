@@ -786,11 +786,13 @@ Used as test request to check the latency connection.
 
 #### Arguments
 
-| Name         | Type   | Description      |
-|--------------|--------|------------------|
-| username     | String | Account username |
-| password     | String | Account password |
-| secondFactor | String | Optional secondFactor, if the authentication require second factor, you'll receive an error with `NeedSecondFactor = true` |
+| Name               | Type    | Description      |
+|--------------------|---------|------------------|
+| username           | String  | Account username |
+| password           | String  | Account password |
+| secondFactor       | String  | Optional. If the authentication require second factor, you'll receive an error with `NeedSecondFactor = true`, **NOTE**: Is recommended that you use an API Key / API Password instead, which don't required second factor |
+| brokerId           | Number  | Optional. Overwrites the broker id provided by the constructor |
+| cancelOnDisconnect | Boolean | Optional. If it's true, all orders sent by the session will be cancelled when the WebSocket disconnects |
 
 ### logout [websocket]
 
