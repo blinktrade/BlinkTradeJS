@@ -1,3 +1,4 @@
+import path from 'path';
 import json from 'rollup-plugin-json';
 import flow from 'rollup-plugin-flow';
 import babel from 'rollup-plugin-babel';
@@ -60,6 +61,11 @@ if (format === 'umd') {
     dgram: 'export default {}',
     os: 'export default {}',
     'macaddress-secure': 'export default {}',
+    [path.join(__dirname, 'src/util/macaddress')]: 'export function getMac() {}',
+    [path.join(__dirname, 'src/util/stun')]: `
+      export function getStun() {}
+      export function closeStun() {}
+    `,
   }));
 } else {
   config.external = ['ws'];
