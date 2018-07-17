@@ -73,9 +73,9 @@ class BlinkTradeWS extends TradeBase {
     }
   }
 
-  emit(event) {
+  emit(event, data) {
     if (this.transport.eventEmitter) {
-      return this.transport.eventEmitter.emit(event);
+      return this.transport.eventEmitter.emit(event, data);
     }
   }
 
@@ -310,6 +310,7 @@ class BlinkTradeWS extends TradeBase {
     return this.onEvent(ActionMsgRes.EXECUTION_REPORT, (data) => {
       callback && callback(data);
       const event = EVENTS.EXECUTION_REPORT[data.ExecType];
+      console.log('report', EXECUTION_REPORT, event, data)
       return this.emit(`${EXECUTION_REPORT}:${event}`, data);
     });
   }
