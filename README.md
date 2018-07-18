@@ -235,7 +235,7 @@ You can pass a callback to receive balance updates.
 
 ```js
 
-blinktrade.balance(function(err, balance) {
+blinktrade.balance(null, function(err, balance) {
   console.log(balance);
 });
 
@@ -254,11 +254,7 @@ blinktrade.balance(function(err, balance) {
     },
     "MsgType": "U3",
     "ClientID": 90800003,
-    "BalanceReqID": 5019624,
-    "Available": {
-        "USD": 177814907002760,
-        "BTC": 1468038442214
-    }
+    "BalanceReqID": 5019624
 }
 
 ```
