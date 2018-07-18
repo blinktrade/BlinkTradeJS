@@ -66,3 +66,20 @@ export const formatOrderBook = (data, level) => {
 
   return data;
 };
+
+export const formatIncremental = (data, level) => {
+  if (level === 2) {
+    return {
+      index: data.MDEntryPositionNo,
+      price: data.MDEntryPx / 1e8,
+      size: data.MDEntrySize / 1e8,
+      side: data.MDEntryType === '0' ? 'buy' : 'sell',
+      userId: data.UserID,
+      orderId: data.OrderID,
+      symbol: data.Symbol,
+      time: new Date(`${data.MDEntryDate} ${data.MDEntryTime}`).toString(),
+    };
+  }
+
+  return data;
+};

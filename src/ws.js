@@ -34,7 +34,7 @@ import {
 } from './constants/actionTypes';
 
 import { ActionMsgReq, ActionMsgRes } from './constants/messages';
-import { formatOrderBook, formatTradeHistory } from './util/utils';
+import { formatOrderBook, formatIncremental, formatTradeHistory } from './util/utils';
 
 import TradeBase from './trade';
 import WebSocketTransport from './transports/websocket';
@@ -79,9 +79,9 @@ class BlinkTradeWS extends TradeBase {
     }
   }
 
-  emitterPromise(promise) {
+  emitterPromise(promise, callback) {
     return this.transport.emitterPromise
-      ? this.transport.emitterPromise(promise)
+      ? this.transport.emitterPromise(promise, callback)
       : promise;
   }
 
@@ -215,13 +215,13 @@ class BlinkTradeWS extends TradeBase {
 
     return this.emitterPromise(new Promise((resolve, reject) => {
       return this.send(msg).then(data => {
-        resolve(formatTicker(data));
         const event = ActionMsgRes.SECURITY_STATUS_SUBSCRIBE + ':' + data.SecurityStatusReqID;
         this.onEvent(event, (ticker) => {
           const tickerFormatted = formatTicker(ticker);
           callback && callback(null, tickerFormatted);
           return this.emit(`${ticker.Market}:${ticker.Symbol}`, tickerFormatted);
         });
+        return resolve(formatTicker(data));
       }).catch(reject);
     }), callback);
   }
@@ -251,17 +251,7 @@ class BlinkTradeWS extends TradeBase {
     const subscribeEvent = (data) => {
       if (data.MDBkTyp === '3') {
         data.MDIncGrp.map(order => {
-          const dataOrder = {
-            index: order.MDEntryPositionNo,
-            price: order.MDEntryPx / 1e8,
-            size: order.MDEntrySize / 1e8,
-            side: order.MDEntryType === '0' ? 'buy' : 'sell',
-            userId: order.UserID,
-            orderId: order.OrderID,
-            symbol: order.Symbol,
-            time: new Date(`${order.MDEntryDate} ${order.MDEntryTime}`).toString(),
-          };
-
+          const dataOrder = formatIncremental(order, this.level);
           switch (order.MDEntryType) {
             case '0':
             case '1':
@@ -310,7 +300,6 @@ class BlinkTradeWS extends TradeBase {
     return this.onEvent(ActionMsgRes.EXECUTION_REPORT, (data) => {
       callback && callback(data);
       const event = EVENTS.EXECUTION_REPORT[data.ExecType];
-      console.log('report', EXECUTION_REPORT, event, data)
       return this.emit(`${EXECUTION_REPORT}:${event}`, data);
     });
   }
