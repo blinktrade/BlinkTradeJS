@@ -37,7 +37,8 @@
     "Request": true,
     "Listener": true,
     "window": true,
-    "expect": true
+    "expect": true,
+    "jest": true
   },
   "plugins": ["flowtype"]
 }

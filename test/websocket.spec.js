@@ -16,407 +16,214 @@
 
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @flow weak
  */
 
 /* eslint-disable new-cap */
 
-import nodeify from 'nodeify';
-import { spy, stub } from 'sinon';
-import { expect } from 'chai';
 import { BlinkTradeWS } from '../src';
-import * as listener from '../src/listener';
+import { ActionMsgRes } from '../src/constants/messages';
 
-let BlinkTrade;
+jest.mock('../src/transports/websocket');
 
-const MOCK_FULL_REFRESH: Object = {
-  MsgType: 'W',
-  Symbol: 'BTCUSD',
-  MDFullGrp: [{}],
-};
+let blinktrade;
 
-const MOCK_INCREMENT = (action, type) => {
-  return {
-    MDReqID: 1062858,
-    MDBkTyp: '3',
-    MsgType: 'X',
-    MDIncGrp: [{
-      MDUpdateAction: action || 0,
-      MDEntryType: type || '0',
-      MDEntryPositionNo: 1,
-      MDEntryTime: '03:50:48',
-      MDEntryDate: '2016-08-24',
-      MDEntryPx: 58000000000,
+const incremental = {
+  MDReqID: 354590,
+  MDBkTyp: '3',
+  MsgType: 'X',
+  MDIncGrp: [
+    {
+      OrderID: 1459030505702,
+      MDEntryPx: 1637400000000,
+      MDUpdateAction: '0',
+      MDEntryTime: '22:34:12',
+      Symbol: 'BTCBRL',
+      UserID: 90800078,
+      Broker: 'foxbit',
+      MDEntryType: '0',
+      MDEntryPositionNo: 2,
       MDEntrySize: 100000000,
-      UserID: 90800535,
-      OrderID: 1459028829944,
-      Symbol: 'BTCUSD',
-    }],
-  };
+      MDEntryID: 1459030505702,
+      MDEntryDate: '2018-07-17',
+    },
+  ],
 };
 
-const MOCK_NEW_ORDER: Object = {
+const incrementalTrade = {
+  MDReqID: 354590,
+  MDBkTyp: '3',
+  MsgType: 'X',
+  MDIncGrp: [{
+    OrderID: 1459030505939,
+    MDEntryPx: 27000000000000,
+    TradeID: 20617,
+    MDEntryBuyerID: 90800078,
+    MDUpdateAction: '0',
+    MDEntryTime: '00:01:01',
+    Symbol: 'BTCBRL',
+    SecondaryOrderID: 1459030449305,
+    MDEntrySize: 100000,
+    MDEntryType: '2',
+    MDEntrySellerID: 90800027,
+    MDEntryDate: '2018-07-18',
+    Side: '1',
+    type: 'OB:TRADE_NEW',
+  }],
+};
+
+const newOrder = {
   side: '1',
-  price: parseInt(550 * 1e8, 10),
+  price: parseInt(16374 * 1e8, 10),
   amount: parseInt(0.05 * 1e8, 10),
-  symbol: 'BTCUSD',
+  symbol: 'BTCBRL',
 };
 
 describe('WebSocket', () => {
-  beforeEach(() => {
-    const stubConnect = stub(BlinkTradeWS.prototype, 'connect', (callback) => {
-      stubConnect.restore();
-      return nodeify.extend(Promise.resolve({ connected: true })).nodeify(callback);
+  test('Should connect on websocket and resolve a promise', (done) => {
+    blinktrade = new BlinkTradeWS({ prod: false });
+    blinktrade.connect().then(({ connected }) => {
+      expect(connected).toBe(true);
+      return done();
     });
   });
 
-  it('Should connect on websocket and resolve a promise', (done) => {
-    BlinkTrade = new BlinkTradeWS({ prod: false });
-    BlinkTrade.connect().then(() => done()).catch(err => done({ ...err }));
-  });
-
-  it('Should connect on websocket and callback', (done) => {
-    BlinkTrade = new BlinkTradeWS({ prod: false });
-    BlinkTrade.connect((err) => {
-      expect(err).to.be.null;
+  test('Should connect on websocket and callback', (done) => {
+    blinktrade = new BlinkTradeWS({ prod: false });
+    blinktrade.connect((err, { connected }) => {
+      expect(connected).toBe(true);
+      expect(err).toBe(null);
       done();
     });
   });
 
-  it('Should send heartBeat message and mock ws response', (done) => {
-    const mock: Object = {
-      SendTime: 1455409766521,
-      ServerTimestamp: 1455410567,
-    };
-
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      mock.TestReqID = msg.TestReqID;
-      const request = listener.getRequest(mock);
-      return request && request.resolve(mock);
-    });
-
-    BlinkTrade.connect().then(() => {
-      return BlinkTrade.heartbeat();
-    }).then((data) => {
-      expect(data.SendTime).to.be.equal(mock.SendTime);
-      expect(data.TestReqID).to.be.equal(mock.TestReqID);
-      expect(data.ServerTimestamp).to.be.equal(mock.ServerTimestamp);
-      expect(data).to.have.property('Latency');
+  test('Should send heartBeat message and mock ws response', (done) => {
+    blinktrade = new BlinkTradeWS();
+    blinktrade.connect().then(() => blinktrade.heartbeat()).then((res) => {
+      const { req } = blinktrade.transport;
+      expect(res.Latency).toBe(req.SendTime - res.SendTime);
       done();
     }).catch(done);
   });
 
-  it('Should send heartBeat message with callback', (done) => {
-    const mock: Object = {
-      SendTime: 1455409766521,
-      ServerTimestamp: 1455410567,
-    };
-
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      mock.TestReqID = msg.TestReqID;
-      const request = listener.getRequest(mock);
-      return request && request.resolve(mock);
-    });
-
-    BlinkTrade.connect().then(() => {
-      BlinkTrade.heartbeat((err, data) => {
-        expect(data.SendTime).to.be.equal(mock.SendTime);
-        expect(data.TestReqID).to.be.equal(mock.TestReqID);
-        expect(data.ServerTimestamp).to.be.equal(mock.ServerTimestamp);
-        expect(data).to.have.property('Latency');
+  test('Should send heartBeat message with callback', (done) => {
+    blinktrade = new BlinkTradeWS();
+    blinktrade.connect().then(() => {
+      blinktrade.heartbeat((err, res) => {
+        const { req } = blinktrade.transport;
+        expect(res.Latency).toBe(req.SendTime - res.SendTime);
         done();
       });
     }).catch(done);
   });
 
-  it('Should authenticate successfully ', (done) => {
-    const mock: Object = {
-      UserID: 90800003,
-      UserStatus: 1,
-      BrokerID: 5,
-      Username: 'user',
-      Broker: {},
-      Profile: {},
-    };
-
-    const login = { username: 'user', password: 'abc12345' };
-
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      mock.UserReqID = msg.UserReqID;
-      const request = listener.getRequest(mock);
-      return request && request.resolve(mock);
-    });
-
-    BlinkTrade.connect().then(() => {
-      return BlinkTrade.login(login);
-    }).then(data => {
-      expect(data.Username).to.be.equal(login.username);
-      expect(data.UserStatus).to.be.equal(1);
-      done();
-    }).catch(err => done(err));
-  });
-
-  it('Should reject authentication', (done) => {
-    const mock: Object = {
-      UserID: 90800003,
-      UserStatus: 3,
-      BrokerID: 5,
-      Username: 'user',
-      Broker: {},
-      Profile: {},
-    };
-
-    const login = { username: 'user', password: 'wrongpassword' };
-
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      mock.UserReqID = msg.UserReqID;
-      const request = listener.getRequest(mock);
-      return request && request.resolve(mock);
-    });
-
-    BlinkTrade.connect().then(() => {
-      return BlinkTrade.login(login);
-    }).catch(data => {
-      expect(data.UserStatus).to.be.equal(3);
+  test('Should authenticate successfully ', (done) => {
+    const data = { username: 'user', password: 'abc12345' };
+    blinktrade = new BlinkTradeWS();
+    blinktrade.connect().then(() => blinktrade.login(data)).then((res) => {
+      expect(res.UserStatus).toBe(1);
+      expect(res.Username).toBe(data.username);
       done();
     });
   });
 
-  it('Should login and logout successfully', (done) => {
-    const mock: Object = {
-      login: {
-        UserID: 90800003,
-        UserStatus: 1,
-        BrokerID: 5,
-        Username: 'user',
-      },
-      logout: {
-        Username: 'rodrigo',
-        UserID: 90800003,
-        MsgType: 'BF',
-        UserStatus: 2,
-      },
-    };
-
-    const login = { username: 'user', password: 'abc12345' };
-
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      const response = msg.UserReqTyp === '1' ? mock.login : mock.logout;
-      response.UserReqID = msg.UserReqID;
-      const request = listener.getRequest(response);
-      return request && request.resolve(response);
-    });
-
-    BlinkTrade.connect().then(() => {
-      return BlinkTrade.login(login);
-    }).then(data => {
-      expect(data.Username).to.be.equal(login.username);
-      expect(data.UserStatus).to.be.equal(1);
-      return BlinkTrade.logout();
-    }).then(data => {
-      expect(data.UserStatus).to.be.equal(2);
+  test('Should reject authentication ', (done) => {
+    const data = { username: 'user', password: 'wrongpassword' };
+    blinktrade = new BlinkTradeWS();
+    blinktrade.connect().then(() => blinktrade.login(data)).catch((res) => {
+      expect(res.UserStatus).toBe(3);
+      expect(res.Username).toBe(data.username);
       done();
-    }).catch(err => done(err));
+    });
   });
 
-  it('Should request balance and match available balance', (done) => {
-    const mock: Object = {
-      // $FlowFixMe
-      5: {
-        BTC_locked: 0,
-        USD: 178116788294761,
-        BTC: 1467995872214,
-        USD_locked: 5500000000,
-      },
-      MsgType: 'U3',
-      ClientID: 90800003,
-    };
-
-    const Available = { USD: 178111288294761, BTC: 1467995872214 };
-
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      mock.BalanceReqID = msg.BalanceReqID;
-      const request = listener.getRequest(mock);
-      return request && request.resolve(mock);
-    });
-
-    BlinkTrade.connect().then(() => {
-      return BlinkTrade.balance();
-    }).then(balance => {
-      expect(balance).to.be.eql({
-        ...mock,
-        Available,
-      });
+  test('Should login and logout successfully', (done) => {
+    const data = { username: 'user', password: 'abc12345' };
+    blinktrade = new BlinkTradeWS();
+    blinktrade.connect().then(() => blinktrade.login(data)).then((res) => {
+      expect(res.Username).toBe(data.username);
+      expect(res.UserStatus).toBe(1);
+      return blinktrade.logout();
+    }).then((res) => {
+      expect(res.UserStatus).toBe(2);
       done();
-    }).catch(done);
+    });
   });
 
-  it('Should subscribe on ticker', (done) => {
-    const mock: Object = {
-      SellVolume: 487859418,
-      LowPx: 189189000000,
-      LastPx: 189189000000,
-      MsgType: 'f',
-      BestAsk: 191000000000,
-      HighPx: 190000000000,
-      BuyVolume: 925019572651,
-      BestBid: 189189000000,
-      Symbol: 'BTCBRL',
-      Market: 'BLINK',
-    };
-
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      mock.SecurityStatusReqID = msg.SecurityStatusReqID;
-      const request = listener.getRequest(mock);
-      return request && request.resolve(mock);
+  test('Should request balance and match available balance', (done) => {
+    blinktrade = new BlinkTradeWS();
+    blinktrade.connect().then(() => blinktrade.balance()).then((res) => {
+      expect(res).toHaveProperty('4');
+      done();
     });
+  });
 
-    BlinkTrade.connect().then(() => {
-      return BlinkTrade.subscribeTicker(['BLINK:BTCBRL']);
-    }).then(data => {
-      expect(data).to.be.eql({
-        ...mock,
-        BestAsk: 1910,
-        BestBid: 1891.89,
-        BuyVolume: 9250.19572651,
-        HighPx: 1900,
-        LastPx: 1891.89,
-        LowPx: 1891.89,
-        Market: 'BLINK',
+  test('Should subscribe on ticker', (done) => {
+    blinktrade = new BlinkTradeWS();
+    blinktrade.connect().then(() => {
+      return blinktrade.subscribeTicker(['BLINK:BTCBRL']);
+    }).then((res) => {
+      const { req } = blinktrade.transport;
+      expect(res).toEqual({
+        SellVolume: 6.0693,
+        LowPx: 16437,
+        LastPx: 16437,
         MsgType: 'f',
-        SellVolume: 4.87859418,
+        BestAsk: 113700,
+        HighPx: 16540,
+        BuyVolume: 100333.9509,
+        BestBid: 16437,
         Symbol: 'BTCBRL',
+        SecurityStatusReqID: req.SecurityStatusReqID,
+        Market: 'BLINK',
       });
       done();
-    }).catch(err => done(err));
+    });
   });
 
-  it('Should subscribe on ticker with callback', (done) => {
-    const mock: Object = {
-      SellVolume: 487859418,
-      LowPx: 189189000000,
-      LastPx: 189189000000,
-      MsgType: 'f',
-      BestAsk: 191000000000,
-      HighPx: 190000000000,
-      BuyVolume: 925019572651,
-      BestBid: 189189000000,
-      Symbol: 'BTCBRL',
-      Market: 'BLINK',
-    };
-
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      mock.SecurityStatusReqID = msg.SecurityStatusReqID;
-      const request = listener.getRequest(mock);
-      return request && request.resolve(mock);
-    });
-
-    BlinkTrade.connect().then(() => {
-      BlinkTrade.subscribeTicker(['BLINK:BTCBRL'], (err, data) => {
-        expect(data).to.be.eql({
-          ...mock,
-          BestAsk: 1910,
-          BestBid: 1891.89,
-          BuyVolume: 9250.19572651,
-          HighPx: 1900,
-          LastPx: 1891.89,
-          LowPx: 1891.89,
-          Market: 'BLINK',
+  test('Should subscribe on ticker with callback', (done) => {
+    blinktrade = new BlinkTradeWS();
+    blinktrade.connect().then(() => {
+      blinktrade.subscribeTicker(['BLINK:BTCBRL'], (err, res) => {
+        const { req } = blinktrade.transport;
+        expect(res).toEqual({
+          SellVolume: 6.0693,
+          LowPx: 16437,
+          LastPx: 16437,
           MsgType: 'f',
-          SellVolume: 4.87859418,
+          BestAsk: 113700,
+          HighPx: 16540,
+          BuyVolume: 100333.9509,
+          BestBid: 16437,
           Symbol: 'BTCBRL',
+          SecurityStatusReqID: req.SecurityStatusReqID,
+          Market: 'BLINK',
         });
         done();
       });
     });
   });
 
-  it('Should get full orderbook', (done) => {
-    const mock = {
-      MDReqID: 1062858,
-      Symbol: 'BTCUSD',
-      MsgType: 'W',
-      MDFullGrp: [{
-        MDEntryPositionNo: 1,
-        MDEntrySize: 2863231429,
-        MDEntryPx: 57800000000,
-        MDEntryID: 1459028829948,
-        MDEntryTime: '03:51:26',
-        MDEntryDate: '2016-08-24',
-        UserID: 90800535,
-        OrderID: 1459028829948,
-        MDEntryType: '0',
-        Broker: 'exchange',
-      }, {
-        MDEntryPositionNo: 2,
-        MDEntrySize: 568000000,
-        MDEntryPx: 57779000000,
-        MDEntryID: 1459028830259,
-        MDEntryTime: '05:10:35',
-        MDEntryDate: '2016-08-24',
-        UserID: 90800535,
-        OrderID: 1459028830259,
-        MDEntryType: '0',
-        Broker: 'exchange',
-      }, {
-        MDEntryPositionNo: 1,
-        MDEntrySize: 10000000,
-        MDEntryPx: 57871000000,
-        MDEntryID: 1459028830271,
-        MDEntryTime: '22:01:19',
-        MDEntryDate: '2016-08-26',
-        UserID: 90800292,
-        OrderID: 1459028830271,
-        MDEntryType: '1',
-        Broker: 'exchange',
-      }, {
-        MDEntryPositionNo: 2,
-        MDEntrySize: 887239144,
-        MDEntryPx: 57872000000,
-        MDEntryID: 1459028829944,
-        MDEntryTime: '03:50:48',
-        MDEntryDate: '2016-08-24',
-        UserID: 90800535,
-        OrderID: 1459028829944,
-        MDEntryType: '1',
-        Broker: 'exchange',
-      }],
-    };
+  test('Should get full orderbook with level 0', (done) => {
+    blinktrade = new BlinkTradeWS({ level: 0 });
+    blinktrade.connect().then(() => blinktrade.subscribeOrderbook(['BTCBRL'])).then((res) => {
+      expect(res.MDFullGrp).toHaveLength(4);
+      done();
+    }).catch(err => done(err));
+  });
 
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      mock.MDReqID = msg.MDReqID;
-      const request = listener.getRequest(mock);
-      return request && request.resolve(mock);
-    });
-
-    BlinkTrade.connect().then(() => {
-      return BlinkTrade.subscribeOrderbook(['BTCUSD']);
-    }).then(data => {
-      expect(data).to.be.eql({
-        ...mock,
+  test('Should get full orderbook with level 2', (done) => {
+    blinktrade = new BlinkTradeWS({ level: 2 });
+    blinktrade.connect().then(() => blinktrade.subscribeOrderbook(['BTCBRL'])).then((res) => {
+      const { req } = blinktrade.transport;
+      expect(res).toEqual({
+        MsgType: 'W',
+        MDReqID: req.MDReqID,
+        MarketDepth: 1000,
+        Symbol: 'BTCBRL',
         MDFullGrp: {
-          BTCUSD: {
-            bids: [[578, 28.63231429, 90800535, 1459028829948], [577.79, 5.68, 90800535, 1459028830259]],
-            asks: [[578.71, 0.1, 90800292, 1459028830271], [578.72, 8.87239144, 90800535, 1459028829944]],
+          BTCBRL: {
+            bids: [[16424, 0.749, 90804823, 1459030499584], [16374, 2, 90804823, 1459030499586]],
+            asks: [[28326.42, 0.00068008, 90800025, 1459030505672], [113700, 0.00206, 90800027, 1459030449304]],
           },
         },
       });
@@ -424,462 +231,135 @@ describe('WebSocket', () => {
     }).catch(err => done(err));
   });
 
-  it('Should get incremental orderbook updates and emit OB:NEW_ORDER', (done) => {
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      MOCK_FULL_REFRESH.MDReqID = msg.MDReqID;
-      const request = listener.getRequest(MOCK_FULL_REFRESH);
-      return request && request.resolve(MOCK_FULL_REFRESH);
-    });
-
-    // Mock eventEmitter callback
-    const sinon = stub(listener, 'registerEventEmitter', (message, callback) => {
-      callback(MOCK_INCREMENT('0'));
-    });
-
-    BlinkTrade.connect().then(() => {
-      BlinkTrade.subscribeOrderbook(['BTCUSD'])
-        .on('OB:NEW_ORDER', (data) => {
-          expect(data.index).to.be.equal(1);
-          expect(data.size).to.be.equal(1);
-          expect(data.price).to.be.equal(580);
-          expect(data.side).to.be.equal('buy');
-          expect(data.type).to.be.equal('OB:NEW_ORDER');
-          sinon.restore();
-          done();
-        }).catch(err => done(err));
-    }).catch(err => done(err));
-  });
-
-  it('Should get incremental orderbook updates and emit OB:UPDATE_ORDER', (done) => {
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      MOCK_FULL_REFRESH.MDReqID = msg.MDReqID;
-      const request = listener.getRequest(MOCK_FULL_REFRESH);
-      return request && request.resolve(MOCK_FULL_REFRESH);
-    });
-
-    // Mock eventEmitter callback
-    const sinon = stub(listener, 'registerEventEmitter', (message, callback) => {
-      callback(MOCK_INCREMENT('1'));
-    });
-
-    BlinkTrade.connect().then(() => {
-      BlinkTrade.subscribeOrderbook(['BTCUSD'])
-        .on('OB:UPDATE_ORDER', (data) => {
-          expect(data.type).to.be.equal('OB:UPDATE_ORDER');
-          sinon.restore();
+  test('Should get incremental orderbook updates and emit OB:NEW_ORDER with default level', (done) => {
+    blinktrade = new BlinkTradeWS();
+    blinktrade.connect().then(() => {
+      return blinktrade.subscribeOrderbook(['BTCBRL'])
+        .on('OB:NEW_ORDER', (res) => {
+          expect(res.index).toBe(2);
+          expect(res.size).toBe(1);
+          expect(res.price).toBe(16374);
+          expect(res.side).toBe('buy');
+          expect(res.type).toBe('OB:NEW_ORDER');
           done();
         });
-    }).catch(err => done(err));
+    }).then(() => {
+      const { req } = blinktrade.transport;
+      blinktrade.transport.eventEmitter.emit(`${ActionMsgRes.MD_INCREMENT}:${req.MDReqID}`, incremental);
+    });
   });
 
-  it('Should get incremental orderbook updates and emit OB:DELETE_ORDER', (done) => {
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      MOCK_FULL_REFRESH.MDReqID = msg.MDReqID;
-      const request = listener.getRequest(MOCK_FULL_REFRESH);
-      return request && request.resolve(MOCK_FULL_REFRESH);
-    });
-
-    // Mock eventEmitter callback
-    const sinon = stub(listener, 'registerEventEmitter', (message, callback) => {
-      callback(MOCK_INCREMENT('2'));
-    });
-
-    BlinkTrade.connect().then(() => {
-      BlinkTrade.subscribeOrderbook(['BTCUSD'])
-        .on('OB:DELETE_ORDER', (data) => {
-          expect(data.type).to.be.equal('OB:DELETE_ORDER');
-          sinon.restore();
+  test('Should get incremental orderbook updates and emit OB:NEW_ORDER with level 0', (done) => {
+    blinktrade = new BlinkTradeWS({ level: 0 });
+    blinktrade.connect().then(() => {
+      return blinktrade.subscribeOrderbook(['BTCBRL'])
+        .on('OB:NEW_ORDER', (res) => {
+          expect(res.MDEntryPositionNo).toBe(2);
+          expect(res.MDEntrySize).toBe(100000000);
+          expect(res.MDEntryPx).toBe(1637400000000);
+          expect(res.MDEntryType).toBe('0');
+          expect(res.type).toBe('OB:NEW_ORDER');
           done();
         });
-    }).catch(err => done(err));
-  });
-
-  it('Should get incremental orderbook updates and emit OB:DELETE_ORDERS_THRU', (done) => {
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      MOCK_FULL_REFRESH.MDReqID = msg.MDReqID;
-      const request = listener.getRequest(MOCK_FULL_REFRESH);
-      return request && request.resolve(MOCK_FULL_REFRESH);
+    }).then(() => {
+      const { req } = blinktrade.transport;
+      blinktrade.transport.eventEmitter.emit(`${ActionMsgRes.MD_INCREMENT}:${req.MDReqID}`, incremental);
     });
-
-    // Mock eventEmitter callback
-    const sinon = stub(listener, 'registerEventEmitter', (message, callback) => {
-      callback(MOCK_INCREMENT('3'));
-    });
-
-    BlinkTrade.connect().then(() => {
-      BlinkTrade.subscribeOrderbook(['BTCUSD'])
-        .on('OB:DELETE_ORDERS_THRU', (data) => {
-          expect(data.type).to.be.equal('OB:DELETE_ORDERS_THRU');
-          sinon.restore();
-          done();
-        });
-    }).catch(err => done(err));
   });
 
   it('Should get incremental orderbook updates and emit OB:TRADE_NEW', (done) => {
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      MOCK_FULL_REFRESH.MDReqID = msg.MDReqID;
-      const request = listener.getRequest(MOCK_FULL_REFRESH);
-      return request && request.resolve(MOCK_FULL_REFRESH);
-    });
-
-    // Mock eventEmitter callback
-    const sinon = stub(listener, 'registerEventEmitter', (message, callback) => {
-      callback(MOCK_INCREMENT('0', '2'));
-    });
-
-    BlinkTrade.connect().then(() => {
-      return BlinkTrade.subscribeOrderbook(['BTCUSD'])
+    blinktrade = new BlinkTradeWS({ level: 0 });
+    blinktrade.connect().then(() => {
+      return blinktrade.subscribeOrderbook(['BTCBRL'])
         .on('OB:TRADE_NEW', (data) => {
-          expect(data.type).to.be.equal('OB:TRADE_NEW');
-          sinon.restore();
+          expect(data).toEqual({
+            ...incrementalTrade.MDIncGrp[0],
+            type: 'OB:TRADE_NEW',
+          });
           done();
         });
-    }).catch(err => done(err));
-  });
-
-  it('Should send order and resolve promise', (done) => {
-    const mock = {
-      MsgType: '8',
-      ExecType: '0',
-    };
-
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      MOCK_NEW_ORDER.ClOrdID = msg.ClOrdID;
-      const request = listener.getRequest(MOCK_NEW_ORDER);
-      return request && request.resolve(mock);
-    });
-
-    const sinon = stub(listener, 'registerListener', (message, callback) => {
-      callback(mock);
-    });
-
-    BlinkTrade.connect().then(() => {
-      return BlinkTrade.sendOrder(MOCK_NEW_ORDER);
-    }).then(order => {
-      expect(order.ExecType).to.be.equal('0');
-      sinon.restore();
-      done();
-    }).catch(err => done(err));
-  });
-
-  it('Should send order and emit EXECUTION_REPORT:NEW', (done) => {
-    const mock = {
-      MsgType: '8',
-      ExecType: '0',
-    };
-
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      MOCK_NEW_ORDER.ClOrdID = msg.ClOrdID;
-      const request = listener.getRequest(MOCK_NEW_ORDER);
-      return request && request.resolve(mock);
-    });
-
-    const sinon = stub(listener, 'registerListener', (message, callback) => {
-      // Simulate server latency
-      setTimeout(() => {
-        callback(mock);
-      }, 500);
-    });
-
-    BlinkTrade.connect().then(() => {
-      return BlinkTrade.sendOrder(MOCK_NEW_ORDER);
     }).then(() => {
-      BlinkTrade.executionReport().on('EXECUTION_REPORT:NEW', (data) => {
-        expect(data.ExecType).to.be.equal('0');
-        sinon.restore();
+      const { req } = blinktrade.transport;
+      blinktrade.transport.eventEmitter.emit(`${ActionMsgRes.MD_INCREMENT}:${req.MDReqID}`, incrementalTrade);
+    });
+  });
+
+  test('Should send order and resolve promise', (done) => {
+    blinktrade = new BlinkTradeWS();
+    blinktrade.connect().then(() => blinktrade.sendOrder(newOrder)).then((res) => {
+      const { req } = blinktrade.transport;
+      expect(res.ExecType).toBe('0');
+      expect(res.Price).toBe(1637400000000);
+      expect(res.ClOrdID).toBe(req.ClOrdID);
+      done();
+    });
+  });
+
+  test('Should send order and emit EXECUTION_REPORT:NEW', (done) => {
+    blinktrade = new BlinkTradeWS();
+    blinktrade.executionReport().on('EXECUTION_REPORT:NEW', (res) => {
+      const { req } = blinktrade.transport;
+      expect(res.ExecType).toBe('0');
+      expect(res.Price).toBe(1637400000000);
+      expect(res.ClOrdID).toBe(req.ClOrdID);
+      done();
+    });
+    blinktrade.connect().then(() => blinktrade.sendOrder(newOrder));
+  });
+
+  test('Should send order and callback execution report', (done) => {
+    blinktrade = new BlinkTradeWS();
+
+    const callback = jest.fn();
+
+    blinktrade.connect().then(() => {
+      blinktrade.executionReport(callback);
+      return blinktrade.sendOrder(newOrder);
+    }).then(() => {
+      expect(callback).toHaveBeenCalled();
+      done();
+    });
+  });
+
+  test('Should request a deposit and emit DEPOSIT_REFRESH event', (done) => {
+    blinktrade = new BlinkTradeWS();
+    blinktrade.connect().then(() => {
+      return blinktrade.requestDeposit().on('DEPOSIT_REFRESH', (res) => {
+        const { req } = blinktrade.transport;
+        expect(res.State).toBe('UNCONFIRMED');
+        expect(res.ClOrdID).toBe(req.ClOrdID);
+        expect(res.DepositReqID).toBe(req.DepositReqID);
         done();
       });
-    }).catch(err => done(err));
+    }).then((res) => {
+      const { req } = blinktrade.transport;
+      blinktrade.transport.eventEmitter.emit(`${ActionMsgRes.DEPOSIT_REFRESH}:${req.ClOrdID}`, res);
+    });
   });
 
-  it('Should send order and callback execution report ', (done) => {
-    const mock = {
-      MsgType: '8',
-      ExecType: '0',
-    };
-
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      MOCK_NEW_ORDER.ClOrdID = msg.ClOrdID;
-      const request = listener.getRequest(MOCK_NEW_ORDER);
-      return request && request.resolve(mock);
-    });
-
-    const callback = spy();
-
-    const sinon = stub(listener, 'registerListener', () => {
-      callback(mock);
-    });
-
-    BlinkTrade.connect().then(() => {
-      BlinkTrade.executionReport(callback);
-      return BlinkTrade.sendOrder(MOCK_NEW_ORDER);
-    }).then(() => {
-      expect(callback.called).to.be.true;
-      sinon.restore();
-      done();
-    }).catch(err => done(err));
-  });
-
-  it('Should send order and emit BALANCE updates', (done) => {
-    let mock: Object;
-    const balance = {
-      // $FlowFixMe
-      5: { USD_locked: 8250000000 },
-      MsgType: 'U3',
-      ClientID: 90800003,
-    };
-
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      if (msg.ClOrdID) {
-        mock = { ClOrdID: msg.ClOrdID };
-      } else {
-        mock = {
-          ...balance,
-          BalanceReqID: msg.BalanceReqID,
-        };
-      }
-
-      const request = listener.getRequest(mock);
-      return request && request.resolve(mock);
-    });
-
-    const sinon = stub(listener, 'registerListener', (message, callback) => {
-      // Simulate server latency
-      setTimeout(() => {
-        callback(mock);
-      }, 500);
-    });
-
-    BlinkTrade.connect().then(() => {
-      return BlinkTrade.sendOrder(MOCK_NEW_ORDER);
-    }).then(() => {
-      BlinkTrade.balance().on('BALANCE', (data) => {
-        expect(data.BalanceReqID).to.be.equal(mock.BalanceReqID);
-        sinon.restore();
-        done();
-      });
-    }).catch(err => done(err));
-  });
-
-  it('Should send order and callback balance updates', (done) => {
-    let mock: Object;
-    const balance = {
-      // $FlowFixMe
-      5: { USD_locked: 8250000000 },
-      MsgType: 'U3',
-      ClientID: 90800003,
-    };
-
-    BlinkTrade = new BlinkTradeWS();
-
-    const callback = spy();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      if (msg.ClOrdID) {
-        mock = { ClOrdID: msg.ClOrdID };
-      } else {
-        mock = {
-          ...balance,
-          BalanceReqID: msg.BalanceReqID,
-        };
-      }
-
-      const request = listener.getRequest(mock);
-      return request && request.resolve(mock);
-    });
-
-    const sinon = stub(listener, 'registerListener', () => {
-      callback(mock);
-    });
-
-    BlinkTrade.connect().then(() => {
-      BlinkTrade.balance(callback);
-      return BlinkTrade.sendOrder(MOCK_NEW_ORDER);
-    }).then(() => {
-      expect(callback.called).to.be.true;
-      sinon.restore();
-      done();
-    }).catch(err => done(err));
-  });
-
-  it('Should request a deposit and emit DEPOSIT_REFRESH event', (done) => {
-    const mock = {
-      DepositMethodName: 'deposit_btc',
-      State: 'UNCONFIRMED',
-      DepositID: '2a6b5e322fd24574a4d9f988681a542f',
-      Data: {
-        InputAddress: 'mjjVMr8WcYQwVGzYc8HpaRyAZc89ngTdKV',
-        Destination: 'n19ZAH1WGoUkQhubQw71fH11BenifxpBxf',
-      },
-      ClOrdID: '7302188',
-      Status: '0',
-      Value: 0,
-      BrokerID: 5,
-      PaidValue: 0,
-      Currency: 'BTC',
-    };
-
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      mock.ClOrdID = msg.ClOrdID;
-      const request = listener.getRequest(mock);
-      return request && request.resolve(mock);
-    });
-
-    const sinon = stub(listener, 'registerEventEmitter', (message, callback) => {
-      // Simulate server latency
-      setTimeout(() => {
-        callback({
-          State: 'PROGRESS',
-          DepositID: '2a6b5e322fd24574a4d9f988681a542f',
-        });
-      }, 500);
-    });
-
-    BlinkTrade.connect().then(() => {
-      return BlinkTrade.requestDeposit().on('DEPOSIT_REFRESH', (data) => {
-        expect(data.State).to.be.equal('PROGRESS');
-        expect(data.DepositID).to.be.equal(data.DepositID);
-        sinon.restore();
-        done();
-      });
-    }).catch(err => done(err));
-  });
-
-  it('Should request a withdraw and emit WITHDRAW_REFRESH event', (done) => {
-    const withdraw = {
+  test('Should request a withdraw and emit WITHDRAW_REFRESH event', (done) => {
+    const data = {
       amount: 200 * 1e8,
-      currency: 'USD',
+      currency: 'BRL',
       method: 'PayPal',
       data: {
-        Email: 'user@blinktrade.com',
+        Memo: 'Memo',
+        email: 'user@blinktrade.com',
       },
     };
 
-    const mock = {
-      Status: '1',
-      ClOrdID: '3332623',
-      WithdrawID: 523,
-      WithdrawReqID: 3332623,
-      Data: {
-        Email: 'user@blinktrade.com',
-      },
-    };
-
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      mock.ClOrdID = msg.ClOrdID;
-      mock.WithdrawReqID = msg.WithdrawReqID;
-      const request = listener.getRequest(mock);
-      return request && request.resolve(mock);
+    blinktrade = new BlinkTradeWS();
+    blinktrade.connect().then(() => {
+      return blinktrade.requestWithdraw(data).on('WITHDRAW_REFRESH', (res) => {
+        const { req } = blinktrade.transport;
+        expect(res.Status).toBe('1');
+        expect(res.ClOrdID).toBe(req.ClOrdID);
+        expect(res.WithdrawReqID).toBe(req.WithdrawReqID);
+        done();
+      });
+    }).then((res) => {
+      const { req } = blinktrade.transport;
+      blinktrade.transport.eventEmitter.emit(`${ActionMsgRes.WITHDRAW_REFRESH}:${req.ClOrdID}`, res);
     });
-
-    const sinon = stub(listener, 'registerEventEmitter', (message, callback) => {
-      // Simulate server latency
-      setTimeout(() => {
-        // Withdraw cancelled
-        callback({
-          ...mock,
-          Status: '8',
-        });
-      }, 500);
-    });
-
-    BlinkTrade.connect().then(() => {
-      return BlinkTrade.requestWithdraw(withdraw)
-        .on('WITHDRAW_REFRESH', (data) => {
-          expect(data.Status).to.be.equal('8');
-          expect(data.DepositID).to.be.equal(data.DepositID);
-          expect(data.Data).to.be.eql(withdraw.data);
-          sinon.restore();
-          done();
-        });
-    }).catch(err => done(err));
-  });
-
-  it('Should request a withdraw and emit WITHDRAW_REFRESH together with onWithdrawRefresh', (done) => {
-    const withdraw = {
-      amount: 200 * 1e8,
-      currency: 'USD',
-      method: 'PayPal',
-      data: {
-        Email: 'user@blinktrade.com',
-      },
-    };
-
-    const mock = {
-      Status: '1',
-      ClOrdID: '3332623',
-      WithdrawID: 523,
-      WithdrawReqID: 3332623,
-      Data: {
-        Email: 'user@blinktrade.com',
-      },
-    };
-
-    const mockResponse = {
-      ...mock,
-      Status: '8',
-    };
-
-    BlinkTrade = new BlinkTradeWS();
-
-    stub(BlinkTrade, 'sendMessage', (msg) => {
-      mock.ClOrdID = msg.ClOrdID;
-      mock.WithdrawReqID = msg.WithdrawReqID;
-      const request = listener.getRequest(mock);
-      return request && request.resolve(mock);
-    });
-
-    const onWithdrawRefresh = spy();
-
-    const sinonListener = stub(listener, 'registerListener', (message, callback) => {
-      setTimeout(() => {
-        callback(mockResponse);
-      }, 500);
-    });
-
-    const sinonEventEmitter = stub(listener, 'registerEventEmitter', (message, callback) => {
-      // Simulate server latency
-      setTimeout(() => {
-        // Withdraw cancelled
-        callback(mockResponse);
-      }, 500);
-    });
-
-    BlinkTrade.connect().then(() => {
-      BlinkTrade.onWithdrawRefresh(onWithdrawRefresh);
-      return BlinkTrade.requestWithdraw(withdraw)
-        .on('WITHDRAW_REFRESH', (data) => {
-          expect(data.Status).to.be.equal('8');
-          expect(data.DepositID).to.be.equal(data.DepositID);
-          expect(data.Data).to.be.eql(withdraw.data);
-          expect(onWithdrawRefresh.called).to.be.true;
-          sinonListener.restore();
-          sinonEventEmitter.restore();
-          done();
-        });
-    }).catch(err => done(err));
   });
 });
