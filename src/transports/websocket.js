@@ -39,6 +39,8 @@ import {
   deleteRequest,
 } from '../listener';
 
+const RECONNECT_INTERVAL = 5000;
+
 class WebSocketTransport extends Transport {
   /*
    * WebSocket Instance
@@ -67,23 +69,30 @@ class WebSocketTransport extends Transport {
 
   headers: Object;
 
+  autoReconnect: boolean;
+
+  reconnectInterval: number;
+
   constructor(params?: BlinkTradeWS = {}) {
     super(params, params.brokerId === BROKERS.BITCAMBIO ? 'wsBitcambio' : 'ws');
 
     this.stun = { local: null, public: [] };
 
-    this.getStun();
     this.getFingerPrint(params.fingerPrint);
     this.headers = params.headers;
+    this.autoReconnect = params.reconnect;
+    this.reconnectInterval = params.reconnectInterval || RECONNECT_INTERVAL;
 
     this.eventEmitter = new EventEmitter({ wildcard: true, delimiter: ':' });
   }
 
   connect(callback?: Function): Promise<Object> {
     return nodeify.extend(new Promise((resolve, reject) => {
-      this.request = { resolve, reject };
+      this.connection = { resolve, reject };
 
       const WebSocket = IS_NODE ? WS : window.WebSocket;
+
+      this.getStun();
 
       this.socket = new WebSocket(this.endpoint, [], this.headers);
       this.socket.onopen = this.onOpen.bind(this);
@@ -98,15 +107,25 @@ class WebSocketTransport extends Transport {
     this.closeStun();
   }
 
-  onOpen(): void {
-    this.request.resolve({ connected: true });
+  onOpen(e): void {
+    this.eventEmitter.emit('open', e);
+    this.connection.resolve({ connected: true });
   }
 
-  onClose(): void {
+  onClose(e): void {
+    this.eventEmitter.emit('close', e, this.lastMessageSent);
+    this.closeStun();
+    this.reconnect();
   }
 
   onError(error: any): void {
-    this.request.reject(error);
+    this.eventEmitter.emit('error', error, this.lastMessageSent);
+  }
+
+  reconnect() {
+    if (this.autoReconnect) {
+      setTimeout(() => this.connect(), this.reconnectInterval);
+    }
   }
 
   sendMessage(msg: Object): void {
@@ -116,25 +135,28 @@ class WebSocketTransport extends Transport {
       data.STUNTIP = this.stun;
       data.FingerPrint = this.fingerPrint;
 
+      this.lastMessageSent = data;
+      this.eventEmitter.emit('send', data);
       this.socket.send(JSON.stringify(data));
     }
   }
 
   sendMessageAsPromise(msg: Object): Promise<Object> {
     return new Promise((resolve, reject) => {
-      const promise = { resolve, reject };
+      this.lastPromise = { resolve, reject };
       setRequest(msg, { resolve, reject });
-      // We are passing the promise as a parameter to spy it in our tests
-      this.sendMessage(msg, promise);
+      this.sendMessage(msg);
     });
   }
 
   onMessage(msg: Object): void {
     const data = JSON.parse(msg.data);
 
+    this.eventEmitter.emit('receive', data);
+
     if (!MsgActionRes[data.MsgType]) {
       if (data.MsgType === 'ERROR') {
-        throw new Error(`${data.Detail} ${data.Description}`);
+        this.eventEmitter.emit('error', data, this.lastMessageSent);
       }
 
       return;

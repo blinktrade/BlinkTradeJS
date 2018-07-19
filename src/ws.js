@@ -56,7 +56,7 @@ class BlinkTradeWS extends TradeBase {
   }
 
   connect(callback?: Function) {
-    return this.transport.connect(callback);
+    return this.emitterPromise(this.transport.connect(callback));
   }
 
   disconnect() {
@@ -67,7 +67,7 @@ class BlinkTradeWS extends TradeBase {
     return this.transport.sendMessageAsPromise(msg);
   }
 
-  onEvent(event, callback) {
+  on(event, callback) {
     if (this.transport.eventEmitter) {
       return this.transport.eventEmitter.on(event, callback);
     }
@@ -181,7 +181,7 @@ class BlinkTradeWS extends TradeBase {
   balance(clientId, callback?: Function): PromiseEmitter<Object> {
     return this.emitterPromise(new Promise((resolve, reject) => {
       return super.balance(clientId, callback).then((data) => {
-        this.onEvent(ActionMsgRes.BALANCE, (balance) => {
+        this.on(ActionMsgRes.BALANCE, (balance) => {
           callback && callback(null, balance);
           return this.emit(BALANCE, balance);
         });
@@ -191,7 +191,7 @@ class BlinkTradeWS extends TradeBase {
   }
 
   onBalanceUpdate(callback?: Function) {
-    return this.onEvent(ActionMsgRes.BALANCE, callback);
+    return this.on(ActionMsgRes.BALANCE, callback);
   }
 
   subscribeTicker(symbols: Array<string>, callback?: Function): PromiseEmitter<Object> {
@@ -216,7 +216,7 @@ class BlinkTradeWS extends TradeBase {
     return this.emitterPromise(new Promise((resolve, reject) => {
       return this.send(msg).then(data => {
         const event = ActionMsgRes.SECURITY_STATUS_SUBSCRIBE + ':' + data.SecurityStatusReqID;
-        this.onEvent(event, (ticker) => {
+        this.on(event, (ticker) => {
           const tickerFormatted = formatTicker(ticker);
           callback && callback(null, tickerFormatted);
           return this.emit(`${ticker.Market}:${ticker.Symbol}`, tickerFormatted);
@@ -278,7 +278,7 @@ class BlinkTradeWS extends TradeBase {
 
     return this.emitterPromise(new Promise((resolve, reject) => {
       return this.send(msg).then(data => {
-        this.onEvent(ActionMsgRes.MD_INCREMENT + ':' + data.MDReqID, subscribeEvent);
+        this.on(ActionMsgRes.MD_INCREMENT + ':' + data.MDReqID, subscribeEvent);
         return resolve(formatOrderBook(data, this.level));
       }).catch(err => reject(err));
     }), callback);
@@ -297,7 +297,7 @@ class BlinkTradeWS extends TradeBase {
   }
 
   executionReport(callback?: Function): EventEmitter {
-    return this.onEvent(ActionMsgRes.EXECUTION_REPORT, (data) => {
+    return this.on(ActionMsgRes.EXECUTION_REPORT, (data) => {
       callback && callback(data);
       const event = EVENTS.EXECUTION_REPORT[data.ExecType];
       return this.emit(`${EXECUTION_REPORT}:${event}`, data);
@@ -343,14 +343,14 @@ class BlinkTradeWS extends TradeBase {
     return this.emitterPromise(new Promise((resolve, reject) => {
       return super.requestDeposit({ currency, value, depositMethodId }).then(deposit => {
         const event = ActionMsgRes.DEPOSIT_REFRESH + ':' + deposit.ClOrdID;
-        this.onEvent(event, subscribeEvent);
+        this.on(event, subscribeEvent);
         return resolve(deposit);
       }).catch(reject);
     }), callback);
   }
 
   onDepositRefresh(callback?: Function): Promise<Object> {
-    return this.onEvent(ActionMsgRes.DEPOSIT_REFRESH, callback);
+    return this.on(ActionMsgRes.DEPOSIT_REFRESH, callback);
   }
 
   requestWithdraw({ amount, data, currency = 'BTC', method = 'bitcoin' }: {
@@ -366,14 +366,14 @@ class BlinkTradeWS extends TradeBase {
 
     return this.emitterPromise(new Promise((resolve, reject) => {
       return super.requestWithdraw({ amount, data, currency, method }).then(withdraw => {
-        this.onEvent(ActionMsgRes.WITHDRAW_REFRESH + ':' + withdraw.ClOrdID, subscribeEvent);
+        this.on(ActionMsgRes.WITHDRAW_REFRESH + ':' + withdraw.ClOrdID, subscribeEvent);
         return resolve(withdraw);
       }).catch(reject);
     }), callback);
   }
 
   onWithdrawRefresh(callback?: Function): Promise<Object> {
-    return this.onEvent(ActionMsgRes.WITHDRAW_REFRESH, callback);
+    return this.on(ActionMsgRes.WITHDRAW_REFRESH, callback);
   }
 }
 
