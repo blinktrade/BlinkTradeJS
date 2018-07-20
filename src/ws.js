@@ -103,7 +103,7 @@ class BlinkTradeWS extends TradeBase {
     })).nodeify(callback);
   }
 
-  login({ username, password, secondFactor, token, trustedDevice, cancelOnDisconnect, brokerId }: {
+  login({ username, password, secondFactor, cancelOnDisconnect, brokerId, ...extraData }: {
     username: string,
     password: string,
     token?: string,
@@ -136,17 +136,13 @@ class BlinkTradeWS extends TradeBase {
       Username: username,
       Password: password,
       UserReqTyp: '1',
-      TrustedDevice: trustedDevice || false,
       CancelOnDisconnect: cancelOnDisconnect ? '1' : '0',
       ...userAgent,
+      ...extraData,
     };
 
     if (secondFactor) {
       msg.SecondFactor = secondFactor;
-    }
-
-    if (token) {
-      msg.Token = token;
     }
 
     return nodeify.extend(new Promise((resolve, reject) => {

@@ -80,16 +80,6 @@ declare module blinktrade {
         secondFactor?: string;
 
         /**
-         * Optional token, sent by email to authorize your IP address
-         */
-        token?: string;
-
-        /**
-         * Optional boolean, trust this device for 30 days
-         */
-        trustedDevice?: boolean;
-
-        /**
          * Cancel all orders sent by the session when the websocket disconnects
          */
         cancelOnDisconnect?: boolean;
