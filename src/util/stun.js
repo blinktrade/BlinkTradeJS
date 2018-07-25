@@ -40,7 +40,9 @@ function addIPAddress(ipAddress) {
 }
 
 export function closeStun() {
-  socket.close();
+  if (socket._receiving) {
+    socket.close();
+  }
 }
 
 export function getStun(callback) {
