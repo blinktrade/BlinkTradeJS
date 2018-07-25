@@ -87,17 +87,16 @@ describe('WebSocket', () => {
     });
   });
 
-  test('Should connect on websocket receive a callback', (done) => {
+  test('Should connect on websocket receive open event', (done) => {
     blinktrade = new BlinkTradeWS({ prod: false });
     const callback = jest.fn();
-    blinktrade.connect().on('open', callback).then(() => {
-      blinktrade.transport.eventEmitter.emit('open');
+    blinktrade.connect().on('OPEN', callback).then(() => {
       expect(callback).toBeCalled();
       done();
     });
   });
 
-  test('Should connect on websocket receive open event', (done) => {
+  test('Should connect on websocket receive a callback ', (done) => {
     blinktrade = new BlinkTradeWS({ prod: false });
     blinktrade.connect((err, { connected }) => {
       expect(connected).toBe(true);

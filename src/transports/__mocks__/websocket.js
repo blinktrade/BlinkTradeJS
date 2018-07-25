@@ -7,7 +7,12 @@ export default jest.fn().mockImplementation(() => {
     eventEmitter: new EventEmitter({ wildcard: true, delimiter: ':' }),
 
     connect(callback) {
-      return nodeify.extend(Promise.resolve({ connected: true })).nodeify(callback);
+      return nodeify.extend(new Promise((resolve) => {
+        setTimeout(() => {
+          this.eventEmitter.emit('OPEN', {});
+          return resolve({ connected: true });
+        });
+      })).nodeify(callback);
     },
 
     sendMessageAsPromise(req) {
