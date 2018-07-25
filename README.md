@@ -43,12 +43,12 @@ The most simple way to get the ticker, orderbook and trades, is through our publ
 
 ```js
 
-var BlinkTradeRest = require("blinktrade").BlinkTradeRest;
-var blinktrade = new BlinkTradeRest({ currency: "BRL" });
+const BlinkTradeRest = require("blinktrade").BlinkTradeRest;
+const blinktrade = new BlinkTradeRest({ currency: "BRL" });
 
-blinktrade.ticker().then(function(ticker) {
-  console.log(ticker);
-});
+blinktrade.ticker().then((ticker) => {
+  console.log(ticker)
+})
 
 ```
 
@@ -74,12 +74,12 @@ blinktrade.ticker().then(function(ticker) {
 
 ```js
 
-var BlinkTradeRest = require("blinktrade").BlinkTradeRest;
-var blinktrade = new BlinkTradeRest({ currency: "BRL" });
+const BlinkTradeRest = require("blinktrade").BlinkTradeRest;
+const blinktrade = new BlinkTradeRest({ currency: "BRL" });
 
-blinktrade.orderbook().then(function(orderbook) {
-  console.log(orderbook);
-});
+blinktrade.orderbook().then((orderbook) => {
+  console.log(orderbook)
+})
 
 ```
 
@@ -105,12 +105,12 @@ blinktrade.orderbook().then(function(orderbook) {
 
 ```js
 
-var BlinkTradeRest = require("blinktrade").BlinkTradeRest;
-var blinktrade = new BlinkTradeRest({ currency: "BRL" });
+const BlinkTradeRest = require("blinktrade").BlinkTradeRest;
+const blinktrade = new BlinkTradeRest({ currency: "BRL" });
 
-blinktrade.trades().then(function(trades) {
-  console.log(trades);
-});
+blinktrade.trades().then((trades) => {
+  console.log(trades)
+})
 
 ```
 
@@ -151,8 +151,8 @@ Be aware that our RESTful trade endpoint can be changed at any time, we strongly
 > **NOTE** that when generate the API Key and the API Secret, it will be only shown once, you should save it securely. The API Password is only used in the WebSocket API.
 
 ```js
-var BlinkTradeRest = require("blinktrade").BlinkTradeRest;
-var blinktrade = new BlinkTradeRest({
+const BlinkTradeRest = require("blinktrade").BlinkTradeRest;
+const blinktrade = new BlinkTradeRest({
   prod: false,
   key: "YOUR_API_KEY_GENERATED_IN_API_MODULE",
   secret: "YOUR_SECRET_KEY_GENERATED_IN_API_MODULE",
@@ -160,13 +160,13 @@ var blinktrade = new BlinkTradeRest({
 });
 
 blinktrade.sendOrder({
-  side: "1",
+  side: "BUY",
   price: parseInt(1800 * 1e8).toFixed(0),
   amount: parseInt(0.5 * 1e8).toFixed(0),
   symbol: "BTCBRL",
-}).then(function(order) {
-    console.log(order);
-});
+}).then((order) => {
+    console.log(order)
+})
 
 ```
 
@@ -208,14 +208,13 @@ Make sure that you're connected to send messages through WebSocket, most of the 
 
 ```js
 
-var BlinkTradeWS = require("blinktrade").BlinkTradeWS;
-var blinktrade = new BlinkTradeWS({ prod: true });
+const BlinkTradeWS = require("blinktrade").BlinkTradeWS;
+const blinktrade = new BlinkTradeWS({ prod: true });
 
-blinktrade.connect().then(function() {
+blinktrade.connect().then(() => {
   // Connected
-  return blinktrade.login({ username: "", password: "" });
-}).then(function() {
-});
+  return blinktrade.login({ username: "<API_KEY>", password: "<API_SECRET>" });
+}).then((logged) => {});
 
 ```
 
@@ -225,7 +224,7 @@ Will request your balance for each broker.
 
 ```js
 
-blinktrade.balance().then(function(balance) {
+blinktrade.balance().then((balance) => {
   console.log(balance);
 });
 
@@ -235,7 +234,7 @@ You can pass a callback to receive balance updates.
 
 ```js
 
-blinktrade.balance(null, function(err, balance) {
+blinktrade.balance(null, (err, balance) => {
   console.log(balance);
 });
 
@@ -263,9 +262,9 @@ blinktrade.balance(null, function(err, balance) {
 
 ```js
 
-blinktrade.subscribeOrderbook(["BTCUSD"]).then(function(orderbook) {
-  console.log(orderbook);
-});
+blinktrade.subscribeOrderbook(["BTCBRL"]).then((orderbook) => {
+  console.log(orderbook)
+})
 
 ```
 
@@ -292,7 +291,7 @@ To unsubscribe from orderbook, you should pass the `MDReqID` on `unSubscribeOrde
 
 ```js
 
-blinktrade.subscribeOrderbook(["BTCUSD"]).then(function(orderbook) {
+blinktrade.subscribeOrderbook(["BTCBRL"]).then((orderbook) => {
   blinktrade.unSubscribeOrderbook(orderbook.MDReqID);
 });
 
@@ -307,7 +306,7 @@ You can subscribe on one or more market symbols.
 
 ```js
 
-blinktrade.subscribeTicker(["BLINK:BTCUSD"]).then(function(ticker) {
+blinktrade.subscribeTicker(["BLINK:BTCBRL"]).then((ticker) => {
   console.log(ticker);
 });
 
@@ -317,7 +316,7 @@ To unsubscribe from ticker, you do the same as `unSubscribeOrderbook`, but passi
 
 ```js
 
-blinktrade.subscribeTicker(["BLINK:BTCUSD"]).then(function(ticker) {
+blinktrade.subscribeTicker(["BLINK:BTCBRL"]).then((ticker) => {
   blinktrade.unSubscribeTicker(ticker.SecurityStatusReqID);
 });
 
@@ -346,14 +345,92 @@ parseInt((0.57 * 1e8).toFixed(0)) => 57000000
 ```js
 
 blinktrade.sendOrder({
-  "side": "1", // Buy
-  "price": parseInt((550 * 1e8).toFixed(0)),
-  "amount": parseInt((0.05 * 1e8).toFixed(0)),
-  "symbol": "BTCUSD",
-}).then(function(order) {
+  side: "BUY",
+  price: parseInt((550 * 1e8).toFixed(0)),
+  amount: parseInt((0.05 * 1e8).toFixed(0)),
+  symbol: "BTCUSD",
+}).then((order) => {
   // Sent
 });
 
+```
+
+### Advanced Orders (MARKET, LIMIT, STOP)
+
+### Market
+
+Market orders automatically execute your order at the current price.
+
+```js
+blinktrade.sendOrder({
+  side: 'BUY',
+  type: 'MARKET',
+  symbol: 'BTCBRL',
+  amount: parseInt(0.01 * 1e8),
+})
+```
+
+**NOTE** Market orders will execute indenpendently of the price of the other side, so be careful on low liquidity scenarios.
+
+### Limit
+
+Limit order allows you specified your own price.
+
+```js
+blinktrade.sendOrder({
+  side: 'SELL',
+  type: 'LIMIT',
+  symbol: 'BTCBRL',
+  price: parseInt(16000 * 1e8),
+  amount: parseInt(0.01 * 1e8),
+})
+```
+
+#### Post Only
+
+Post Only ensures that your order will be added to the order book and not match with a existing order.
+
+```js
+blinktrade.sendOrder({
+  side: 'BUY',
+  type: 'LIMIT',
+  symbol: 'BTCBRL',
+  price: parseInt(16000 * 1e8),
+  amount: parseInt(0.01 * 1e8),
+  postOnly: true,
+})
+```
+
+### Stop
+
+Stop order allow you place an order only when the price reaches the stop price,
+your order won't be visible on the book until it triggered.
+
+```js
+blinktrade.sendOrder({
+  side: 'SELL',
+  type: 'STOP',
+  symbol: 'BTCBRL',
+  stopPrice: parseInt(16000 * 1e8), // Price bellow the best bid
+  amount: parseInt(0.01 * 1e8),
+})
+```
+
+**NOTE** STOP order will act as a MARKET order, if you want yo specify a limit price use STOP_LIMIT instead.
+
+### Stop Limit
+
+Stop Limit order allow you specified a limit price toghether with the stop price.
+
+```js
+blinktrade.sendOrder({
+  side: 'SELL',
+  type: 'STOP_LIMIT',
+  symbol: 'BTCBRL',
+  price: parseInt(15900 * 1e8), // Limit price
+  stopPrice: parseInt(16000 * 1e8), // Price bellow the best bid
+  amount: parseInt(0.01 * 1e8),
+})
 ```
 
 > Response
@@ -392,9 +469,9 @@ if you didn't provide `orderId`, all open orders will be cancelled.
 
 ```js
 
-blinktrade.cancelOrder({ orderId: order.OrderID, clientId: order.ClOrdID }).then(function(order) {
+blinktrade.cancelOrder({ orderId: order.OrderID, clientId: order.ClOrdID }).then((order) => {
   console.log("Order Cancelled");
-});
+})
 
 ```
 
@@ -408,9 +485,9 @@ List the latest trades executed on an exchange since a chosen date.
 
 ```js
 
-blinktrade.trades({ limit: 100, since: 2270000 }).then(function(data) {
+blinktrade.trades({ limit: 100, since: 2270000 }).then((data) => {
   console.log("Trades", data);
-});
+})
 
 ```
 
@@ -422,9 +499,9 @@ You can generate either bitcoin or FIAT deposits, if any arguments was passed, i
 
 ```js
 
-blinktrade.requestDeposit().then(function(deposit) {
-  console.log(deposit);
-});
+blinktrade.requestDeposit().then((deposit) => {
+  console.log(deposit)
+})
 
 ```
 
@@ -438,9 +515,9 @@ blinktrade.requestDeposit({
   value: parseInt(200 * 1e8),
   currency: "BRL",
   depositMethodId: 502,
-}).then(function(deposit) {
-  console.log(deposit);
-});
+}).then((deposit) => {
+  console.log(deposit)
+})
 
 ```
 
@@ -492,14 +569,14 @@ it's related to bank accounts, numbers, or a bitcoin address. This information i
 ```js
 
 blinktrade.requestWithdraw({
-  "amount": parseInt(400 * 1e8),
-  "currency": "BRL",
-  "method": "bradesco",
-  "data": {
-    "AccountBranch": "111",
-    "AccountNumber": "4444-5",
-    "AccountType": "corrente",
-    "CPF_CNPJ": "00000000000"
+  amount: parseInt(400 * 1e8),
+  currency: "BRL",
+  method: "bradesco",
+  data: {
+    AccountBranch: "111",
+    AccountNumber: "4444-5",
+    AccountType: "corrente",
+    CPF_CNPJ: "00000000000"
   }
 })
 
@@ -516,7 +593,7 @@ or `secondFactor` if needed.
 blinktrade.confirmWithdraw({
     withdrawId: 523,
     confirmationToken: 'TOKEN'
-});
+})
 
 ```
 
@@ -562,6 +639,30 @@ you can listen to individual events to match your needs, you can listen to new o
 Event emitters can also be used as promises to keep it chained, event emitters are implemented with [`EventEmitter2`](https://github.com/asyncly/EventEmitter2),
 which gives you more flexibility to match events with multi-level wildcards and extends events such as `.onAny`, `.once`, `.many` and so on.
 
+### Connection Events
+
+You can listem to `OPEN`, `CLOSE`, and `ERROR` events to get WebSocket events and error handling.
+
+```js
+
+blinktrade.connect()
+  .on('OPEN',  (e) => {})
+  .on('CLOSE', (e, lastMessageSent) => {})
+  .on('ERROR', (error, lastMessageSent) => {})
+  .then(() => {
+    console.log('Connected')
+  })
+
+```
+
+The `OPEN` event is useful to handle reconnections, since the promise is already resolved.
+
+The `ERROR` event is where you can do all the error handling, both from WebSocket errors or an
+error raised by the backend due some invalid message, both `CLOSE` and `ERROR` will give you
+the last message that you sent as the second argument.
+
+You can also listen them by just `blinktrade.on('OPEN', (e) => {})` that works just fine.
+
 ### Event Ticker
 
 To keep ticker update on new events, you can return a event emitter and match with the market.
@@ -569,10 +670,9 @@ To keep ticker update on new events, you can return a event emitter and match wi
 ```js
 
 blinktrade.subscribeTicker(["UOL:USDBRT", "BLINK:BTCUSD", "BLINK:BTCBRL"])
-  .on("UOL:USDBRT",   function(usdbrt) {
-}).on("BLINK:BTCUSD", function(btcusd) {
-}).on("BLINK:BTCBRL", function(btcbrl) {
-});
+  .on("UOL:USDBRT",   (usdbrt) => {})
+  .on("BLINK:BTCUSD", (btcusd) => {})
+  .on("BLINK:BTCBRL", (btcbrl) => {})
 
 ```
 
@@ -581,8 +681,7 @@ You can easily match all symbols at the same listener.
 ```js
 
 blinktrade.subscribeTicker(["UOL:USDBRT", "BLINK:BTCUSD", "BLINK:BTCBRL"])
-.on("BLINK:*", function(symbol) {
-});
+.on("BLINK:*", (ticker) => {})
 
 ```
 
@@ -593,12 +692,11 @@ To get realtime updates on order book, you should listen to the following events
 ```js
 
 blinktrade.subscribeOrderbook(["BTCUSD"])
-  .on("OB:NEW_ORDER", function(order) {
-}).on("OB:UPDATE_ORDER", function(order) {
-}).on("OB:DELETE_ORDER", function(order) {
-}).on("OB:DELETE_ORDERS_THRU", function(order) {
-}).on("OB:TRADE_NEW", function(order) {
-});
+  .on("OB:NEW_ORDER", (order) => {})
+  .on("OB:UPDATE_ORDER", (order) => {})
+  .on("OB:DELETE_ORDER", (order) => {})
+  .on("OB:DELETE_ORDERS_THRU", (order) => {})
+  .on("OB:TRADE_NEW", (order) => {})
 
 ```
 
@@ -606,12 +704,12 @@ You can still return a promise when listen events.
 
 ```js
 
-blinktrade.subscribeOrderbook(["BTCUSD"])
-.on("OB:NEW_ORDER", function(order) {
-  console.log("New order received");
-}).then(function(orderbook) {
-  console.log("Full orderbook", orderbook);
-});
+blinktrade.subscribeOrderbook(["BTCBRL"])
+.on("OB:NEW_ORDER", (order) => {
+  console.log("New order received")
+}).then((orderbook) => {
+  console.log("Full orderbook", orderbook)
+})
 
 ```
 
@@ -621,9 +719,7 @@ You listen to the `BALANCE` event to receive balance updates.
 
 ```js
 
-blinktrade.balance().on("BALANCE", function(balance) {
-  console.log(balance);
-});
+blinktrade.balance().on("BALANCE", (balance) => console.log(balance))
 
 ```
 
@@ -634,12 +730,11 @@ In order the get when a order is executed, you can listen to the execution repor
 ```js
 
 blinktrade.executionReport()
-  .on("EXECUTION_REPORT:NEW", function(data) {
-}).on("EXECUTION_REPORT:PARTIAL", function(data) {
-}).on("EXECUTION_REPORT:EXECUTION", function(data) {
-}).on("EXECUTION_REPORT:CANCELED", function(data) {
-}).on("EXECUTION_REPORT:REJECTED", function(data) {
-});
+  .on("EXECUTION_REPORT:NEW", (data) => {})
+  .on("EXECUTION_REPORT:PARTIAL", (data) => {})
+  .on("EXECUTION_REPORT:EXECUTION", (data) => {})
+  .on("EXECUTION_REPORT:CANCELED", (data) => {})
+  .on("EXECUTION_REPORT:REJECTED", (data) => {})
 
 ```
 
@@ -649,13 +744,13 @@ To get deposit and withdraw updates, you can listen to `DEPOSIT_REFRESH` and `WI
 
 ```js
 
-blinktrade.requestDeposit().on('DEPOSIT_REFRESH', function(deposit) {
-  console.log(deposit);
-});
+blinktrade.requestDeposit().on('DEPOSIT_REFRESH', (deposit) => {
+  console.log(deposit)
+})
 
-blinktrade.requestWithdraw().on('WITHDRAW_REFRESH', function(withdraw) {
-  console.log(withdraw);
-});
+blinktrade.requestWithdraw().on('WITHDRAW_REFRESH', (withdraw) => {
+  console.log(withdraw)
+})
 
 ```
 
@@ -664,13 +759,39 @@ If you want to listen to any deposit / withdraw updates, you should use `onDepos
 
 ```js
 
-blinktrade.onDepositRefresh(function(deposit) {
-  console.log(deposit);
-});
+blinktrade.onDepositRefresh((deposit) => {
+  console.log(deposit)
+})
 
-blinktrade.onWithdrawRefresh(function(withdraw) {
-  console.log(withdraw);
-});
+blinktrade.onWithdrawRefresh((withdraw) => {
+  console.log(withdraw)
+})
+
+```
+
+## Handling WebSocket Reconnections
+
+A simple connection pool
+
+```js
+
+const blinktrade = new BlinkTradeWS({
+  prod: false,
+  brokerId: 11,
+  reconnect: true,
+  reconnectInterval: 3000,
+})
+
+blinktrade.connect().on('OPEN', () => {
+  console.log('connected');
+  blinktrade.login({
+    username: '<API_KEY>'
+    password: '<API_PASSWORD>'
+  }).then(() => {
+    // Manually disconnect WebSocket connection
+    blinktrade.disconnect()
+  })
+})
 
 ```
 
@@ -756,19 +877,29 @@ blinktrade.onWithdrawRefresh(function(withdraw) {
 
 #### Arguments
 
-| Name        | Type    | Description                              |
-|-------------|---------|------------------------------------------|
-| prod        | Boolean | Production environment, default to false |
-| brokerId    | Number  | [see brokers list](https://blinktrade.com/docs/#brokers) |
-| url         | String  | Custom url in case if you're using a custom backend url |
-| headers     | String  | Custom headers to pass to WebSocket constructor if it supported, (useful on react-native) |
-| fingerPrint | String  | Custom fingerprint if you are not using in either a browser or node (useful on react-native) |
+| Name              | Type    | Description                              |
+|-------------------|---------|------------------------------------------|
+| prod              | Boolean | Production environment, default to false |
+| brokerId          | Number  | [see brokers list](https://blinktrade.com/docs/#brokers) |
+| url               | String  | Custom url in case if you're using a custom backend url |
+| headers           | String  | Custom headers to pass to WebSocket constructor if it supported, (useful on react-native) |
+| fingerPrint       | String  | Custom fingerprint if you are not using in either a browser or node (useful on react-native) |
+| reconnect         | Boolean | Automatically reconnects WebSocket after disconnected, to receive the reconnection event you should listen to the `OPEN` since the promise is already resolved |
+| reconnectInterval | Number  | Reconnection Interval in miliseconds |
 
 ### connect [websocket]
 
 Connect to our WebSocket.
 
 `connect(Function? callback)` => Promise / callback
+
+### Connection Events
+
+| Event | Description |
+|-------|-------------|
+| OPEN  | Callback when WebSocket connects, by using this approach instead of a promise, you can benefit of reconnection events |
+| CLOSE | Callback when WebSocket closes |
+| ERROR | Callback when an error occured on both WebSocket or an error raised by the backend |
 
 ### heartbeat [websocket]
 
@@ -784,8 +915,8 @@ Used as test request to check the latency connection.
 
 | Name               | Type    | Description      |
 |--------------------|---------|------------------|
-| username           | String  | Account username |
-| password           | String  | Account password |
+| username           | String  | Account username or API_Key |
+| password           | String  | Account password or API_Password |
 | secondFactor       | String  | Optional. If the authentication require second factor, you'll receive an error with `NeedSecondFactor = true`, **NOTE**: Is recommended that you use an API Key / API Password instead, which don't required second factor |
 | brokerId           | Number  | Optional. Overwrites the broker id provided by the constructor |
 | cancelOnDisconnect | Boolean | Optional. If it's true, all orders sent by the session will be cancelled when the WebSocket disconnects |
@@ -812,7 +943,6 @@ Symbols Available:
 |--------------|------------------------------|
 | BLINK:BTCUSD | BTC <-> Testnet (USD)        |
 | BLINK:BTCBRL | BTC <-> Brazil Reals (BRL)   |
-| BLINK:BTCVEF | BTC <-> Venezuelan Bolivares |
 | BLINK:BTCCLP | BTC <-> Chilean Pesos        |
 | BLINK:BTCVND | BTC <-> Vietnamise Dongs     |
 | UOL:USDBRT   | Dólar Turismo                |
@@ -879,13 +1009,16 @@ These methods bellow are both availabe under REST and WebSocket API.
 
 #### Arguments
 
-| Name     | Type   | Description                                    |
-|----------|--------|------------------------------------------------|
-| side     | String | "1" = Buy, "2" = Sell                          |
-| price    | Number | Price in "satoshis". e.g.: 1800 * 1e8          |
-| amount   | Number | Amount to be sent in satoshis. e.g.: 0.5 * 1e8 |
-| symbol   | String | Currency pair symbol, [check symbols table]()  |
-
+| Name      | Type    | Description                                          |
+|-----------|---------|------------------------------------------------------|
+| type      | String  | "MARKET", "LIMIT", "STOP" or "STOP_LIMIT"            |
+| side      | String  | "BUY, "SELL" or "1" = BUY, "2" = SELL                |
+| price     | Number  | Price in "satoshis". e.g.: 1800 * 1e8                |
+| stopPrice | Number  | Stop price used by order type "STOP" or "STOP_LIMIT" |
+| amount    | Number  | Amount to be sent in satoshis. e.g.: 0.5 * 1e8       |
+| symbol    | String  | Currency pair symbol, [check symbols table]()        |
+| postOnly  | Boolean | If true, ensures that your order will be added to the order book and not match with a existing order |
+| clientId  | String  | Optional clientId, if doens't provided, will be used the requestId instead |
 
 ### cancelOrder [websocket, rest]
 
