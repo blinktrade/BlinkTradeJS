@@ -30,3 +30,15 @@ export const EVENTS = {
     '8': EXECUTION_REPORT_REJECTED,
   },
 };
+
+export const ORDER_TYPE = {
+  MARKET: '1',
+  LIMIT: '2',
+  STOP: '3',
+  STOP_LIMIT: '4',
+};
+
+export const ORDER_SIDE = {
+  BUY: '1',
+  SELL: '2',
+};

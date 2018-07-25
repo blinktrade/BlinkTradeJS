@@ -25,7 +25,7 @@ import nodeify from 'nodeify';
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { generateRequestId } from './listener';
 
-import { EVENTS } from './constants/events';
+import { EVENTS } from './constants/utils';
 import {
   BALANCE,
   DEPOSIT_REFRESH,

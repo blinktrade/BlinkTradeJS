@@ -24,6 +24,7 @@ import nodeify from 'nodeify';
 import { ActionMsgReq } from './constants/messages';
 import { formatColumns } from './util/utils';
 import { generateRequestId } from './listener';
+import { ORDER_TYPE, ORDER_SIDE } from './constants/utils';
 
 type StatusListType = '1' | '2' | '4' | '8';
 
@@ -88,23 +89,35 @@ class TradeBase {
     return nodeify.extend(this.send(msg).then(format)).nodeify(callback);
   }
 
-  sendOrder({ side, amount, price, symbol, clientId }: {
-    side: '1' | '2',
-    price: number,
+  sendOrder({ type, side, amount, price, stopPrice, symbol, postOnly, clientId }: {
+    side: 'BUY' | 'SELL' | '1' | '2',
+    type: 'MARKET' | 'LIMIT' | 'STOP' | 'STOP_LIMIT',
+    price?: number,
+    stopPrice?: number,
     amount: number,
     symbol: string,
     clientId?: string,
+    postOnly?: boolean,
   }, callback?: Function): Promise<Object> {
     const msg = {
       MsgType: ActionMsgReq.ORDER_SEND,
       ClOrdID: clientId || generateRequestId().toString(),
+      Side: ORDER_SIDE[side] || side,
+      OrdType: ORDER_TYPE[type] || ORDER_TYPE.LIMIT,
       Symbol: symbol,
-      Side: side,
-      OrdType: '2',
-      Price: price,
       OrderQty: amount,
       BrokerID: this.brokerId,
     };
+
+    if (price) {
+      msg.Price = price;
+    }
+    if (stopPrice) {
+      msg.StopPx = stopPrice;
+    }
+    if (postOnly) {
+      msg.ExecInst = '6';
+    }
 
     return nodeify.extend(this.send(msg)).nodeify(callback);
   }

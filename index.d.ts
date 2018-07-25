@@ -105,12 +105,22 @@ declare module blinktrade {
         /**
          * "1" = Buy, "2" = Sell
          */
-        side: '1' | '2';
+        side: 'BUY' | 'SELL' | '1' | '2';
+
+        /**
+         * Order type, defaults to LIMIT
+         */
+        type: 'MARKET' | 'LIMIT' | 'STOP' | 'STOP_LIMIT';
 
         /**
          * Price in "satoshis". e.g.: 1800 * 1e8
          */
-        price: number;
+        price?: number;
+
+        /**
+         * Stop price
+         */
+        stopPrice?: number,
 
         /**
          * Amount to be sent in satoshis. e.g.: 0.5 * 1e8
@@ -126,6 +136,11 @@ declare module blinktrade {
          * Optional Client ID
          */
         clientId?: string;
+
+        /**
+         * If true, ensures that your order will be added to the order book and not match with a existing order
+         */
+        postOnly?: boolean;
     }
 
     /**
