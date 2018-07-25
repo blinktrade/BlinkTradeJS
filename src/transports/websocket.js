@@ -108,18 +108,18 @@ class WebSocketTransport extends Transport {
   }
 
   onOpen(e): void {
-    this.eventEmitter.emit('open', e);
+    this.eventEmitter.emit('OPEN', e);
     this.connection.resolve({ connected: true });
   }
 
   onClose(e): void {
-    this.eventEmitter.emit('close', e, this.lastMessageSent);
+    this.eventEmitter.emit('CLOSE', e, this.lastMessageSent);
     this.closeStun();
     this.reconnect();
   }
 
   onError(error: any): void {
-    this.eventEmitter.emit('error', error, this.lastMessageSent);
+    this.eventEmitter.emit('ERROR', error, this.lastMessageSent);
   }
 
   reconnect() {
@@ -156,7 +156,7 @@ class WebSocketTransport extends Transport {
 
     if (!MsgActionRes[data.MsgType]) {
       if (data.MsgType === 'ERROR') {
-        this.eventEmitter.emit('error', data, this.lastMessageSent);
+        this.eventEmitter.emit('ERROR', data, this.lastMessageSent);
       }
 
       return;
