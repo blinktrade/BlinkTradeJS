@@ -56,7 +56,7 @@ declare module blinktrade {
         /**
          * Currency symbol to fetch public endpoint.
          */
-        currency?: 'USD' | 'BRL' | 'VEF' | 'CLP' | 'VND' | 'PKR';
+        currency?: 'USD' | 'BRL' | 'CLP' | 'VND';
     }
 
     /**
@@ -261,9 +261,21 @@ declare module blinktrade {
         limit?: number;
 
         /**
-         * Date which executed trades must be fetched from. is in Unix Time date format. Optional; defaults to the date of the first executed trade.
+         * TradeID which must be fetched from. Optional;
          */
         since?: number;
+    }
+
+    interface TradeHistory extends Pagination {
+        /**
+         * TradeID or Date which executed trades must be fetched from. is in Unix Time date format. Optional; defaults to the date of the first executed trade.
+         */
+        since?: number;
+
+        /**
+         * List os symbols to be returned
+         */
+        symbols?: Array<string>;
     }
 
     interface Ledger extends Pagination {
@@ -289,7 +301,7 @@ declare module blinktrade {
          *
          * @Events: `BALANCE`
          */
-        balance(callback?: Function): Promise<Object>;
+        balance(clientId?: string, callback?: Function): Promise<Object>;
 
         /**
          * Returns your open orders
@@ -419,7 +431,7 @@ declare module blinktrade {
         /**
          * A list of the last trades executed in the last 24 hours.
          */
-        tradeHistory(pagination?: Pagination, callback?: Function): Promise<Object>;
+        tradeHistory(params?: TradeHistory, callback?: Function): Promise<Object>;
 
         /**
          * Callbacks on each deposit update, note that using as promise will only returned once.

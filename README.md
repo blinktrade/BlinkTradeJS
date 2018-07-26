@@ -981,15 +981,16 @@ An event emitter to get execution reports.
 
 ### tradeHistory [websocket]
 
-`tradeHistory(Object pagination, Function? callback)` => Promise / callback
+`tradeHistory(Object params, Function? callback)` => Promise / callback
 
 #### Arguments
 
-| Name     | Type   | Description                                     |
-|----------|--------|-------------------------------------------------|
-| page     | Number | Current page to fetch, defaults to 0            |
-| pageSize | Number | Number of trades, limits to 80 |
-
+| Name     | Type   | Description                                 |
+|----------|--------|---------------------------------------------|
+| page     | Number | Current page to fetch, defaults to 0        |
+| pageSize | Number | Number of trades, limits to 80              |
+| since    | Number | TradeID or Date which executed trades must be fetched from. is in Unix Time date format. Optional; defaults to the date of the first executed trade. |
+| symbols  | Array  | List of symbols, e.g.: ["BTCVND", "BTCCLP"] |
 
 ## Trade REST / Websocket
 

@@ -306,9 +306,9 @@ class BlinkTradeWS extends TradeBase {
     });
   }
 
-  tradeHistory({ since, filter, page: Page = 0, pageSize: PageSize = 80 }: {
+  tradeHistory({ since, symbols, page: Page = 0, pageSize: PageSize = 100 }: {
     since?: number,
-    filter?: Array<string>,
+    symbols?: Array<string>,
     page?: number,
     pageSize?: number,
   } = {}, callback?: Function): Promise<Object> {
@@ -319,8 +319,8 @@ class BlinkTradeWS extends TradeBase {
       PageSize,
     };
 
-    if (filter && filter.length > 0) {
-      msg.Filter = filter;
+    if (symbols && symbols.length > 0) {
+      msg.SymbolList = symbols;
     }
 
     if (since && typeof since === 'number') {
