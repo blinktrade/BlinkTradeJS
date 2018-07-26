@@ -24,17 +24,25 @@ import nodeify from 'nodeify';
 import RestTransport from './transports/rest';
 import TradeBase from './trade';
 
+import type {
+  Message,
+  BlinkTradeRestParams,
+  BlinkTradeRestTransport,
+} from './types';
+
 class BlinkTradeRest extends TradeBase {
-  constructor(params?: BlinkTradeBase = {}) {
+  transport: BlinkTradeRestTransport;
+
+  constructor(params?: BlinkTradeRestParams = {}) {
     super(params);
     this.transport = params.transport || new RestTransport(params);
   }
 
-  send(path) {
-    return this.transport.fetchTrade(path);
+  send(msg: Message): Promise<Object> {
+    return this.transport.fetchTrade(msg);
   }
 
-  fetchPublic(path) {
+  fetchPublic(path: string): Promise<Object> {
     return this.transport.fetchPublic(path);
   }
 
@@ -43,8 +51,8 @@ class BlinkTradeRest extends TradeBase {
   }
 
   trades({ limit = 100, since = 0 }: {
-    limit: number,
-    since: number,
+    limit?: number,
+    since?: number,
   } = {}, callback?: Function): Promise<Object> {
     return nodeify.extend(this.fetchPublic(`trades?limit=${limit}&since=${since}`)).nodeify(callback);
   }

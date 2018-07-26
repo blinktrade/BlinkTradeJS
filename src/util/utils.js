@@ -1,20 +1,24 @@
+/* @flow */
 /* eslint-disable no-param-reassign */
 
-const zipColumns = (arr, columns) => (
+import type { BlinkTradeLevel, MsgTypes } from '../types';
+
+const zipColumns = (arr: Array<any>, columns: Array<string>) => (
   arr.reduce((prev, val, i) => {
     prev[columns[i]] = val;
     return prev;
   }, {})
 );
 
-export const msgToAction = (messages) => {
+export const msgToAction = (messages: MsgTypes) => {
   return Object.entries(messages).reduce((prev, val) => {
+    // $FlowFixMe Fixed entries mixed type
     prev[val[1][0]] = val[0];
     return prev;
   }, {});
 };
 
-export const formatColumns = (field, level) => (data) => {
+export const formatColumns = (field: string, level: BlinkTradeLevel) => (data: Object) => {
   if (level === 2) {
     const list = data[field].map(row => zipColumns(row, data.Columns));
     return Promise.resolve({ ...data, [field]: list });
@@ -23,7 +27,7 @@ export const formatColumns = (field, level) => (data) => {
   return Promise.resolve(data);
 };
 
-export const formatTradeHistory = (level) => (data) => {
+export const formatTradeHistory = (level: BlinkTradeLevel) => (data: Object) => {
   if (level === 2) {
     const TradeHistoryGrp = data.TradeHistoryGrp
       .map(row => zipColumns(row, data.Columns))
@@ -38,7 +42,7 @@ export const formatTradeHistory = (level) => (data) => {
   return Promise.resolve(data);
 };
 
-export const formatOrderBook = (data, level) => {
+export const formatOrderBook = (data: Object, level: BlinkTradeLevel) => {
   if (level === 2) {
     const { bids, asks } = data.MDFullGrp
       .filter(order => order.MDEntryType === '0' || order.MDEntryType === '1')
@@ -67,7 +71,7 @@ export const formatOrderBook = (data, level) => {
   return data;
 };
 
-export const formatIncremental = (data, level) => {
+export const formatIncremental = (data: Object, level: BlinkTradeLevel) => {
   if (level === 2) {
     return {
       index: data.MDEntryPositionNo,

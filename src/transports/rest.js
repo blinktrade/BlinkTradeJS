@@ -26,25 +26,31 @@ import fetchPonyfill from 'fetch-ponyfill';
 import BROKERS from '../constants/brokers';
 import Transport from './transport';
 
+import type {
+  Message,
+  BlinkTradeRestParams,
+  BlinkTradeCurrencies,
+} from '../types';
+
 const { fetch } = fetchPonyfill({ Promise });
 
 class RestTransport extends Transport {
   /**
    * APIKey
    */
-  key: string;
+  key: ?string;
 
   /**
    * APISecret
    */
-  secret: string;
+  secret: ?string;
 
   /**
    * Exchanges currencies available.
    */
-  currency: 'USD' | 'BRL' | 'VEF' | 'CLP' | 'VND' | 'PKR';
+  currency: BlinkTradeCurrencies;
 
-  constructor(params: BlinkTradeRest = {}) {
+  constructor(params?: BlinkTradeRestParams = {}) {
     super(params, params.brokerId === BROKERS.BITCAMBIO ? 'restBitcambio' : 'rest');
 
     this.key = params.key;
@@ -68,18 +74,18 @@ class RestTransport extends Transport {
     };
   }
 
-  fetch(msg: Object, api: string, headers?: Object = {}): Promise<Object> {
+  fetch(api: string, headers?: Object = {}): Promise<Object> {
     return fetch(this.endpoint + api, headers)
       .then(response => response.json());
   }
 
   fetchPublic(api: string): Promise<Object> {
-    return this.fetch({}, `api/v1/${this.currency}/${api}`);
+    return this.fetch(`api/v1/${this.currency}/${api}`);
   }
 
-  fetchTrade(msg: Object): Promise<Object> {
+  fetchTrade(msg: Message): Promise<Object> {
     const headers = this.headers('POST', msg);
-    return this.fetch(msg, 'tapi/v1/message', headers)
+    return this.fetch('tapi/v1/message', headers)
       .then(response => (response.Status === 500 ? Promise.reject(response) : response.Responses))
       .then(response => (response.length === 1 ? response[0] : response));
   }

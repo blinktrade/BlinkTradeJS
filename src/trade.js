@@ -26,22 +26,26 @@ import { formatColumns } from './util/utils';
 import { generateRequestId } from './listener';
 import { ORDER_TYPE, ORDER_SIDE } from './constants/utils';
 
-type StatusListType = '1' | '2' | '4' | '8';
+import type {
+  Message,
+  OrderSide,
+  OrderType,
+  StatusListType,
+  BlinkTradeEnv,
+  BlinkTradeParams,
+  BlinkTradeLevel,
+} from './types';
 
 class TradeBase {
   env: BlinkTradeEnv;
 
-  level: number;
+  level: BlinkTradeLevel;
 
   brokerId: number;
 
-  send: (msg: Object) => Promise<Object>;
+  +send: (msg: Message) => Promise<Message>;
 
-  +fetchTrade: (msg: Object) => Promise<Object>;
-
-  +sendMessageAsPromise: (msg: Object) => Promise<Object>;
-
-  constructor(params?: BlinkTradeBase = {}) {
+  constructor(params?: BlinkTradeParams = {}) {
     this.level = params.level === undefined ? 2 : params.level;
 
     this.brokerId = params.brokerId || 4;
@@ -51,8 +55,8 @@ class TradeBase {
     this.brokerId = brokerId;
   }
 
-  balance(clientId, callback?: Function): Promise<Object> {
-    const msg = {
+  balance(clientId?: string, callback?: Function): Promise<Object> {
+    const msg: Message = {
       MsgType: ActionMsgReq.BALANCE,
       BalanceReqID: generateRequestId(),
     };
@@ -73,7 +77,7 @@ class TradeBase {
     pageSize?: number,
     filter: Array<string>,
   } = {}, callback?: Function): Promise<Object> {
-    const msg = {
+    const msg: Message = {
       MsgType: ActionMsgReq.ORDER_HISTORY,
       OrdersReqID: generateRequestId(),
       Page,
@@ -90,8 +94,8 @@ class TradeBase {
   }
 
   sendOrder({ type, side, amount, price, stopPrice, symbol, postOnly, clientId }: {
-    side: 'BUY' | 'SELL' | '1' | '2',
-    type: 'MARKET' | 'LIMIT' | 'STOP' | 'STOP_LIMIT',
+    side: OrderSide,
+    type: OrderType,
     price?: number,
     stopPrice?: number,
     amount: number,
@@ -99,7 +103,7 @@ class TradeBase {
     clientId?: string,
     postOnly?: boolean,
   }, callback?: Function): Promise<Object> {
-    const msg = {
+    const msg: Message = {
       MsgType: ActionMsgReq.ORDER_SEND,
       ClOrdID: clientId || generateRequestId().toString(),
       Side: ORDER_SIDE[side] || side,
@@ -127,7 +131,7 @@ class TradeBase {
     clientId?: string,
   } = {}, callback?: Function): Promise<Object> {
     const orderId = param.orderId ? param.orderId : param;
-    const msg: Object = {
+    const msg: Message = {
       MsgType: ActionMsgReq.ORDER_CANCEL,
     };
 
@@ -146,11 +150,11 @@ class TradeBase {
    * status: 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled
    */
   requestWithdrawList({
+    filter,
+    clientId,
     page: Page = 0,
     pageSize: PageSize = 20,
     status: StatusList = ['1', '2', '4', '8'],
-    filter,
-    clientId,
   }: {
     page?: number,
     pageSize?: number,
@@ -158,7 +162,7 @@ class TradeBase {
     filter?: Array<string>,
     status?: Array<StatusListType>,
   } = {}, callback?: Function): Promise<Object> {
-    const msg = {
+    const msg: Message = {
       MsgType: ActionMsgReq.WITHDRAW_LIST,
       WithdrawListReqID: generateRequestId(),
       Page,
@@ -186,7 +190,7 @@ class TradeBase {
     currency?: string,
   }, callback?: Function): Promise<Object> {
     const reqId = generateRequestId();
-    const msg = {
+    const msg: Message = {
       MsgType: ActionMsgReq.WITHDRAW_REQUEST,
       WithdrawReqID: reqId,
       ClOrdID: reqId,
@@ -203,8 +207,8 @@ class TradeBase {
     withdrawId: string,
     confirmationToken?: string,
     secondFactor?: string,
-  }, callback: Function): Promise<Object> {
-    const msg: Object = {
+  }, callback?: Function): Promise<Object> {
+    const msg: Message = {
       MsgType: ActionMsgReq.WITHDRAW_CONFIRM,
       WithdrawReqID: generateRequestId(),
       WithdrawID,
@@ -221,9 +225,9 @@ class TradeBase {
     return nodeify.extend(this.send(msg)).nodeify(callback);
   }
 
-  cancelWithdraw(withdrawId: string, callback: Function): Promise<Object> {
+  cancelWithdraw(withdrawId: string, callback?: Function): Promise<Object> {
     const reqId = generateRequestId();
-    const msg = {
+    const msg: Message = {
       MsgType: ActionMsgReq.WITHDRAW_CANCEL,
       WithdrawCancelReqID: reqId,
       ClOrdID: reqId,
@@ -240,12 +244,13 @@ class TradeBase {
     filter,
     clientId,
   }: {
-    page: number,
-    pageSize: number,
-    status: Array<StatusListType>,
+    page?: number,
+    pageSize?: number,
+    status?: Array<StatusListType>,
     filter?: Array<string>,
+    clientId?: string,
   } = {}, callback?: Function): Promise<Object> {
-    const msg = {
+    const msg: Message = {
       MsgType: ActionMsgReq.DEPOSIT_LIST,
       DepositListReqID: generateRequestId(),
       Page,
@@ -272,7 +277,7 @@ class TradeBase {
     depositMethodId?: number,
   } = {}, callback?: Function): Promise<Object> {
     const reqId = generateRequestId();
-    const msg: Object = {
+    const msg: Message = {
       MsgType: ActionMsgReq.DEPOSIT_REQUEST,
       DepositReqID: reqId,
       ClOrdID: reqId,
@@ -289,7 +294,7 @@ class TradeBase {
   }
 
   requestDepositMethods(callback?: Function): Promise<Object> {
-    const msg = {
+    const msg: Message = {
       MsgType: ActionMsgReq.DEPOSIT_METHODS,
       DepositMethodReqID: generateRequestId(),
       BrokerID: this.brokerId,
@@ -305,13 +310,13 @@ class TradeBase {
     clientId,
     currency,
   }: {
-    page: number,
-    pageSize: number,
-    currency: string,
+    page?: number,
+    pageSize?: number,
+    currency?: string,
     brokerId?: number,
     clientId?: string,
   } = {}, callback?: Function) {
-    const msg: Object = {
+    const msg: Message = {
       MsgType: ActionMsgReq.LEDGER_LIST,
       LedgerListReqID: generateRequestId(),
       BrokerID: this.brokerId,

@@ -22,6 +22,8 @@
 
 import { MsgActionReq, MsgActionRes } from './constants/messages';
 
+import type { Message, MsgTypes, ResolveReject } from './types';
+
 const reqs = new Map();
 
 export function generateRequestId(): number {
@@ -40,10 +42,8 @@ export function getRequest(msg: Message): ?ResolveReject {
 
 export function setRequest(msg: Message, promise: ResolveReject): void {
   reqs.set(getKey(MsgActionReq, msg), promise);
-  return reqs;
 }
 
 export function deleteRequest(msg: Message): void {
   reqs.delete(getKey(MsgActionRes, msg));
-  return reqs;
 }

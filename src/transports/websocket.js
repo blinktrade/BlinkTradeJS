@@ -32,6 +32,13 @@ import { MsgActionRes } from '../constants/messages';
 import BROKERS from '../constants/brokers';
 
 import Transport, { IS_NODE, IS_BROWSER } from './transport';
+import type {
+  Stun,
+  Message,
+  ResolveReject,
+  PromiseEmitter,
+  BlinkTradeWSParams,
+} from '../types';
 
 import {
   getRequest,
@@ -55,32 +62,32 @@ class WebSocketTransport extends Transport {
   /*
    * Stun object
    */
-  stuntip: Stun;
+  stun: Stun;
 
-  /*
-   * Transport Promise
-   */
-  request: Request;
+  connection: ResolveReject;
+  lastPromise: ResolveReject;
+
+  lastMessageSent: Message;
 
   /*
    * Event emitter to dispatch websocket updates
    */
   eventEmitter: EventEmitter;
 
-  headers: Object;
+  headers: ?Object;
 
   autoReconnect: boolean;
 
   reconnectInterval: number;
 
-  constructor(params?: BlinkTradeWS = {}) {
+  constructor(params?: BlinkTradeWSParams = {}) {
     super(params, params.brokerId === BROKERS.BITCAMBIO ? 'wsBitcambio' : 'ws');
 
     this.stun = { local: null, public: [] };
 
     this.getFingerPrint(params.fingerPrint);
     this.headers = params.headers;
-    this.autoReconnect = params.reconnect;
+    this.autoReconnect = params.reconnect || false;
     this.reconnectInterval = params.reconnectInterval || RECONNECT_INTERVAL;
 
     this.eventEmitter = new EventEmitter({ wildcard: true, delimiter: ':' });
@@ -107,18 +114,18 @@ class WebSocketTransport extends Transport {
     this.closeStun();
   }
 
-  onOpen(e): void {
+  onOpen(e: Event): void {
     this.eventEmitter.emit('OPEN', e);
     this.connection.resolve({ connected: true });
   }
 
-  onClose(e): void {
+  onClose(e: Event): void {
     this.eventEmitter.emit('CLOSE', e, this.lastMessageSent);
     this.closeStun();
     this.reconnect();
   }
 
-  onError(error: any): void {
+  onError(error: Event): void {
     this.eventEmitter.emit('ERROR', error, this.lastMessageSent);
   }
 
@@ -128,7 +135,7 @@ class WebSocketTransport extends Transport {
     }
   }
 
-  sendMessage(msg: Object): void {
+  sendMessage(msg: Message): void {
     if (this.socket.readyState === 1) {
       const data = msg;
 
@@ -141,7 +148,7 @@ class WebSocketTransport extends Transport {
     }
   }
 
-  sendMessageAsPromise(msg: Object): Promise<Object> {
+  sendMessageAsPromise(msg: Message): Promise<Message> {
     return new Promise((resolve, reject) => {
       this.lastPromise = { resolve, reject };
       setRequest(msg, { resolve, reject });

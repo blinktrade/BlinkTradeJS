@@ -22,6 +22,11 @@
 
 import common from '../constants/common';
 
+import type {
+  BlinkTradeEnv,
+  BlinkTradeParams,
+} from '../types';
+
 export const IS_NODE = typeof window === 'undefined';
 export const IS_BROWSER = typeof document !== 'undefined';
 
@@ -31,7 +36,7 @@ class Transport {
    */
   endpoint: string;
 
-  constructor(params: BlinkTradeBase = {}, env: BlinkTradeEnv) {
+  constructor(params: BlinkTradeParams = {}, env: BlinkTradeEnv) {
     /* eslint-disable indent */
     this.endpoint =
         params.url  ? params.url

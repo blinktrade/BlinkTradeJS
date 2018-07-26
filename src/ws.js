@@ -25,6 +25,13 @@ import nodeify from 'nodeify';
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { generateRequestId } from './listener';
 
+import type {
+  Message,
+  PromiseEmitter,
+  BlinkTradeWSParams,
+  BlinkTradeWSTransport,
+} from './types';
+
 import { EVENTS } from './constants/utils';
 import {
   BALANCE,
@@ -46,9 +53,9 @@ class BlinkTradeWS extends TradeBase {
    */
   session: Object;
 
-  transport: Object;
+  transport: BlinkTradeWSTransport;
 
-  constructor(params?: BlinkTradeBase = {}) {
+  constructor(params?: BlinkTradeWSParams = {}) {
     super(params);
 
     this.transport = params.transport || new WebSocketTransport(params);
@@ -67,19 +74,19 @@ class BlinkTradeWS extends TradeBase {
     return this.transport.sendMessageAsPromise(msg);
   }
 
-  on(event, callback) {
+  on(event: string, callback: ?Function) {
     if (this.transport.eventEmitter) {
       return this.transport.eventEmitter.on(event, callback);
     }
   }
 
-  emit(event, data) {
+  emit(event: string, data: Object) {
     if (this.transport.eventEmitter) {
       return this.transport.eventEmitter.emit(event, data);
     }
   }
 
-  emitterPromise(promise, callback) {
+  emitterPromise(promise: Promise<Object> & Object, callback?: Function) {
     return this.transport.emitterPromise
       ? this.transport.emitterPromise(promise, callback)
       : promise;
@@ -87,7 +94,7 @@ class BlinkTradeWS extends TradeBase {
 
   heartbeat(callback?: Function): Promise<Object> {
     const d = new Date();
-    const msg: Object = {
+    const msg: Message = {
       MsgType: ActionMsgReq.HEARTBEAT,
       TestReqID: d.getTime(),
       SendTime: d.getTime(),
@@ -106,7 +113,6 @@ class BlinkTradeWS extends TradeBase {
   login({ username, password, secondFactor, cancelOnDisconnect, brokerId, ...extraData }: {
     username: string,
     password: string,
-    token?: string,
     secondFactor?: string,
     brokerId?: number,
     trustedDevice?: boolean,
@@ -129,7 +135,7 @@ class BlinkTradeWS extends TradeBase {
       };
     }
 
-    const msg: Object = {
+    const msg: Message = {
       MsgType: ActionMsgReq.LOGIN,
       UserReqID: generateRequestId(),
       BrokerID: brokerId || this.brokerId,
@@ -158,7 +164,7 @@ class BlinkTradeWS extends TradeBase {
   }
 
   logout(callback?: Function): Promise<Object> {
-    const msg = {
+    const msg: Message = {
       MsgType: ActionMsgReq.LOGIN,
       BrokerID: this.brokerId,
       UserReqID: generateRequestId(),
@@ -174,7 +180,7 @@ class BlinkTradeWS extends TradeBase {
     return nodeify.extend(Promise.resolve(profile)).nodeify(callback);
   }
 
-  balance(clientId, callback?: Function): PromiseEmitter<Object> {
+  balance(clientId?: string, callback?: Function): PromiseEmitter<Object> {
     return this.emitterPromise(new Promise((resolve, reject) => {
       return super.balance(clientId, callback).then((data) => {
         this.on(ActionMsgRes.BALANCE, (balance) => {
@@ -186,12 +192,12 @@ class BlinkTradeWS extends TradeBase {
     }));
   }
 
-  onBalanceUpdate(callback?: Function) {
+  onBalanceUpdate(callback: Function) {
     return this.on(ActionMsgRes.BALANCE, callback);
   }
 
   subscribeTicker(symbols: Array<string>, callback?: Function): PromiseEmitter<Object> {
-    const msg = {
+    const msg: Message = {
       MsgType: ActionMsgReq.SECURITY_STATUS_SUBSCRIBE,
       SecurityStatusReqID: generateRequestId(),
       SubscriptionRequestType: '1',
@@ -223,10 +229,10 @@ class BlinkTradeWS extends TradeBase {
   }
 
   unSubscribeTicker(SecurityStatusReqID: number): number {
-    const msg = {
+    const msg: Message = {
       MsgType: ActionMsgReq.SECURITY_STATUS_SUBSCRIBE,
-      SecurityStatusReqID,
       SubscriptionRequestType: '2',
+      SecurityStatusReqID,
     };
 
     this.transport.sendMessage(msg);
@@ -234,7 +240,7 @@ class BlinkTradeWS extends TradeBase {
   }
 
   subscribeOrderbook(symbols: Array<string>, callback?: Function): PromiseEmitter<Object> {
-    const msg = {
+    const msg: Message = {
       MsgType: ActionMsgReq.MD_FULL_REFRESH,
       MDReqID: generateRequestId(),
       SubscriptionRequestType: '1',
@@ -281,7 +287,7 @@ class BlinkTradeWS extends TradeBase {
   }
 
   unSubscribeOrderbook(MDReqID: number): number {
-    const msg = {
+    const msg: Message = {
       MsgType: ActionMsgReq.MD_FULL_REFRESH,
       MDReqID,
       MarketDepth: 0,
@@ -306,7 +312,7 @@ class BlinkTradeWS extends TradeBase {
     page?: number,
     pageSize?: number,
   } = {}, callback?: Function): Promise<Object> {
-    const msg: Object = {
+    const msg: Message = {
       MsgType: ActionMsgReq.TRADE_HISTORY,
       TradeHistoryReqID: generateRequestId(),
       Page,
@@ -345,7 +351,7 @@ class BlinkTradeWS extends TradeBase {
     }), callback);
   }
 
-  onDepositRefresh(callback?: Function): Promise<Object> {
+  onDepositRefresh(callback?: Function) {
     return this.on(ActionMsgRes.DEPOSIT_REFRESH, callback);
   }
 
@@ -368,7 +374,7 @@ class BlinkTradeWS extends TradeBase {
     }), callback);
   }
 
-  onWithdrawRefresh(callback?: Function): Promise<Object> {
+  onWithdrawRefresh(callback?: Function) {
     return this.on(ActionMsgRes.WITHDRAW_REFRESH, callback);
   }
 }
