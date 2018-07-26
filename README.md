@@ -838,7 +838,7 @@ blinktrade.connect().on('OPEN', () => {
 
 ### Constructor [rest]
 
-`new BlinkTradeRest(Object constructor)`
+`new BlinkTradeRest(params: Object)`
 
 #### Arguments
 
@@ -852,28 +852,28 @@ blinktrade.connect().on('OPEN', () => {
 
 ### ticker [rest]
 
-`ticker(Function? callback)` => Promise / callback
+`ticker(callback?: Function)` => Promise / callback
 
 ### trades [rest]
 
-`trades(Object params, Function? callback)` => Promise / callback
+`trades(params: Object, callback?: Function)` => Promise / callback
 
 #### Arguments
 
 | Name  | Type   | Description                                                                |
 |-------|--------|----------------------------------------------------------------------------|
 | limit | Number | Limit of trades that will be returned. <NUMBER> should be a positive integer. Optional; defaults to 100 trades |
-| since | Number | tid (TradeID) which executed trades must be fetched from. Optional; defaults to the date of the first executed trade |
+| since | Number | tid (TradeID) which must be fetched from. Optional; defaults to the date of the first executed trade |
 
 ### orderbook [rest]
 
-`orderbook(Function? callback)` => Promise / callback
+`orderbook(callback?: Function)` => Promise / callback
 
 ## WebSocket
 
 ### constructor [websocket]
 
-`new BlinkTradeWS(Object constructor)`
+`new BlinkTradeWS(params?: Object)`
 
 #### Arguments
 
@@ -891,7 +891,7 @@ blinktrade.connect().on('OPEN', () => {
 
 Connect to our WebSocket.
 
-`connect(Function? callback)` => Promise / callback
+`connect(callback?: Function)` => Promise / callback
 
 ### Connection Events
 
@@ -905,11 +905,11 @@ Connect to our WebSocket.
 
 Used as test request to check the latency connection.
 
-`heartbeat(Function? callback)` => Promise / callback
+`heartbeat(callback?: Function)` => Promise / callback
 
 ### login [websocket]
 
-`login(Object login, Function? callback)` => Promise / callback
+`login(params: Object, callback?: Function)` => Promise / callback
 
 #### Arguments
 
@@ -923,13 +923,13 @@ Used as test request to check the latency connection.
 
 ### logout [websocket]
 
-`logout(Function? callback)` => Promise / callback
+`logout(callback?: Function)` => Promise / callback
 
 ### profile [websocket]
 
 Available only on `WebSocket`.
 
-`profile(Function? callback)` => Promise / callback
+`profile(callback?: Function)` => Promise / callback
 
 
 ### subscribeTicker [websocket]
@@ -964,7 +964,7 @@ Symbols Available:
 
 ### executionReport [websocket]
 
-`executionReport(Function? callback)` => Promise / callback
+`executionReport(callback?: Function)` => Promise / callback
 
 #### Events
 
@@ -981,14 +981,14 @@ An event emitter to get execution reports.
 
 ### tradeHistory [websocket]
 
-`tradeHistory(Object params, Function? callback)` => Promise / callback
+`tradeHistory(params: Object, callback?: Function)` => Promise / callback
 
 #### Arguments
 
 | Name     | Type   | Description                                 |
 |----------|--------|---------------------------------------------|
 | page     | Number | Current page to fetch, defaults to 0        |
-| pageSize | Number | Number of trades, limits to 80              |
+| pageSize | Number | Number of trades, limits to 100             |
 | since    | Number | TradeID or Date which executed trades must be fetched from. is in Unix Time date format. Optional; defaults to the date of the first executed trade. |
 | symbols  | Array  | List of symbols, e.g.: ["BTCVND", "BTCCLP"] |
 
@@ -998,15 +998,15 @@ These methods bellow are both availabe under REST and WebSocket API.
 
 ### balance [websocket, rest]
 
-`balance(Function? callback)` => Promise / callback
+`balance(clientId?: string, callback?: Function)` => Promise / callback
 
 #### Events
 
-`balance().on("BALANCE", Function callback)` => Promise
+`balance().on("BALANCE", (balance) => {})` => Promise
 
 ### sendOrder [websocket, rest]
 
-`sendOrder(Object order, Function? callback)` => Promise / callback
+`sendOrder(params: Object, callback?: Function)` => Promise / callback
 
 #### Arguments
 
@@ -1023,7 +1023,7 @@ These methods bellow are both availabe under REST and WebSocket API.
 
 ### cancelOrder [websocket, rest]
 
-`cancelOrder(Object order | Number orderId, Function? callback)` => Promise / callback
+`cancelOrder(params: { orderId?: number, clientId?: string } | number, callback?: Function)` => Promise / callback
 
 #### Arguments
 
@@ -1035,7 +1035,7 @@ These methods bellow are both availabe under REST and WebSocket API.
 
 ### myOrders [websocket, rest]
 
-`myOrders(Object params, Function? callback)` => Promise / callback
+`myOrders(params: Object, callback?: Function)` => Promise / callback
 
 #### Arguments
 
@@ -1047,7 +1047,7 @@ These methods bellow are both availabe under REST and WebSocket API.
 
 ### requestLedger [websocket, rest]
 
-`requestLedger(Object params, Function? callback)` => Promise / callback
+`requestLedger(params: Object, callback?: Function)` => Promise / callback
 
 #### Arguments
 
@@ -1061,17 +1061,17 @@ These methods bellow are both availabe under REST and WebSocket API.
 
 ### requestWithdrawList [websocket, rest]
 
-`requestWithdrawList(Object pagination, Array<string> statusList, Function? callback)` => Promise / callback
+`requestWithdrawList(params: Object, callback?: Function)` => Promise / callback
 
-| Name       | Type   | Description                                        |
-|------------|--------|----------------------------------------------------|
-| page       | Number | Current page to fetch, defaults to 0               |
-| pageSize   | Number | Number of withdraws, limits to 20                  |
-| statusList | Array  | 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled |
+| Name     | Type   | Description                                        |
+|----------|--------|----------------------------------------------------|
+| page     | Number | Current page to fetch, defaults to 0               |
+| pageSize | Number | Number of withdraws, limits to 20                  |
+| status   | Array  | 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled |
 
 ### requestWithdraw [websocket, rest]
 
-`requestWithdraw(Object params, Function? callback)` => Promise / callback
+`requestWithdraw(params: Object, callback?: Function)` => Promise / callback
 
 | Name     | Type   | Description                                                            |
 |----------|--------|------------------------------------------------------------------------|
@@ -1088,7 +1088,7 @@ These methods bellow are both availabe under REST and WebSocket API.
 
 ### confirmWithdraw [websocket, rest]
 
-`confirmWithdraw(Object params, Function? callback)` => Promise / callback
+`confirmWithdraw(params: Object, callback?: Function)` => Promise / callback
 
 | Name              | Type   | Description                                                       |
 |-------------------|--------|-------------------------------------------------------------------|
@@ -1098,25 +1098,25 @@ These methods bellow are both availabe under REST and WebSocket API.
 
 ### cancelWithdraw [websocket, rest]
 
-`cancelWithdraw(Number withdrawId, Function? callback)` => Promise / callback
+`cancelWithdraw(withdrawId: number, callback?: Function)` => Promise / callback
 
 ### onWithdrawRefresh [websocket]
 
-`onWithdrawRefresh(Function callback)` => Promise
+`onWithdrawRefresh(callback: Function)` => Promise
 
 ### requestDepositList [websocket, rest]
 
-`requestDepositList(Object params, Function? callback)` => Promise / callback
+`requestDepositList(params: Object, callback?: Function)` => Promise / callback
 
-| Name       | Type   | Description                                        |
-|------------|--------|----------------------------------------------------|
-| page       | Number | Current page to fetch, defaults to 0               |
-| pageSize   | Number | Number of deposits, limits to 20                   |
-| statusList | Array  | 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled |
+| Name     | Type   | Description                                        |
+|----------|--------|----------------------------------------------------|
+| page     | Number | Current page to fetch, defaults to 0               |
+| pageSize | Number | Number of deposits, limits to 20                   |
+| status   | Array  | 1-Pending, 2-In Progress, 4-Completed, 8-Cancelled |
 
 ### requestDeposit [websocket, rest]
 
-`requestDeposit(Object params, Function? callback)` => Promise / callback
+`requestDeposit(params: Object, callback?: Function)` => Promise / callback
 
 | Name            | Type   | Description                                             |
 |-----------------|--------|---------------------------------------------------------|
@@ -1132,11 +1132,11 @@ These methods bellow are both availabe under REST and WebSocket API.
 
 ### requestDepositMethods [websocket, rest]
 
-`requestDepositMethods(Function? callback)` => Promise / callback
+`requestDepositMethods(callback?: Function)` => Promise / callback
 
 ### onDepositRefresh [websocket]
 
-`onDepositRefresh(Function callback)` => Promise
+`onDepositRefresh(callback: Function)` => Promise
 
 # LICENSE
 
