@@ -1,4 +1,5 @@
 import {
+  reqs,
   setRequest,
   deleteRequest,
   generateRequestId,
@@ -14,20 +15,20 @@ const promise = {
 describe('Request Listeners', () => {
   test('Register Request TestReqID', () => {
     TestReqID = generateRequestId();
-    const reqs = setRequest({ MsgType: '1', TestReqID }, promise);
+    setRequest({ MsgType: '1', TestReqID }, promise);
     expect(reqs.size).toBe(1);
     expect(reqs.get('TestReqID:' + TestReqID)).toEqual(promise);
   });
 
   test('Register a second TestReqID', () => {
     TestReqID = generateRequestId();
-    const reqs = setRequest({ MsgType: '1', TestReqID }, promise);
+    setRequest({ MsgType: '1', TestReqID }, promise);
     expect(reqs.size).toBe(2);
     expect(reqs.get('TestReqID:' + TestReqID)).toEqual(promise);
   });
 
   test('Delete Request from a response message', () => {
-    const reqs = deleteRequest({ MsgType: '0', TestReqID });
+    deleteRequest({ MsgType: '0', TestReqID });
     expect(reqs.size).toBe(1);
   });
 });
