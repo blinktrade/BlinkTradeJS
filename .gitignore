@@ -52,3 +52,4 @@ es
 .node_repl_history
 
 flow-typed/
+*.flow
