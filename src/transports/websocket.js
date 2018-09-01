@@ -22,11 +22,10 @@
 
 import WS from 'ws';
 import nodeify from 'nodeify';
-import Fingerprint2 from 'fingerprintjs2';
 import EventEmitter from 'eventemitter2';
 import { getMac } from '../util/macaddress';
+import { getFingerPrint } from '../util/fingerPrint';
 import { getStun, closeStun } from '../util/stun';
-import { encodeByteArray } from '../util/hash32';
 import { MsgActionRes } from '../constants/messages';
 
 import BROKERS from '../constants/brokers';
@@ -197,9 +196,7 @@ class WebSocketTransport extends Transport {
         this.fingerPrint = macAddress;
       });
     } else if (IS_BROWSER) {
-      return new Fingerprint2().get(fingerPrint => {
-        this.fingerPrint = Math.abs(encodeByteArray(fingerPrint)).toString();
-      });
+      this.fingerPrint = getFingerPrint();
     } else if (customFingerprint) {
       this.fingerPrint = customFingerprint;
     } else {

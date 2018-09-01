@@ -39,7 +39,6 @@
   "dependencies": {
     "eventemitter2": "^5.0.1",
     "fetch-ponyfill": "^6.0.2",
-    "fingerprintjs2": "1.6.1",
     "ip": "^1.1.3",
     "js-sha256": "^0.9.0",
     "macaddress-secure": "^0.2.11",
