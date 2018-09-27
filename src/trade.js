@@ -75,7 +75,7 @@ class TradeBase {
   }: {
     page?: number,
     pageSize?: number,
-    filter: Array<string>,
+    filter?: Array<string>,
   } = {}, callback?: Function): Promise<Object> {
     const msg: Message = {
       MsgType: ActionMsgReq.ORDER_HISTORY,

@@ -24,7 +24,7 @@ import { MsgActionReq, MsgActionRes } from './constants/messages';
 
 import type { Message, MsgTypes, ResolveReject } from './types';
 
-export const reqs = new Map();
+export const reqs: Map<string, ResolveReject> = new Map();
 
 export function generateRequestId(): number {
   return parseInt(String(1e7 * Math.random()), 10);
