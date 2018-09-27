@@ -61,6 +61,21 @@ export type Stun = {
   public: ?Array<string>,
 };
 
+export type OrderBookSync = {
+  [symbol: string]: {
+    bids: Array<Object>,
+    asks: Array<Object>,
+  }
+};
+
+export type MarketDataParams = Array<string> | {
+  instruments: Array<string>,
+  columns?: Array<string>,
+  entryTypes?: Array<0 | 1 | 2>,
+  marketDepth?: number,
+  level?: BlinkTradeLevel,
+};
+
 export type StatusListType = '1' | '2' | '4' | '8';
 
 export type OrderSide = 'BUY' | 'SELL' | '1' | '2';

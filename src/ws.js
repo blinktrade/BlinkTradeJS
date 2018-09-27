@@ -30,6 +30,8 @@ import type {
   PromiseEmitter,
   BlinkTradeWSParams,
   BlinkTradeWSTransport,
+  MarketDataParams,
+  OrderBookSync,
 } from './types';
 
 import { EVENTS } from './constants/utils';
@@ -41,7 +43,10 @@ import {
 } from './constants/actionTypes';
 
 import { ActionMsgReq, ActionMsgRes } from './constants/messages';
-import { formatOrderBook, formatIncremental, formatTradeHistory } from './util/utils';
+import {
+  formatOrderBook,
+  formatTradeHistory,
+} from './util/utils';
 
 import TradeBase from './trade';
 import WebSocketTransport from './transports/websocket';
@@ -53,6 +58,10 @@ class BlinkTradeWS extends TradeBase {
    */
   session: Object;
 
+  orderbook: OrderBookSync;
+  syncReqId: number;
+  isOrderBookSynced: boolean;
+
   transport: BlinkTradeWSTransport;
 
   constructor(params?: BlinkTradeWSParams = {}) {
@@ -60,6 +69,9 @@ class BlinkTradeWS extends TradeBase {
 
     this.transport = params.transport || new WebSocketTransport(params);
     this.session = {};
+    this.orderbook = {};
+    this.isOrderBookSynced = false;
+    this.syncReqId = 0;
   }
 
   connect(callback?: Function) {
@@ -239,32 +251,47 @@ class BlinkTradeWS extends TradeBase {
     return SecurityStatusReqID;
   }
 
-  subscribeOrderbook(symbols: Array<string>, callback?: Function): PromiseEmitter<Object> {
+  subscribeOrderbook(options: MarketDataParams, callback?: Function): PromiseEmitter<Object> {
     const msg: Message = {
       MsgType: ActionMsgReq.MD_FULL_REFRESH,
       MDReqID: generateRequestId(),
       SubscriptionRequestType: '1',
       MarketDepth: 0,
       MDUpdateType: '1', // Incremental refresh
-      MDEntryTypes: ['0', '1', '2'],
-      Instruments: symbols,
+      MDEntryTypes: ['0', '1'],
+      BrokerID: this.brokerId,
     };
+
+    if (Array.isArray(options)) {
+      msg.Instruments = options;
+    } else {
+      msg.Instruments = options.instruments;
+      msg.MDEntryTypes = options.entryTypes || msg.MDEntryTypes;
+      msg.MarketDepth = options.marketDepth || msg.MarketDepth;
+    }
+
+    if (options.columns) {
+      msg.Columns = options.columns;
+    }
+
+    const level = (!Array.isArray(options) && typeof options.level !== 'undefined')
+      ? options.level
+      : this.level;
 
     const subscribeEvent = (data) => {
       if (data.MDBkTyp === '3') {
         data.MDIncGrp.map(order => {
-          const dataOrder = formatIncremental(order, this.level);
           switch (order.MDEntryType) {
             case '0':
             case '1':
               const orderbookEvent = `OB:${EVENTS.ORDERBOOK[order.MDUpdateAction]}`;
-              const bidOfferData = { ...dataOrder, type: orderbookEvent };
+              const bidOfferData = { ...order, MDReqID: data.MDReqID, type: orderbookEvent };
 
               callback && callback(null, bidOfferData);
               return this.emit(orderbookEvent, bidOfferData);
             case '2':
               const tradeEvent = `OB:${EVENTS.TRADES[order.MDUpdateAction]}`;
-              const tradeData = { ...dataOrder, type: tradeEvent };
+              const tradeData = { ...order, type: tradeEvent };
 
               callback && callback(null, tradeData);
               return this.emit(tradeEvent, tradeData);
@@ -281,9 +308,44 @@ class BlinkTradeWS extends TradeBase {
     return this.emitterPromise(new Promise((resolve, reject) => {
       return this.send(msg).then(data => {
         this.on(ActionMsgRes.MD_INCREMENT + ':' + data.MDReqID, subscribeEvent);
-        return resolve(formatOrderBook(data, this.level));
+        return resolve(formatOrderBook(data, level));
       }).catch(err => reject(err));
     }), callback);
+  }
+
+  syncOrderBook(options: MarketDataParams): Promise<Object> {
+    if (!this.isOrderBookSynced) {
+      this.isOrderBookSynced = true;
+      const sides = { '0': 'bids', '1': 'asks' };
+      const instruments = Array.isArray(options) ? options : options.instruments;
+      return this.subscribeOrderbook({ instruments, level: 2 })
+        .on('OB:NEW_ORDER', (order) => {
+          if (order.MDReqID === this.syncReqId) {
+            const index = order.MDEntryPositionNo - 1;
+            this.orderbook[order.Symbol][sides[order.MDEntryType]].splice(index, 0, order);
+          }
+        }).on('OB:UPDATE_ORDER', (order) => {
+          if (order.MDReqID === this.syncReqId) {
+            const index = order.MDEntryPositionNo - 1;
+            this.orderbook[order.Symbol][sides[order.MDEntryType]].splice(index, 1, order);
+          }
+        }).on('OB:DELETE_ORDER', (order) => {
+          if (order.MDReqID === this.syncReqId) {
+            const index = order.MDEntryPositionNo - 1;
+            this.orderbook[order.Symbol][sides[order.MDEntryType]].splice(index, 1);
+          }
+        }).on('OB:DELETE_ORDERS_THRU', (order) => {
+          if (order.MDReqID === this.syncReqId) {
+            const index = order.MDEntryPositionNo;
+            this.orderbook[order.Symbol][sides[order.MDEntryType]].splice(0, index);
+          }
+        }).then((data) => {
+          this.syncReqId = data.MDReqID;
+          this.orderbook = data.MDFullGrp;
+          return this.orderbook;
+        });
+    }
+    return Promise.resolve(this.orderbook);
   }
 
   unSubscribeOrderbook(MDReqID: number): number {
