@@ -3,6 +3,7 @@
 ./lib/*
 .*/examples/node_modules/*
 .*/node_modules/editions/source/index.js
+.*/src/.*\.flow
 
 [include]
 

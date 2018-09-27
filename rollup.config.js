@@ -2,10 +2,10 @@ import path from 'path';
 import json from 'rollup-plugin-json';
 import flow from 'rollup-plugin-flow';
 import babel from 'rollup-plugin-babel';
-import uglify from 'rollup-plugin-uglify';
 import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
 import shim from 'rollup-plugin-shim';
+import { uglify } from 'rollup-plugin-uglify';
 
 const env = process.env.NODE_ENV;
 const format = (env === 'development' || env === 'production') ? 'umd' : env;
@@ -32,29 +32,29 @@ const config = {
     }),
     babel({
       babelrc: false,
-      presets: [['env', { modules: false }]],
+      presets: [['@babel/preset-env', { modules: false }]],
       plugins: [
-        'transform-object-rest-spread',
-        'external-helpers',
+        '@babel/plugin-proposal-object-rest-spread',
+        '@babel/plugin-external-helpers',
       ],
-    }),
-    uglify({
-      mangle: env === 'production',
-      output: {
-        beautify: env !== 'production',
-      },
-      compress: {
-        pure_getters: true,
-        unsafe: true,
-        unsafe_comps: true,
-        warnings: false,
-      },
     }),
   ],
 };
 
 if (format === 'umd') {
   // Remove modules that can't be bundled on the browser
+  config.plugins.push(uglify({
+    mangle: env === 'production',
+    output: {
+      beautify: env !== 'production',
+    },
+    compress: {
+      pure_getters: true,
+      unsafe: true,
+      unsafe_comps: true,
+      warnings: false,
+    },
+  }))
   config.plugins.unshift(shim({
     ws: 'export default {}',
     ip: 'export default {}',
