@@ -48,12 +48,7 @@ export const formatOrderBook = (data: Object, level: BlinkTradeLevel) => {
       .filter(order => order.MDEntryType === '0' || order.MDEntryType === '1')
       .reduce((prev, order) => {
         const side = order.MDEntryType === '0' ? 'bids' : 'asks';
-        (prev[side] || (prev[side] = [])).push([
-          order.MDEntryPx / 1e8,
-          order.MDEntrySize / 1e8,
-          order.UserID,
-          order.OrderID,
-        ]);
+        (prev[side] || (prev[side] = [])).push(order);
         return prev;
       }, []);
 
@@ -61,27 +56,10 @@ export const formatOrderBook = (data: Object, level: BlinkTradeLevel) => {
       ...data,
       MDFullGrp: {
         [data.Symbol]: {
-          bids,
-          asks,
+          bids: bids || [],
+          asks: asks || [],
         },
       },
-    };
-  }
-
-  return data;
-};
-
-export const formatIncremental = (data: Object, level: BlinkTradeLevel) => {
-  if (level === 2) {
-    return {
-      index: data.MDEntryPositionNo,
-      price: data.MDEntryPx / 1e8,
-      size: data.MDEntrySize / 1e8,
-      side: data.MDEntryType === '0' ? 'buy' : 'sell',
-      userId: data.UserID,
-      orderId: data.OrderID,
-      symbol: data.Symbol,
-      time: new Date(`${data.MDEntryDate} ${data.MDEntryTime}`).toString(),
     };
   }
 
