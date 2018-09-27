@@ -23,31 +23,33 @@
 import { BlinkTradeWS } from '../src';
 import { ActionMsgRes } from '../src/constants/messages';
 
+import mocks from '../src/transports/__mocks__/messages';
+
 jest.mock('../src/transports/websocket');
 
 let blinktrade;
 
-const incremental = {
-  MDReqID: 354590,
+const incremental = ({ action = '0', type = '0', position = 2, MDReqID } = {}) => ({
+  MDReqID,
   MDBkTyp: '3',
   MsgType: 'X',
   MDIncGrp: [
     {
       OrderID: 1459030505702,
       MDEntryPx: 1637400000000,
-      MDUpdateAction: '0',
+      MDUpdateAction: action,
       MDEntryTime: '22:34:12',
       Symbol: 'BTCBRL',
       UserID: 90800078,
-      Broker: 'foxbit',
-      MDEntryType: '0',
-      MDEntryPositionNo: 2,
+      Broker: 'bitcambio',
+      MDEntryType: type,
+      MDEntryPositionNo: position,
       MDEntrySize: 100000000,
       MDEntryID: 1459030505702,
       MDEntryDate: '2018-07-17',
     },
   ],
-};
+});
 
 const incrementalTrade = {
   MDReqID: 354590,
@@ -215,7 +217,8 @@ describe('WebSocket', () => {
   test('Should get full orderbook with level 0', (done) => {
     blinktrade = new BlinkTradeWS({ level: 0 });
     blinktrade.connect().then(() => blinktrade.subscribeOrderbook(['BTCBRL'])).then((res) => {
-      expect(res.MDFullGrp).toHaveLength(4);
+      const { req } = blinktrade.transport;
+      expect(res).toEqual(mocks.V(req));
       done();
     }).catch(err => done(err));
   });
@@ -224,6 +227,7 @@ describe('WebSocket', () => {
     blinktrade = new BlinkTradeWS({ level: 2 });
     blinktrade.connect().then(() => blinktrade.subscribeOrderbook(['BTCBRL'])).then((res) => {
       const { req } = blinktrade.transport;
+      const book = mocks.V(req).MDFullGrp;
       expect(res).toEqual({
         MsgType: 'W',
         MDReqID: req.MDReqID,
@@ -231,8 +235,8 @@ describe('WebSocket', () => {
         Symbol: 'BTCBRL',
         MDFullGrp: {
           BTCBRL: {
-            bids: [[16424, 0.749, 90804823, 1459030499584], [16374, 2, 90804823, 1459030499586]],
-            asks: [[28326.42, 0.00068008, 90800025, 1459030505672], [113700, 0.00206, 90800027, 1459030449304]],
+            bids: [book[0], book[1]],
+            asks: [book[2], book[3]],
           },
         },
       });
@@ -245,16 +249,16 @@ describe('WebSocket', () => {
     blinktrade.connect().then(() => {
       return blinktrade.subscribeOrderbook(['BTCBRL'])
         .on('OB:NEW_ORDER', (res) => {
-          expect(res.index).toBe(2);
-          expect(res.size).toBe(1);
-          expect(res.price).toBe(16374);
-          expect(res.side).toBe('buy');
+          expect(res.MDEntryPositionNo).toBe(2);
+          expect(res.MDEntrySize).toBe(1 * 1e8);
+          expect(res.MDEntryPx).toBe(16374 * 1e8);
+          expect(res.MDEntryType).toBe('0');
           expect(res.type).toBe('OB:NEW_ORDER');
           done();
         });
     }).then(() => {
       const { req } = blinktrade.transport;
-      blinktrade.transport.eventEmitter.emit(`${ActionMsgRes.MD_INCREMENT}:${req.MDReqID}`, incremental);
+      blinktrade.transport.eventEmitter.emit(`${ActionMsgRes.MD_INCREMENT}:${req.MDReqID}`, incremental());
     });
   });
 
@@ -272,11 +276,11 @@ describe('WebSocket', () => {
         });
     }).then(() => {
       const { req } = blinktrade.transport;
-      blinktrade.transport.eventEmitter.emit(`${ActionMsgRes.MD_INCREMENT}:${req.MDReqID}`, incremental);
+      blinktrade.transport.eventEmitter.emit(`${ActionMsgRes.MD_INCREMENT}:${req.MDReqID}`, incremental());
     });
   });
 
-  it('Should get incremental orderbook updates and emit OB:TRADE_NEW', (done) => {
+  test('Should get incremental orderbook updates and emit OB:TRADE_NEW', (done) => {
     blinktrade = new BlinkTradeWS({ level: 0 });
     blinktrade.connect().then(() => {
       return blinktrade.subscribeOrderbook(['BTCBRL'])
@@ -369,6 +373,59 @@ describe('WebSocket', () => {
     }).then((res) => {
       const { req } = blinktrade.transport;
       blinktrade.transport.eventEmitter.emit(`${ActionMsgRes.WITHDRAW_REFRESH}:${req.ClOrdID}`, res);
+    });
+  });
+
+  test('Should test syncOrderBook', (done) => {
+    blinktrade = new BlinkTradeWS();
+    blinktrade.connect().then(() => {
+      blinktrade.syncOrderBook(['BTCUSD']).then(() => {
+        const { req } = blinktrade.transport;
+        const { MDReqID } = req;
+        const getOrder = (order) => ({ ...order.MDIncGrp[0], MDReqID, type: 'OB:NEW_ORDER' });
+        const book = mocks.V(req).MDFullGrp;
+        const event = `${ActionMsgRes.MD_INCREMENT}:${req.MDReqID}`;
+        const inc1 = incremental({ MDReqID, type: '0', position: 1 });
+        const inc2 = incremental({ MDReqID, type: '0', position: 2 });
+        const inc3 = incremental({ MDReqID, type: '1', position: 1 });
+        const inc4 = incremental({ MDReqID, type: '1', position: 2 });
+        const inc5 = incremental({ MDReqID, type: '1', action: '2', position: 1 });
+        const inc6 = incremental({ MDReqID, type: '0', action: '2', position: 1 });
+        const inc7 = incremental({ MDReqID, type: '0', action: '3', position: 2 });
+        const inc8 = incremental({ MDReqID: 0, type: '0', action: '0', position: 1 });
+        const order1 = getOrder(inc1);
+        const order2 = getOrder(inc2);
+        const order3 = getOrder(inc3);
+        const order4 = getOrder(inc4);
+        expect(blinktrade.orderbook).toEqual({
+          BTCBRL: {
+            bids: [book[0], book[1]],
+            asks: [book[2], book[3]],
+          },
+        });
+        // Reset OrderBook
+        blinktrade.orderbook = { BTCBRL: { bids: [], asks: [] }};
+        blinktrade.transport.eventEmitter.emit(event, inc1);
+        expect(blinktrade.orderbook).toEqual({ BTCBRL: { bids: [order1], asks: [] }});
+        blinktrade.transport.eventEmitter.emit(event, inc2);
+        expect(blinktrade.orderbook).toEqual({ BTCBRL: { bids: [order1, order2], asks: [] }});
+        blinktrade.transport.eventEmitter.emit(event, inc1);
+        expect(blinktrade.orderbook).toEqual({ BTCBRL: { bids: [order1, order1, order2], asks: [] }});
+        blinktrade.transport.eventEmitter.emit(event, inc4);
+        expect(blinktrade.orderbook).toEqual({ BTCBRL: { bids: [order1, order1, order2], asks: [order4] }});
+        blinktrade.transport.eventEmitter.emit(event, inc3);
+        expect(blinktrade.orderbook).toEqual({ BTCBRL: { bids: [order1, order1, order2], asks: [order3, order4] }});
+        blinktrade.transport.eventEmitter.emit(event, inc5);
+        expect(blinktrade.orderbook).toEqual({ BTCBRL: { bids: [order1, order1, order2], asks: [order4] }});
+        blinktrade.transport.eventEmitter.emit(event, inc6);
+        expect(blinktrade.orderbook).toEqual({ BTCBRL: { bids: [order1, order2], asks: [order4] }});
+        blinktrade.transport.eventEmitter.emit(event, inc7);
+        expect(blinktrade.orderbook).toEqual({ BTCBRL: { bids: [], asks: [order4] }});
+        // Ignore incrementals from different MDReqID
+        blinktrade.transport.eventEmitter.emit(event, inc8);
+        expect(blinktrade.orderbook).toEqual({ BTCBRL: { bids: [], asks: [order4] }});
+        done();
+      });
     });
   });
 });
