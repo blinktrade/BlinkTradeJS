@@ -95,7 +95,7 @@ class TradeBase {
 
   sendOrder({ type, side, amount, price, stopPrice, symbol, postOnly, clientId }: {
     side: OrderSide,
-    type: OrderType,
+    type?: OrderType,
     price?: number,
     stopPrice?: number,
     amount: number,
@@ -158,7 +158,7 @@ class TradeBase {
   }: {
     page?: number,
     pageSize?: number,
-    clientId: string,
+    clientId?: string,
     filter?: Array<string>,
     status?: Array<StatusListType>,
   } = {}, callback?: Function): Promise<Object> {
