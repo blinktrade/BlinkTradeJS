@@ -279,8 +279,28 @@ blinktrade.subscribeOrderbook(["BTCBRL"]).then((orderbook) => {
   "MarketDepth": 0,
   "MDFullGrp": {
     "BTCUSD": {
-      "bids": [[ 578, 1.59231429, 90800535 ], [ 577.79, 5.68, 90800535 ]],
-      "asks": [[ 578.72, 8.32039144, 90800535 ], [ 579.67, 2, 90800535 ]]
+      "bids": [{
+        "MDEntryPositionNo": 1,
+        "MDEntrySize": 50000000,
+        "MDEntryPx": 1150600000000,
+        "MDEntryID": 1459030492064,
+        "MDEntryTime": "05:50:13",
+        "MDEntryDate": "2018-02-03",
+        "UserID": 90800000,
+        "OrderID": 1459000000000,
+        "MDEntryType": "0",
+      }],
+      "asks": [{
+        "MDEntryPositionNo": 1,
+        "MDEntrySize": 50000000,
+        "MDEntryPx": 1150700000000,
+        "MDEntryID": 1459030492064,
+        "MDEntryTime": "05:50:13",
+        "MDEntryDate": "2018-02-03",
+        "UserID": 90800000,
+        "OrderID": 1459000000000,
+        "MDEntryType": "1",
+      }]
     }
   }
 }
@@ -299,6 +319,49 @@ blinktrade.subscribeOrderbook(["BTCBRL"]).then((orderbook) => {
 
 > Note that there's no return when unsubscribe from orderbook.
 
+### Syncronize orderbook
+
+The `syncOrderbook` function automatically handles the event system to keep the order book syncronized
+for you, you can access the order book at anywhere in your application with `blinktrade.orderbook`
+
+```js
+blinktrade.syncOrderbook(["BTCBRL"]).then(() => {
+  console.log(blinktrade.orderbook);
+})
+```
+
+The `blinktrade.orderbook` is a object like this
+
+```json
+
+{
+  "BTCUSD": {
+    "bids": [{
+      "MDEntryPositionNo": 1,
+      "MDEntrySize": 50000000,
+      "MDEntryPx": 1150600000000,
+      "MDEntryID": 1459030492064,
+      "MDEntryTime": "05:50:13",
+      "MDEntryDate": "2018-02-03",
+      "UserID": 90800000,
+      "OrderID": 1459000000000,
+      "MDEntryType": "0",
+    }],
+    "asks": [{
+      "MDEntryPositionNo": 1,
+      "MDEntrySize": 50000000,
+      "MDEntryPx": 1150700000000,
+      "MDEntryID": 1459030492064,
+      "MDEntryTime": "05:50:13",
+      "MDEntryDate": "2018-02-03",
+      "UserID": 90800000,
+      "OrderID": 1459000000000,
+      "MDEntryType": "1",
+    }]
+  }
+}
+
+```
 
 ### Subscribe to ticker
 
@@ -951,7 +1014,16 @@ Symbols Available:
 
 ### subscribeOrderbook [websocket]
 
-`subscribeOrderbook(Array<string> symbol, Function? callback)` => Promise / callback
+`subscribeOrderbook(options: Object | Array<string>, callback?: Function)` => Promise / callback
+
+#### Arguments
+
+| Name        | Type             | Description                                          |
+|-------------|------------------|------------------------------------------------------|
+| instruments | Array<string>    | Array of instruments to subscribe e.g.: ['BTCBRL', 'BTCVND']
+| columns     | Array<string>    | Optional; Array of columns that you want to received, note that you will also receive the same columns on incremental updates e.g.: ['MDEntryType', 'MDEntryPx', 'MDEntrySize']
+| entryTypes  | Array<0 | 1 | 2> | Optional; Array on which entry type you want to subscribe to. 0 = Bids, 1 = Asks, 2 = Trades
+| marketDepth | number           | Optional; Number of orders to be returned from orderbook e.g.: 0 = Full Book, 1 = Top of book, N > 1 = Number of orders to be returned
 
 #### Events
 
@@ -961,6 +1033,12 @@ Symbols Available:
 | OB:UPDATE_ORDER       | Callback when an order has been updated                                      |
 | OB:DELETE_ORDER       | Callback when an order has been deleted                                      |
 | OB:DELETE_ORDERS_THRU | Callback when one or more orders has been executed and deleted from the book |
+
+### syncOrderbook [websocket]
+
+`syncOrderbook(options: Object | Array<string>)` => Promise
+
+See `subscribeOrderbook` options
 
 ### executionReport [websocket]
 
