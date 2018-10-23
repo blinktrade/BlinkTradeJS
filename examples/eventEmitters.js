@@ -61,7 +61,7 @@ blinktrade.connect().then(function() {
     .on('EXECUTION_REPORT:REJECTED', onExecutionReportRejected);
 
 
-  return blinktrade.subscribeOrderbook(['BTCBRL'])
+  return blinktrade.subscribeMarketData(['BTCBRL'])
     .on('OB:NEW_ORDER', onOrderBookNewOrder)
     .on('OB:UPDATE_ORDER', onOrderBookUpdateOrder)
     .on('OB:DELETE_ORDER', onOrderBookDeleteOrder)

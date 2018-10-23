@@ -252,6 +252,11 @@ class BlinkTradeWS extends TradeBase {
   }
 
   subscribeOrderbook(options: MarketDataParams, callback?: Function): PromiseEmitter<Object> {
+    console.warn('Warning: subscribeOrderbook is DEPRECATED, use subscribeMarketData instead');
+    return this.subscribeMarketData(options, callback);
+  }
+
+  subscribeMarketData(options: MarketDataParams, callback?: Function): PromiseEmitter<Object> {
     const msg: Message = {
       MsgType: ActionMsgReq.MD_FULL_REFRESH,
       MDReqID: generateRequestId(),
@@ -313,12 +318,12 @@ class BlinkTradeWS extends TradeBase {
     }), callback);
   }
 
-  syncOrderBook(options: MarketDataParams): Promise<Object> {
+  syncOrderbook(options: MarketDataParams): Promise<Object> {
     if (!this.isOrderBookSynced) {
       this.isOrderBookSynced = true;
       const sides = { '0': 'bids', '1': 'asks' };
       const instruments = Array.isArray(options) ? options : options.instruments;
-      return this.subscribeOrderbook({ instruments, level: 2 })
+      return this.subscribeMarketData({ instruments, level: 2 })
         .on('OB:NEW_ORDER', (order) => {
           if (order.MDReqID === this.syncReqId) {
             const index = order.MDEntryPositionNo - 1;

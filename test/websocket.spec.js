@@ -216,7 +216,7 @@ describe('WebSocket', () => {
 
   test('Should get full orderbook with level 0', (done) => {
     blinktrade = new BlinkTradeWS({ level: 0 });
-    blinktrade.connect().then(() => blinktrade.subscribeOrderbook(['BTCBRL'])).then((res) => {
+    blinktrade.connect().then(() => blinktrade.subscribeMarketData(['BTCBRL'])).then((res) => {
       const { req } = blinktrade.transport;
       expect(res).toEqual(mocks.V(req));
       done();
@@ -225,7 +225,7 @@ describe('WebSocket', () => {
 
   test('Should get full orderbook with level 2', (done) => {
     blinktrade = new BlinkTradeWS({ level: 2 });
-    blinktrade.connect().then(() => blinktrade.subscribeOrderbook(['BTCBRL'])).then((res) => {
+    blinktrade.connect().then(() => blinktrade.subscribeMarketData(['BTCBRL'])).then((res) => {
       const { req } = blinktrade.transport;
       const book = mocks.V(req).MDFullGrp;
       expect(res).toEqual({
@@ -247,7 +247,7 @@ describe('WebSocket', () => {
   test('Should get incremental orderbook updates and emit OB:NEW_ORDER with default level', (done) => {
     blinktrade = new BlinkTradeWS();
     blinktrade.connect().then(() => {
-      return blinktrade.subscribeOrderbook(['BTCBRL'])
+      return blinktrade.subscribeMarketData(['BTCBRL'])
         .on('OB:NEW_ORDER', (res) => {
           expect(res.MDEntryPositionNo).toBe(2);
           expect(res.MDEntrySize).toBe(1 * 1e8);
@@ -265,7 +265,7 @@ describe('WebSocket', () => {
   test('Should get incremental orderbook updates and emit OB:NEW_ORDER with level 0', (done) => {
     blinktrade = new BlinkTradeWS({ level: 0 });
     blinktrade.connect().then(() => {
-      return blinktrade.subscribeOrderbook(['BTCBRL'])
+      return blinktrade.subscribeMarketData(['BTCBRL'])
         .on('OB:NEW_ORDER', (res) => {
           expect(res.MDEntryPositionNo).toBe(2);
           expect(res.MDEntrySize).toBe(100000000);
@@ -283,7 +283,7 @@ describe('WebSocket', () => {
   test('Should get incremental orderbook updates and emit OB:TRADE_NEW', (done) => {
     blinktrade = new BlinkTradeWS({ level: 0 });
     blinktrade.connect().then(() => {
-      return blinktrade.subscribeOrderbook(['BTCBRL'])
+      return blinktrade.subscribeMarketData(['BTCBRL'])
         .on('OB:TRADE_NEW', (data) => {
           expect(data).toEqual({
             ...incrementalTrade.MDIncGrp[0],
@@ -379,7 +379,7 @@ describe('WebSocket', () => {
   test('Should test syncOrderBook', (done) => {
     blinktrade = new BlinkTradeWS();
     blinktrade.connect().then(() => {
-      blinktrade.syncOrderBook(['BTCUSD']).then(() => {
+      blinktrade.syncOrderbook(['BTCUSD']).then(() => {
         const { req } = blinktrade.transport;
         const { MDReqID } = req;
         const getOrder = (order) => ({ ...order.MDIncGrp[0], MDReqID, type: 'OB:NEW_ORDER' });

@@ -262,7 +262,7 @@ blinktrade.balance(null, (err, balance) => {
 
 ```js
 
-blinktrade.subscribeOrderbook(["BTCBRL"]).then((orderbook) => {
+blinktrade.subscribeMarketData(["BTCBRL"]).then((orderbook) => {
   console.log(orderbook)
 })
 
@@ -311,7 +311,7 @@ To unsubscribe from orderbook, you should pass the `MDReqID` on `unSubscribeOrde
 
 ```js
 
-blinktrade.subscribeOrderbook(["BTCBRL"]).then((orderbook) => {
+blinktrade.subscribeMarketData(["BTCBRL"]).then((orderbook) => {
   blinktrade.unSubscribeOrderbook(orderbook.MDReqID);
 });
 
@@ -754,7 +754,7 @@ To get realtime updates on order book, you should listen to the following events
 
 ```js
 
-blinktrade.subscribeOrderbook(["BTCUSD"])
+blinktrade.subscribeMarketData(["BTCUSD"])
   .on("OB:NEW_ORDER", (order) => {})
   .on("OB:UPDATE_ORDER", (order) => {})
   .on("OB:DELETE_ORDER", (order) => {})
@@ -767,7 +767,7 @@ You can still return a promise when listen events.
 
 ```js
 
-blinktrade.subscribeOrderbook(["BTCBRL"])
+blinktrade.subscribeMarketData(["BTCBRL"])
 .on("OB:NEW_ORDER", (order) => {
   console.log("New order received")
 }).then((orderbook) => {
@@ -875,7 +875,7 @@ blinktrade.connect().on('OPEN', () => {
 * [profile](#profile-websocket)
 * [subscribeTicker](#ticker-websocket)
 * [unSubscribeTicker](#ticker-websocket)
-* [subscribeOrderbook](#orderbook-websocket)
+* [subscribeMarketData](#orderbook-websocket)
 * [unSubscribeOrderbook](#orderbook-websocket)
 * [executionReport](#executionreport-websocket)
 * [tradeHistory](#tradehistory-websocket)
@@ -1011,19 +1011,22 @@ Symbols Available:
 | UOL:USDBRT   | Dólar Turismo                |
 | UOL:USDBRL   | Dólar Comercial              |
 
-
 ### subscribeOrderbook [websocket]
 
-`subscribeOrderbook(options: Object | Array<string>, callback?: Function)` => Promise / callback
+** DEPRECATED ** Use subscribeMarketData instead
+
+### subscribeMarketData [websocket]
+
+`subscribeMarketData(options: Object | Array<string>, callback?: Function)` => Promise / callback
 
 #### Arguments
 
-| Name        | Type             | Description                                          |
-|-------------|------------------|------------------------------------------------------|
-| instruments | Array<string>    | Array of instruments to subscribe e.g.: ['BTCBRL', 'BTCVND']
-| columns     | Array<string>    | Optional; Array of columns that you want to received, note that you will also receive the same columns on incremental updates e.g.: ['MDEntryType', 'MDEntryPx', 'MDEntrySize']
-| entryTypes  | Array<0 | 1 | 2> | Optional; Array on which entry type you want to subscribe to. 0 = Bids, 1 = Asks, 2 = Trades
-| marketDepth | number           | Optional; Number of orders to be returned from orderbook e.g.: 0 = Full Book, 1 = Top of book, N > 1 = Number of orders to be returned
+| Name        | Type                   | Description                                          |
+|-------------|------------------------|------------------------------------------------------|
+| options     | Object | Array<string> | Object with market data options or the Array of instruments to subscribe e.g.: ['BTCBRL', 'BTCVND']
+| columns     | Array<string>          | Optional; Array of columns that you want to received, note that you will also receive the same columns on incremental updates e.g.: ['MDEntryType', 'MDEntryPx', 'MDEntrySize']
+| entryTypes  | Array<0 | 1 | 2>       | Optional; Array on which entry type you want to subscribe to. 0 = Bids, 1 = Asks, 2 = Trades
+| marketDepth | number                 | Optional; Number of orders to be returned from orderbook e.g.: 0 = Full Book, 1 = Top of book, N > 1 = Number of orders to be returned
 
 #### Events
 
@@ -1038,7 +1041,7 @@ Symbols Available:
 
 `syncOrderbook(options: Object | Array<string>)` => Promise
 
-See `subscribeOrderbook` options
+See `subscribeMarketData` options
 
 ### executionReport [websocket]
 
