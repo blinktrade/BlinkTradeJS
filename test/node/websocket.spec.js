@@ -20,12 +20,12 @@
 
 /* eslint-disable new-cap */
 
-import { BlinkTradeWS } from '../src';
-import { ActionMsgRes } from '../src/constants/messages';
+import { BlinkTradeWS } from '../../src';
+import { ActionMsgRes } from '../../src/constants/messages';
 
-import mocks from '../src/transports/__mocks__/messages';
+import mocks from '../../src/transports/__mocks__/messages';
 
-jest.mock('../src/transports/websocket');
+jest.mock('../../src/transports/websocket');
 
 let blinktrade;
 
@@ -81,6 +81,11 @@ const newOrder = {
 };
 
 describe('WebSocket', () => {
+  test('Should test getMac mock as node.js environment', () => {
+    blinktrade = new BlinkTradeWS({ prod: false });
+    // console.log(blinktrade.transport).fib;
+    expect('ha').toBe('ha');
+  })
   test('Should connect on websocket and resolve a promise', (done) => {
     blinktrade = new BlinkTradeWS({ prod: false });
     blinktrade.connect().then(({ connected }) => {
@@ -170,25 +175,25 @@ describe('WebSocket', () => {
 
   test('Should subscribe on ticker', (done) => {
     blinktrade = new BlinkTradeWS();
-    blinktrade.connect().then(() => {
-      return blinktrade.subscribeTicker(['BLINK:BTCBRL']);
-    }).then((res) => {
-      const { req } = blinktrade.transport;
-      expect(res).toEqual({
-        SellVolume: 6.0693,
-        LowPx: 16437,
-        LastPx: 16437,
-        MsgType: 'f',
-        BestAsk: 113700,
-        HighPx: 16540,
-        BuyVolume: 100333.9509,
-        BestBid: 16437,
-        Symbol: 'BTCBRL',
-        SecurityStatusReqID: req.SecurityStatusReqID,
-        Market: 'BLINK',
+    blinktrade.connect()
+      .then(() => blinktrade.subscribeTicker(['BLINK:BTCBRL']))
+      .then((res) => {
+        const { req } = blinktrade.transport;
+        expect(res).toEqual({
+          SellVolume: 6.0693,
+          LowPx: 16437,
+          LastPx: 16437,
+          MsgType: 'f',
+          BestAsk: 113700,
+          HighPx: 16540,
+          BuyVolume: 100333.9509,
+          BestBid: 16437,
+          Symbol: 'BTCBRL',
+          SecurityStatusReqID: req.SecurityStatusReqID,
+          Market: 'BLINK',
+        });
+        done();
       });
-      done();
-    });
   });
 
   test('Should subscribe on ticker with callback', (done) => {

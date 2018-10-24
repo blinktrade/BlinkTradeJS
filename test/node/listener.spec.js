@@ -3,7 +3,7 @@ import {
   setRequest,
   deleteRequest,
   generateRequestId,
-} from '../src/listener';
+} from '../../src/listener';
 
 let TestReqID = 0;
 
