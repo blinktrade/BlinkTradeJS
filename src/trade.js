@@ -75,7 +75,7 @@ class TradeBase {
   }: {
     page?: number,
     pageSize?: number,
-    filter?: Array<string>,
+    filter?: 'open' | 'filled' | 'cancelled' | Array<string>,
   } = {}, callback?: Function): Promise<Object> {
     const msg: Message = {
       MsgType: ActionMsgReq.ORDER_HISTORY,
@@ -85,7 +85,10 @@ class TradeBase {
     };
 
     if (filter) {
-      msg.Filter = filter;
+      msg.Filter = filter === 'open' ? ['has_leaves_qty eq 1']
+                 : filter === 'filled' ? ['has_cum_qty eq 1']
+                 : filter === 'cancelled' ? ['has_cxl_qty eq 1']
+                 : filter;
     }
 
     const format = formatColumns('OrdListGrp', this.level);

@@ -127,7 +127,6 @@ class BlinkTradeWS extends TradeBase {
     password: string,
     secondFactor?: string,
     brokerId?: number,
-    trustedDevice?: boolean,
     cancelOnDisconnect?: boolean,
   }, callback?: Function): Promise<Object> {
     let userAgent;
