@@ -22,7 +22,7 @@
 
 import nodeify from 'nodeify';
 import { ActionMsgReq } from './constants/messages';
-import { formatColumns } from './util/utils';
+import { formatColumns, formatBrokerList } from './util/utils';
 import { generateRequestId } from './listener';
 import { ORDER_TYPE, ORDER_SIDE } from './constants/utils';
 
@@ -304,6 +304,20 @@ class TradeBase {
     };
 
     return nodeify.extend(this.send(msg)).nodeify(callback);
+  }
+
+  requestBrokerList(callback?: Function): Promise<Object> {
+    const msg: Message = {
+      MsgType: ActionMsgReq.BROKER_LIST,
+      BrokerListReqID: generateRequestId(),
+      Page: 0,
+      PageSize: 20,
+      StatusList: ['1'],
+    };
+
+    const format = formatBrokerList(this.level);
+
+    return nodeify.extend(this.send(msg).then(format)).nodeify(callback);
   }
 
   requestLedger({

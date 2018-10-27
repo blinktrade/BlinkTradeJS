@@ -27,6 +27,21 @@ export const formatColumns = (field: string, level: BlinkTradeLevel) => (data: O
   return Promise.resolve(data);
 };
 
+export const formatBrokerList = (level: BlinkTradeLevel) => (data: Object) => {
+  if (level === 2) {
+    const BrokerListGrp = data.BrokerListGrp
+      .map(row => zipColumns(row, data.Columns))
+      .reduce((prev, val) => {
+        prev[val.BrokerID] = val;
+        return prev;
+      }, {});
+
+    return Promise.resolve({ ...data, BrokerListGrp });
+  }
+
+  return Promise.resolve(data);
+};
+
 export const formatTradeHistory = (level: BlinkTradeLevel) => (data: Object) => {
   if (level === 2) {
     const TradeHistoryGrp = data.TradeHistoryGrp
