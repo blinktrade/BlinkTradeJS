@@ -21,7 +21,13 @@ export const MsgActionReq = {
   U30: [actions.DEPOSIT_LIST, reqs.DepositListReqID],
   U32: [actions.TRADE_HISTORY, reqs.TradeHistoryReqID],
   U34: [actions.LEDGER_LIST, reqs.LedgerListReqID],
+  U42: [actions.POSITIONS, reqs.PositionReqID],
   U70: [actions.WITHDRAW_CANCEL, reqs.WithdrawCancelReqID],
+  B0:  [actions.DEPOSIT_PROCESS, reqs.ProcessDepositReqID],
+  B2:  [actions.CUSTOMER_LIST, reqs.CustomerListReqID],
+  B4:  [actions.KYC_REQUEST, reqs.CustomerReqID],
+  B6:  [actions.WITHDRAW_PROCESS, reqs.ProcessWithdrawReqID],
+  B8:  [actions.KYC_VERIFY, reqs.VerifyCustomerReqID],
 };
 
 export const MsgActionRes = {
@@ -45,7 +51,15 @@ export const MsgActionRes = {
   U31: [actions.DEPOSIT_LIST, reqs.DepositListReqID],
   U33: [actions.TRADE_HISTORY, reqs.TradeHistoryReqID],
   U35: [actions.LEDGER_LIST, reqs.LedgerListReqID],
+  U43: [actions.POSITIONS, reqs.PositionReqID],
   U71: [actions.WITHDRAW_CANCEL, reqs.WithdrawCancelReqID],
+  U79: [actions.WITHDRAW_COMMENT, reqs.WithdrawReqID],
+  B1:  [actions.DEPOSIT_PROCESS, reqs.ProcessDepositReqID],
+  B3:  [actions.CUSTOMER_LIST, reqs.CustomerListReqID],
+  B5:  [actions.KYC_REQUEST, reqs.CustomerReqID],
+  B9:  [actions.KYC_VERIFY, reqs.VerifyCustomerReqID],
+  B7:  [actions.WITHDRAW_PROCESS, reqs.ProcessWithdrawReqID],
+  B11: [actions.CUSTOMER_REFRESH, ''],
 };
 
 export const ActionMsgReq = msgToAction(MsgActionReq);

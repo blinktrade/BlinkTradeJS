@@ -37,12 +37,20 @@ export const LOGIN = 'LOGIN';
 export const LOGOUT = 'LOGOUT';
 
 export const BALANCE = 'BALANCE';
+export const POSITIONS = 'POSITIONS';
+
+export const CUSTOMER_LIST = 'CUSTOMER_LIST';
+export const CUSTOMER_REFRESH = 'CUSTOMER_REFRESH';
+
+export const KYC_VERIFY = 'KYC_VERIFY';
+export const KYC_REQUEST = 'KYC_REQUEST';
 
 export const WITHDRAW_LIST = 'WITHDRAW_LIST';
 export const WITHDRAW_CANCEL = 'WITHDRAW_CANCEL';
 export const WITHDRAW_REFRESH = 'WITHDRAW_REFRESH';
 export const WITHDRAW_PROCESS = 'WITHDRAW_PROCESS';
 export const WITHDRAW_CONFIRM = 'WITHDRAW_CONFIRM';
+export const WITHDRAW_COMMENT = 'WITHDRAW_COMMENT';
 export const WITHDRAW_REQUEST = 'WITHDRAW_REQUEST';
 
 export const DEPOSIT_LIST = 'DEPOSIT_LIST';
