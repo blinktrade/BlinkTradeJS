@@ -21,6 +21,7 @@
  */
 
 import sha256 from 'js-sha256';
+import invariant from 'invariant';
 import fetchPonyfill from 'fetch-ponyfill';
 
 import BROKERS from '../constants/brokers';
@@ -84,6 +85,7 @@ class RestTransport extends Transport {
   }
 
   fetchTrade(msg: Message): Promise<Object> {
+    invariant(this.key && this.secret, 'Key or Secret not provided');
     const headers = this.headers('POST', msg);
     return this.fetch('tapi/v1/message', headers)
       .then(response => (response.Status === 500 ? Promise.reject(response) : response.Responses))

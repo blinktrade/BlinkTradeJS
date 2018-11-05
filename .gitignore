@@ -53,3 +53,6 @@ es
 
 flow-typed/
 *.flow
+
+# cli
+bin/blinktrade

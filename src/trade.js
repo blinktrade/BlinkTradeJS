@@ -30,6 +30,7 @@ import type {
   Message,
   OrderSide,
   OrderType,
+  OrderFilter,
   StatusListType,
   BlinkTradeEnv,
   BlinkTradeParams,
@@ -75,7 +76,7 @@ class TradeBase {
   }: {
     page?: number,
     pageSize?: number,
-    filter?: 'open' | 'filled' | 'cancelled' | Array<string>,
+    filter?: OrderFilter,
   } = {}, callback?: Function): Promise<Object> {
     const msg: Message = {
       MsgType: ActionMsgReq.ORDER_HISTORY,
@@ -84,7 +85,7 @@ class TradeBase {
       PageSize,
     };
 
-    if (filter) {
+    if (filter && filter !== 'all') {
       msg.Filter = filter === 'open' ? ['has_leaves_qty eq 1']
                  : filter === 'filled' ? ['has_cum_qty eq 1']
                  : filter === 'cancelled' ? ['has_cxl_qty eq 1']

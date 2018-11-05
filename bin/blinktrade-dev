@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+
+require('@babel/register')({
+  presets: [
+    '@babel/preset-env',
+    '@babel/preset-flow',
+  ],
+});
+require('regenerator-runtime/runtime');
+require('./program').default();

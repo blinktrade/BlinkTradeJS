@@ -8,19 +8,17 @@ import shim from 'rollup-plugin-shim';
 import { uglify } from 'rollup-plugin-uglify';
 
 const env = process.env.NODE_ENV;
+const isCLI = process.argv[process.argv.length - 1] === 'bin/blinktrade';
 const format = (env === 'development' || env === 'production') ? 'umd' : env;
 
 const config = {
-  input: 'src/index.js',
+  input: isCLI ? 'bin/blinktrade.js' : 'src/index.js',
   output: {
     name: 'blinktrade',
     format,
   },
   plugins: [
-    json({
-      include: 'node_modules/**',
-      preferConst: true,
-    }),
+    json({ preferConst: true }),
     flow({ all: true }),
     resolve({
       jsnext: true,
@@ -33,16 +31,12 @@ const config = {
     babel({
       babelrc: false,
       presets: [['@babel/preset-env', { modules: false }]],
-      plugins: [
-        '@babel/plugin-proposal-object-rest-spread',
-        '@babel/plugin-external-helpers',
-      ],
+      plugins: ['@babel/plugin-proposal-object-rest-spread'],
     }),
   ],
 };
 
 if (format === 'umd') {
-  // Remove modules that can't be bundled on the browser
   config.plugins.push(uglify({
     mangle: env === 'production',
     output: {
@@ -54,7 +48,8 @@ if (format === 'umd') {
       unsafe_comps: true,
       warnings: false,
     },
-  }))
+  }));
+  // Remove modules that can't be bundled on the browser
   config.plugins.unshift(shim({
     ws: 'export default {}',
     ip: 'export default {}',
@@ -68,7 +63,7 @@ if (format === 'umd') {
     `,
   }));
 } else {
-  config.external = ['ws'];
+  config.external = ['ws', 'commander', 'inquirer', 'dotenv', '../lib/blinktrade'];
 }
 
 export default config;

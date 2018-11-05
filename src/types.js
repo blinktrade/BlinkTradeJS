@@ -80,6 +80,7 @@ export type StatusListType = '1' | '2' | '4' | '8';
 
 export type OrderSide = 'BUY' | 'SELL' | '1' | '2';
 export type OrderType = 'MARKET' | 'LIMIT' | 'STOP' | 'STOP_LIMIT';
+export type OrderFilter = | Array<string> | 'all' | 'open' | 'filled' | 'cancelled';
 
 export type ResolveReject = {
   resolve: Function,
