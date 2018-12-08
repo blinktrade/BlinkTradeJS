@@ -133,6 +133,7 @@ class TradeBase {
   cancelOrder(param?: number | {
     orderId?: number,
     clientId?: string,
+    side?: OrderSide,
   } = {}, callback?: Function): Promise<Object> {
     const orderId = param.orderId ? param.orderId : param;
     const msg: Message = {
@@ -145,6 +146,10 @@ class TradeBase {
 
     if (param.orderId) {
       msg.OrderID = orderId;
+    }
+
+    if (param.side) {
+      msg.Side = ORDER_SIDE[param.side] || param.side;
     }
 
     return nodeify.extend(this.send(msg)).nodeify(callback);

@@ -1108,11 +1108,11 @@ These methods bellow are both availabe under REST and WebSocket API.
 
 #### Arguments
 
-| Name     | Type   | Description                                                 |
-|----------|--------|-------------------------------------------------------------|
-| orderId  | Number | **Required** Order ID to be canceled                        |
-| clientId | Number | You need to pass the clientId (`ClOrdID`) to get a response |
-
+| Name     | Type   | Description                                                                |
+|----------|--------|----------------------------------------------------------------------------|
+| orderId  | Number | **Required** Order ID to be canceled                                       |
+| clientId | Number | You need to pass the clientId (`ClOrdID`) to get a response                |
+| side     | String | Cancel all orders of the side e.g.: "BUY, "SELL" or "1" = BUY, "2" = SELL  |
 
 ### myOrders [websocket, rest]
 

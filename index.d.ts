@@ -161,6 +161,11 @@ export class BlinkTradeTrade {
      * You need to pass the clientId (ClOrdID) in order to get a response
      */
     clientId?: string;
+
+    /**
+     * Cancell all orders of the side
+     */
+     side?: OrderSide;
   }, callback?: Function): Promise<any>;
 
   /**
