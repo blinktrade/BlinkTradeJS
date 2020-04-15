@@ -108,7 +108,7 @@ class BlinkTradeWS extends TradeBase {
     const d = new Date();
     const msg: Message = {
       MsgType: ActionMsgReq.HEARTBEAT,
-      TestReqID: d.getTime(),
+      TestReqID: generateRequestId(),
       SendTime: d.getTime(),
     };
 
