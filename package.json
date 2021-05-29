@@ -67,7 +67,7 @@
     "js-sha256": "^0.9.0",
     "macaddress-secure": "^0.2.11",
     "nodeify": "^1.0.0",
-    "ws": "^5.1.1"
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
